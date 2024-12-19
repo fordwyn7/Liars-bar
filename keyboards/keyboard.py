@@ -1,17 +1,46 @@
 from aiogram.types import ReplyKeyboardMarkup, KeyboardButton
 
 
-KEYBOAR_NAME = ReplyKeyboardMarkup(
+main_menu = ReplyKeyboardMarkup(
     keyboard=[
         [
-            KeyboardButton(text="TEXT_OF_KEYBOARD"),KeyboardButton(text="TEXT_OF_KEYBOARD"),
+            KeyboardButton(text="start game 🎮"),
         ],
         [
-            KeyboardButton(text="TEXT_OF_KEYBOARD_2"),
+            KeyboardButton(text="settings ⚙️"),
+            KeyboardButton(text="game status 🌟"),
         ],
         [
-            KeyboardButton(text="TEXT_OF_KEYBOARD_3"),KeyboardButton(text="TEXT_OF_KEYBOARD_4"),KeyboardButton(text="TEXT_OF_KEYBOARD_5"),
+            KeyboardButton(text="how to play 📝"),
+            KeyboardButton(text="statistics 📊"),
         ],
     ],
+    resize_keyboard=True,
+)
+
+change_name = ReplyKeyboardMarkup(
+    keyboard=[
+        [
+            KeyboardButton(text="change name 🖌"),
+            KeyboardButton(text="back to main menu 🔙"),
+        ],
+    ],
+    resize_keyboard=True,
+)
+
+count_players = ReplyKeyboardMarkup(
+    keyboard=[
+        [
+            KeyboardButton(text="2️⃣"),
+            KeyboardButton(text="3️⃣"),
+            KeyboardButton(text="4️⃣"),
+        ],
+        [KeyboardButton(text="back to main menu 🔙")],
+    ],
+    resize_keyboard=True,
+)
+
+cancel_button = ReplyKeyboardMarkup(
+    keyboard=[[KeyboardButton(text="back to main menu 🔙")]],
     resize_keyboard=True,
 )
