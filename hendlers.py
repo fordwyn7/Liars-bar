@@ -13,21 +13,17 @@ from db import (
 )
 
 
-@dp.message("/send" in F.text)
+@dp.message(F.text == "/send")
 async def send_message_to(message: types.Message, state:FSMContext):
     if message.from_user.id == 6807731973:
-        global user_id_va
-        user_id_va = message.text.split(" ")[-1]
-        if not user_id_va.isdigit():
-            await message.answer("You have entered wrong information ❗️")
-        else:
-            await message.answer(f"Send the message to user {int(user_id_va)}")
-            await state.set_state(messagetouser.messag)
+        await message.answer(f"Write the ID of user and then the message in SEPARATE line. ")
+        await state.set_state(messagetouser.messag)
     else:
         await message.answer(f"You entered unfamiliar information.")
 @dp.message(messagetouser.messag)
 async def state_send_msg(message: types.Message, state: FSMContext):
-    await bot.send_message(chat_id=int(user_id_va), text=message.text)
+    user_id_va = message.text.split("\n")[0]
+    await bot.send_message(chat_id=int(user_id_va), text=message.text.split("\n")[1])
     await message.answer("Your message has been sent successfully ✅")
 
 @dp.message(F.text == "settings ⚙️")
