@@ -53,10 +53,10 @@ async def set_new_nfgame(message: types.Message, state: FSMContext):
         )
     else:
         user_id = message.from_user.id
-        with sqlite3.connect("users.db") as conn:
+        with sqlite3.connect("users_database.db") as conn:
             cursor = conn.cursor()
             cursor.execute(
-                "UPDATE users SET nfgame = ? WHERE user_id = ?",
+                "UPDATE users_database SET nfgame = ? WHERE user_id = ?",
                 (new_nfgame, user_id),
             )
             conn.commit()

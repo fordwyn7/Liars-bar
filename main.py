@@ -16,11 +16,11 @@ from db import *
 from aiogram.types import Update
 
 
-conn = sqlite3.connect("users.db")
+conn = sqlite3.connect("users_database.db")
 cursor = conn.cursor()
 cursor.execute(
     """
-CREATE TABLE IF NOT EXISTS users (
+CREATE TABLE IF NOT EXISTS users_database (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     user_id INTEGER UNIQUE NOT NULL,
     username TEXT,
@@ -43,8 +43,8 @@ cursor.execute(
         is_started INTEGER,
         current_turn_user_id INTEGER,  
         number_of_cards INTEGER,
-        FOREIGN KEY(inviter_id) REFERENCES users(user_id),
-        FOREIGN KEY(invitee_id) REFERENCES users(user_id)
+        FOREIGN KEY(inviter_id) REFERENCES users_database(user_id),
+        FOREIGN KEY(invitee_id) REFERENCES users_database(user_id)
     )
     """
 )
@@ -224,7 +224,7 @@ async def get_name(message: types.Message, state: FSMContext):
     user = message.from_user
     game_id = str(uuid.uuid4())
     invite_link = await create_start_link(bot, payload=f"game_{game_id}")
-    conn = sqlite3.connect("users.db")
+    conn = sqlite3.connect("users_database.db")
     cursor = conn.cursor()
     cursor.execute(
         """

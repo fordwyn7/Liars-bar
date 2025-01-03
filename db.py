@@ -8,7 +8,7 @@ from keyboards.keyboard import main_menu
 
 
 def connect_db():
-    return sqlite3.connect("users.db")
+    return sqlite3.connect("users_database.db")
 
 
 def register_user(user_id, username, first_name, last_name, preferred_name):
@@ -17,7 +17,7 @@ def register_user(user_id, username, first_name, last_name, preferred_name):
             cursor = conn.cursor()
             cursor.execute(
                 """
-                INSERT OR IGNORE INTO users (user_id, username, first_name, last_name, nfgame, registration_date)
+                INSERT OR IGNORE INTO users_database (user_id, username, first_name, last_name, nfgame, registration_date)
                 VALUES (?, ?, ?, ?, ?, datetime('now'))
                 """,
                 (user_id, username, first_name, last_name, preferred_name),
@@ -31,7 +31,7 @@ def is_user_registered(user_id):
     try:
         with connect_db() as conn:
             cursor = conn.cursor()
-            cursor.execute("SELECT * FROM users WHERE user_id = ?", (user_id,))
+            cursor.execute("SELECT * FROM users_database WHERE user_id = ?", (user_id,))
             user = cursor.fetchone()
         return user
     except sqlite3.Error as e:
@@ -102,7 +102,7 @@ def get_user_nfgame(user_id):
     try:
         with connect_db() as conn:
             cursor = conn.cursor()
-            cursor.execute("SELECT nfgame FROM users WHERE user_id = ?", (user_id,))
+            cursor.execute("SELECT nfgame FROM users_database WHERE user_id = ?", (user_id,))
             result = cursor.fetchone()
         return result[0] if result else None
     except sqlite3.Error as e:
@@ -147,7 +147,7 @@ def delete_user_from_all_games(user_id):
 
 
 def get_all_players_in_game(game_id):
-    with sqlite3.connect("users.db") as conn:
+    with sqlite3.connect("users_database.db") as conn:
         cursor = conn.cursor()
         cursor.execute(
             """
@@ -195,7 +195,7 @@ def get_games_by_user(user_id):
 
 
 def get_game_id_by_user(user_id):
-    with sqlite3.connect("users.db") as conn:
+    with sqlite3.connect("users_database.db") as conn:
         cursor = conn.cursor()
         cursor.execute(
             "SELECT game_id FROM invitations WHERE inviter_id = ?", (user_id,)
@@ -213,9 +213,9 @@ def get_game_id_by_user(user_id):
 
 
 def get_id_by_nfgame(nfgame):
-    with sqlite3.connect("users.db") as conn:
+    with sqlite3.connect("users_database.db") as conn:
         cursor = conn.cursor()
-        cursor.execute("SELECT user_id FROM users WHERE nfgame = ?", (nfgame,))
+        cursor.execute("SELECT user_id FROM users_database WHERE nfgame = ?", (nfgame,))
         result = cursor.fetchone()
         if result:
             return result[0]
@@ -223,7 +223,7 @@ def get_id_by_nfgame(nfgame):
 
 
 def get_needed_players(game_id):
-    with sqlite3.connect("users.db") as conn:
+    with sqlite3.connect("users_database.db") as conn:
         cursor = conn.cursor()
         cursor.execute(
             """
@@ -240,7 +240,7 @@ def get_needed_players(game_id):
 
 def get_game_creator_id(game_id):
     """Fetch the creator's user ID for a specific game."""
-    with sqlite3.connect("users.db") as conn:
+    with sqlite3.connect("users_database.db") as conn:
         cursor = conn.cursor()
         cursor.execute(
             """
@@ -256,7 +256,7 @@ def get_game_creator_id(game_id):
 
 
 async def send_message_to_all_players(game_id, message: str):
-    with sqlite3.connect("users.db") as conn:
+    with sqlite3.connect("users_database.db") as conn:
         cursor = conn.cursor()
         cursor.execute(
             "SELECT invitee_id FROM invitations WHERE game_id = ? AND invitee_id IS NOT NULL",
@@ -277,7 +277,7 @@ async def send_message_to_all_players(game_id, message: str):
 
 
 def set_game_started(game_id):
-    with sqlite3.connect("users.db") as conn:
+    with sqlite3.connect("users_database.db") as conn:
         cursor = conn.cursor()
         cursor.execute(
             "UPDATE invitations SET is_started = 1 WHERE game_id = ?", (game_id,)
@@ -286,7 +286,7 @@ def set_game_started(game_id):
 
 
 def is_game_started(game_id):
-    with sqlite3.connect("users.db") as conn:
+    with sqlite3.connect("users_database.db") as conn:
         cursor = conn.cursor()
         cursor.execute(
             "SELECT is_started FROM invitations WHERE game_id = ?", (game_id,)
@@ -296,7 +296,7 @@ def is_game_started(game_id):
 
 
 def mark_game_as_started(game_id):
-    with sqlite3.connect("users.db") as conn:
+    with sqlite3.connect("users_database.db") as conn:
         cursor = conn.cursor()
         cursor.execute(
             "UPDATE invitations SET is_started = 1 WHERE game_id = ?", (game_id,)
@@ -319,12 +319,12 @@ def is_name_valid(name):
 
 
 def get_all_players_nfgame(game_id):
-    with sqlite3.connect("users.db") as conn:
+    with sqlite3.connect("users_database.db") as conn:
         cursor = conn.cursor()
         cursor.execute(
             """
             SELECT u.nfgame 
-            FROM users u
+            FROM users_database u
             INNER JOIN invitations i ON u.user_id = i.invitee_id
             WHERE i.game_id = ?
         """,
@@ -363,7 +363,7 @@ def set_current_turn(game_id, user_id):
 
 
 def insert_number_of_cards(game_id, number_of_cards):
-    with sqlite3.connect("users.db") as conn:
+    with sqlite3.connect("users_database.db") as conn:
         cursor = conn.cursor()
 
         cursor.execute("PRAGMA table_info(invitations)")
@@ -392,7 +392,7 @@ def insert_number_of_cards(game_id, number_of_cards):
 
 
 def set_current_table(game_id, current_table):
-    with sqlite3.connect("users.db") as conn:
+    with sqlite3.connect("users_database.db") as conn:
         cursor = conn.cursor()
         cursor.execute("PRAGMA table_info(game_state)")
         columns = [row[1] for row in cursor.fetchall()]
@@ -427,7 +427,7 @@ def set_current_table(game_id, current_table):
 
 
 def get_current_table(game_id):
-    with sqlite3.connect("users.db") as conn:
+    with sqlite3.connect("users_database.db") as conn:
         cursor = conn.cursor()
         cursor.execute("PRAGMA table_info(game_state)")
         columns = [row[1] for row in cursor.fetchall()]
@@ -507,7 +507,7 @@ async def periodically_edit_message(
 
 
 def get_number_of_cards(game_id):
-    with sqlite3.connect("users.db") as conn:
+    with sqlite3.connect("users_database.db") as conn:
         cursor = conn.cursor()
         cursor.execute(
             """
@@ -529,7 +529,7 @@ def generate_random_cards(deck):
 
 
 def delete_all_players_cards(game_id):
-    with sqlite3.connect("users.db") as conn:
+    with sqlite3.connect("users_database.db") as conn:
         cursor = conn.cursor()
         cursor.execute(
             """
@@ -566,7 +566,7 @@ def save_player_cards(game_id):
         print("Not enough cards remaining in the deck for all players.")
         return
     player_cards = {player: generate_random_cards(deck) for player in players}
-    with sqlite3.connect("users.db") as conn:
+    with sqlite3.connect("users_database.db") as conn:
         cursor = conn.cursor()
         cursor.execute("PRAGMA table_info(game_state)")
         columns = [row[1] for row in cursor.fetchall()]
@@ -613,7 +613,7 @@ def set_real_bullet_for_player(game_id, player_id):
     random.shuffle(cards)
     real_bullet = cards.index("real")
 
-    with sqlite3.connect("users.db") as conn:
+    with sqlite3.connect("users_database.db") as conn:
         cursor = conn.cursor()
         try:
             cursor.execute("PRAGMA table_info(game_state)")
@@ -691,7 +691,7 @@ def set_real_bullet_for_player(game_id, player_id):
 
 
 def ensure_life_status_column():
-    with sqlite3.connect("users.db") as conn:
+    with sqlite3.connect("users_database.db") as conn:
         cursor = conn.cursor()
         cursor.execute("PRAGMA table_info(game_state)")
         columns = [row[1] for row in cursor.fetchall()]
@@ -708,7 +708,7 @@ def ensure_life_status_column():
 
 def is_player_dead(game_id, player_id):
     ensure_life_status_column()
-    with sqlite3.connect("users.db") as conn:
+    with sqlite3.connect("users_database.db") as conn:
         cursor = conn.cursor()
         cursor.execute(
             """
@@ -725,7 +725,7 @@ def is_player_dead(game_id, player_id):
 
 
 async def shoot_self(game_id, player_id):
-    with sqlite3.connect("users.db") as conn:
+    with sqlite3.connect("users_database.db") as conn:
         cursor = conn.cursor()
         cursor.execute(
             """
@@ -768,7 +768,7 @@ async def shoot_self(game_id, player_id):
 
 
 def get_player_status(game_id, player_id):
-    with sqlite3.connect("users.db") as conn:
+    with sqlite3.connect("users_database.db") as conn:
         cursor = conn.cursor()
         cursor.execute(
             """
@@ -786,9 +786,9 @@ def get_player_status(game_id, player_id):
 
 def get_total_users():
     try:
-        with sqlite3.connect("users.db") as conn:
+        with sqlite3.connect("users_database.db") as conn:
             cursor = conn.cursor()
-            cursor.execute("SELECT COUNT(*) FROM users")
+            cursor.execute("SELECT COUNT(*) FROM users_database")
             total_users = cursor.fetchone()[0]
             return total_users
     except sqlite3.Error as e:

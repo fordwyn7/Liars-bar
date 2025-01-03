@@ -10,7 +10,7 @@ from collections import Counter
 
 
 def get_current_turn_user_id(game_id):
-    with sqlite3.connect("users.db") as conn:
+    with sqlite3.connect("users_database.db") as conn:
         cursor = conn.cursor()
         cursor.execute(
             "SELECT current_turn_user_id FROM invitations WHERE game_id = ?", (game_id,)
@@ -21,7 +21,7 @@ def get_current_turn_user_id(game_id):
 
 
 def get_player_cards(game_id, player_id):
-    with sqlite3.connect("users.db") as conn:
+    with sqlite3.connect("users_database.db") as conn:
         cursor = conn.cursor()
         cursor.execute(
             """
@@ -148,7 +148,7 @@ async def toggle_card_selection(callback_query: types.CallbackQuery):
 
 
 def add_last_cards_column_if_not_exists():
-    with sqlite3.connect("users.db") as conn:
+    with sqlite3.connect("users_database.db") as conn:
         cursor = conn.cursor()
         try:
             cursor.execute(
@@ -163,7 +163,7 @@ def add_last_cards_column_if_not_exists():
 
 
 def insert_or_update_last_cards(game_id, selected_cards):
-    with sqlite3.connect("users.db") as conn:
+    with sqlite3.connect("users_database.db") as conn:
         cursor = conn.cursor()
         cursor.execute(
             """
@@ -195,7 +195,7 @@ def insert_or_update_last_cards(game_id, selected_cards):
 
 
 def get_last_cards(game_id):
-    with sqlite3.connect("users.db") as conn:
+    with sqlite3.connect("users_database.db") as conn:
         cursor = conn.cursor()
         cursor.execute("PRAGMA table_info(game_state)")
         columns = [row[1] for row in cursor.fetchall()]
@@ -240,7 +240,7 @@ async def send_cards(callback_query: types.CallbackQuery):
             chat_id=callback_query.from_user.id,
             text=f"You sent the following cards: {', '.join(selected_cards)} ",
         )
-        with sqlite3.connect("users.db") as conn:
+        with sqlite3.connect("users_database.db") as conn:
             cursor = conn.cursor()
             cursor.execute(
                 """
@@ -537,7 +537,7 @@ def get_next_player_id(game_id, current_player_id):
 
 
 def is_user_turn(user_id, game_id):
-    with sqlite3.connect("users.db") as conn:
+    with sqlite3.connect("users_database.db") as conn:
         cursor = conn.cursor()
         cursor.execute(
             "SELECT current_turn_user_id FROM invitations WHERE game_id = ?",
@@ -548,7 +548,7 @@ def is_user_turn(user_id, game_id):
 
 
 def update_current_turn(game_id):
-    with sqlite3.connect("users.db") as conn:
+    with sqlite3.connect("users_database.db") as conn:
         cursor = conn.cursor()
         players = get_all_players_in_game(game_id)
         cursor.execute(

@@ -112,11 +112,11 @@ async def send_game_start_messages(player_id, ms1, ms2, lent):
 
 
 def generate_exclude_keyboard(game_id):
-    with sqlite3.connect("users.db") as conn:
+    with sqlite3.connect("users_database.db") as conn:
         cursor = conn.cursor()
         cursor.execute(
             """
-            SELECT invitee_id, (SELECT nfgame FROM users WHERE user_id = invitee_id) AS player_name
+            SELECT invitee_id, (SELECT nfgame FROM users_database WHERE user_id = invitee_id) AS player_name
             FROM invitations
             WHERE game_id = ? AND invitee_id IS NOT NULL
             """,
@@ -156,7 +156,7 @@ def generate_exclude_keyboard(game_id):
 @dp.callback_query(lambda c: c.data == "stop_game")
 async def can_game(callback_query: types.CallbackQuery):
     user = callback_query.from_user
-    with sqlite3.connect("users.db") as conn:
+    with sqlite3.connect("users_database.db") as conn:
         cursor = conn.cursor()
         game_id = get_game_id_by_user(user.id)
         if not game_id:
@@ -199,14 +199,14 @@ async def can_game(callback_query: types.CallbackQuery):
 
 
 async def player_quit_game(user_id, game_id, inviter_id):
-    with sqlite3.connect("users.db") as conn:
+    with sqlite3.connect("users_database.db") as conn:
         cursor = conn.cursor()
         cursor.execute(
             "DELETE FROM invitations WHERE invitee_id = ? AND game_id = ?",
             (user_id, game_id),
         )
         conn.commit()
-        cursor.execute("SELECT nfgame FROM users WHERE user_id = ?", (user_id,))
+        cursor.execute("SELECT nfgame FROM users_database WHERE user_id = ?", (user_id,))
         player_name = cursor.fetchone()
 
         if player_name:
@@ -227,7 +227,7 @@ async def handle_quit_game(callback_query: types.CallbackQuery):
         callback_query.from_user.id, callback_query.message.message_id
     )
     user = callback_query.from_user
-    with sqlite3.connect("users.db") as conn:
+    with sqlite3.connect("users_database.db") as conn:
         cursor = conn.cursor()
         game_id = get_game_id_by_user(user.id)
         if not game_id:
@@ -329,7 +329,7 @@ async def exclude_player(callback_query: types.CallbackQuery):
     player_to_remove = int(data[1])
 
     game_id = get_game_id_by_user(user.id)
-    with sqlite3.connect("users.db") as conn:
+    with sqlite3.connect("users_database.db") as conn:
         cursor = conn.cursor()
         cursor.execute(
             "SELECT inviter_id FROM invitations WHERE game_id = ? AND invitee_id IS NULL",
