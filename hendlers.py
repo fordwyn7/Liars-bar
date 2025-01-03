@@ -80,7 +80,7 @@ async def cancel(message: types.Message, state: FSMContext):
 async def cancel(message: types.Message, state: FSMContext):
     await state.clear()
     await message.answer(
-        f"Here are the bot's statistics 📈:\n\nTotal users in the bot 👥: {get_total_users()}\nBot has been active since 12.08.2024 📅\nBot creator 🧑‍💻: @fordwyn",
+        f"Here are the bot's statistics 📈:\n\nTotal users in the bot 👥: {get_total_users()}\nBot has been active since 01.03.2024 📅\nBot creator 🧑‍💻: @fordwyn",
         reply_markup=main_menu,
     )
 

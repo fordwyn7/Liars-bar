@@ -17,7 +17,6 @@ def get_current_turn_user_id(game_id):
         )
         result = cursor.fetchone()
         return result[0] if result else None
-    # return player_cards
 
 
 def get_player_cards(game_id, player_id):
