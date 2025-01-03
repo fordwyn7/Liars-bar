@@ -13,7 +13,7 @@ class RegistrationMiddleware(BaseMiddleware):
         if event.message:
             user_id = event.message.from_user.id
             command = event.message.text.strip().lower() if event.message.text else None
-            if command.find("/start") == 0:
+            if command == "/start" or "?start=game_" in command:
                 return await handler(event, data)
 
         elif event.callback_query:
@@ -21,7 +21,7 @@ class RegistrationMiddleware(BaseMiddleware):
 
         if user_id:
             registered = is_user_registered(user_id)
-            if not registered and current_state != "registration:pref_name":
+            if not registered and current_state != "registration:pref_name" and current_state != "registration_game:pref1_name":
                 if event.message:
                     await event.message.answer("Please register first by sending /start.")
                 elif event.callback_query:
