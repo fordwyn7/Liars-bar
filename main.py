@@ -14,26 +14,7 @@ from states.state import registration, registration_game, new_game
 from keyboards.inline import *
 from db import *
 from aiogram.types import Update
-from aiohttp import web
 
-
-routes = web.RouteTableDef()
-
-@routes.post("/webhook")
-async def webhook_handler(request: web.Request):
-    try:
-        raw_data = await request.json()
-        update = Update(**raw_data)
-        await dp.feed_update(bot=bot, update=update)
-        return web.Response(text="OK")
-    except Exception as e:
-        print(f"Error in webhook handler: {e}")
-        return web.Response(status=500, text="Internal Server Error")
-async def on_startup(app):
-    await bot.set_webhook(WEBHOOK_URL)
-    logging.info(f"Webhook set at {WEBHOOK_URL}")
-async def on_shutdown(app):
-    await bot.delete_webhook()
 
 conn = sqlite3.connect("users.db")
 cursor = conn.cursor()
@@ -295,22 +276,9 @@ async def any_word(msg: types.Message, state: FSMContext):
 
 
 async def main():
-    app = web.Application()
-    app.add_routes(routes)
-    app.on_startup.append(on_startup)
-    app.on_shutdown.append(on_shutdown)
-    logging.basicConfig(level=logging.INFO)
-    logging.info(f"Starting webhook server on port {PORT}")
-    runner = web.AppRunner(app)
-    await runner.setup()
-    site = web.TCPSite(runner, port=PORT)
-    await site.start()
-    await asyncio.Event().wait()
     await bot.delete_webhook(drop_pending_updates=True)
-
+    await dp.start_polling(bot)
 
 if __name__ == "__main__":
-    try:
-        asyncio.run(main())
-    except (KeyboardInterrupt, SystemExit):
-        logging.error("Bot stopped!")
+    logging.basicConfig(level=logging.INFO)
+    asyncio.run(main())

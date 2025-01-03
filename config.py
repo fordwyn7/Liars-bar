@@ -5,10 +5,8 @@ import os
 from dotenv import load_dotenv
 load_dotenv()
 
-bot = Bot(token=os.getenv("BOT_TOKEN"))
+bot = Bot(token="7848961116:AAFJgEs2Gq3xDAQlgCYyz4uSQsX9r3D7vCY")
 dp = Dispatcher(storage=MemoryStorage())
-WEBHOOK_URL = os.getenv("WEBHOOK_URL")
-PORT = int(os.getenv("PORT", 5000)) 
 from middlewares.registered import RegistrationMiddleware
 
 dp.update.middleware(RegistrationMiddleware())
