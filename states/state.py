@@ -14,3 +14,9 @@ class new_game(StatesGroup):
     
 class NewGameState(StatesGroup):
     waiting_for_nfgame = State()
+
+class MessagetoAdmin(StatesGroup):
+    msgt = State()
+    
+class messagetouser(StatesGroup):
+    messag = State()

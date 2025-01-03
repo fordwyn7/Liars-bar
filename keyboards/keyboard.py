@@ -22,6 +22,9 @@ change_name = ReplyKeyboardMarkup(
     keyboard=[
         [
             KeyboardButton(text="change name 🖌"),
+            KeyboardButton(text="❓ help"),
+        ],
+        [
             KeyboardButton(text="back to main menu 🔙"),
         ],
     ],

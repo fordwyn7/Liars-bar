@@ -1,9 +1,9 @@
 import sqlite3
-from config import dp, F
+from config import dp, F, bot
 from aiogram import types
 from aiogram.fsm.context import FSMContext
 from keyboards.keyboard import change_name, main_menu, cancel_button
-from states.state import NewGameState
+from states.state import NewGameState, MessagetoAdmin, messagetouser
 from db import (
     get_user_nfgame,
     is_name_valid,
@@ -13,9 +13,58 @@ from db import (
 )
 
 
+@dp.message("/send" in F.text)
+async def send_message_to(message: types.Message, state:FSMContext):
+    if message.from_user.id == 6807731973:
+        global user_id_va
+        user_id_va = message.text.split(" ")[-1]
+        if not user_id_va.isdigit():
+            await message.answer("You have entered wrong information ❗️")
+        else:
+            await message.answer(f"Send the message to user {int(user_id_va)}")
+            await state.set_state(messagetouser.messag)
+    else:
+        await message.answer(f"You entered unfamiliar information.")
+@dp.message(messagetouser.messag)
+async def state_send_msg(message: types.Message, state: FSMContext):
+    await bot.send_message(chat_id=int(user_id_va), text=message.text)
+    await message.answer("Your message has been sent successfully ✅")
+
 @dp.message(F.text == "settings ⚙️")
 async def settings(message: types.Message):
     await message.answer(f"Choose one of these options: ⬇️", reply_markup=change_name)
+
+
+@dp.message(F.text == "❓ help")
+async def help_butn(message: types.Message, state: FSMContext):
+    await message.answer(
+        "If you have any questions or suggestions, feel free to write here. An admin will respond as soon as possible. ⬇️",
+        reply_markup=cancel_button,
+    )
+
+    await state.set_state(MessagetoAdmin.msgt)
+
+
+@dp.message(MessagetoAdmin.msgt)
+async def help_button_state(message: types.Message, state: FSMContext):
+    if message.text != "back to main menu 🔙":
+        await bot.send_message(
+            chat_id=6807731973,
+            text=f"User — {message.from_user.first_name} (<a href='tg://openmessage?user_id={message.from_user.id}'>{message.from_user.id}</a>) sent you message: \n{message.text}",
+            parse_mode="HTML",
+        )
+        await message.answer(
+            "Your message has been sent successfully ✅",
+            reply_markup=main_menu,
+        )
+
+        await state.clear()
+    else:
+        await state.clear()
+        await message.answer(
+            f"You are in main menu 👇",
+            reply_markup=main_menu,
+        )
 
 
 @dp.message(F.text == "change name 🖌")
@@ -80,7 +129,7 @@ async def cancel(message: types.Message, state: FSMContext):
 async def cancel(message: types.Message, state: FSMContext):
     await state.clear()
     await message.answer(
-        f"Here are the bot's statistics 📈:\n\nTotal users in the bot 👥: {get_total_users()}\nBot has been active since 01.03.2024 📅\nBot creator 🧑‍💻: @fordwyn",
+        f"Here are the bot's statistics 📈:\n\nTotal users in the bot 👥: {get_total_users()}\nBot has been active since 01.03.2024 📅",
         reply_markup=main_menu,
     )
 
