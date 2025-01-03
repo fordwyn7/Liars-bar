@@ -75,9 +75,7 @@ async def cmd_start(message: types.Message, state: FSMContext):
     await state.clear()
     payload = message.text.split(" ", 1)[-1] if " " in message.text else ""
     await state.update_data(payload=payload)
-    if payload.startswith("game_"):
-        current_state = await state.get_state() if state else None
-
+    if "game_" in payload:
         if not is_user_registered(message.from_user.id):
             await message.answer("Welcome to the bot! Please enter your name:")
             await state.set_state(registration_game.pref1_name)

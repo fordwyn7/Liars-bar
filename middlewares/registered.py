@@ -13,7 +13,7 @@ class RegistrationMiddleware(BaseMiddleware):
         if event.message:
             user_id = event.message.from_user.id
             command = event.message.text.strip().lower() if event.message.text else None
-            if command == "/start" or "?start=game_" in command:
+            if "/start" in command:
                 return await handler(event, data)
 
         elif event.callback_query:
