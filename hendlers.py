@@ -88,13 +88,9 @@ async def set_new_nfgame(message: types.Message, state: FSMContext):
         await message.answer(f"You are in main menu ⬇️", reply_markup=main_menu)
         return
     h = is_name_valid(new_nfgame)
-    if h == 2:
+    if h == 1:
         await message.answer(
-            f"Your data is incorrect! Please try again.\nThe name must contain only uppercase and lowercase letters of the Latin alphabet."
-        )
-    elif h == 1:
-        await message.answer(
-            f"Your data is incorrect! Please try again.\nThe length of the name must not exceed 20 characters."
+            f"The length of the name must not exceed 30 characters."
         )
     else:
         user_id = message.from_user.id

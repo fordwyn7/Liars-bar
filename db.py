@@ -305,17 +305,10 @@ def mark_game_as_started(game_id):
 
 
 def is_name_valid(name):
-    k = 0
-    for i in name:
-        if ord("a") <= ord(i) <= ord("z") or ord("A") <= ord(i) <= ord("Z") or i == " ":
-            k += 1
-    if k == len(name):
-        if k < 21:
-            return 0
-        else:
-            return 1
+    if len(name) < 31:
+        return 0
     else:
-        return 2
+        return 1
 
 
 def get_all_players_nfgame(game_id):
