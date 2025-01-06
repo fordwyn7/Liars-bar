@@ -118,40 +118,41 @@ async def cancel(message: types.Message, state: FSMContext):
 
 
 @dp.message(F.text == "statistics 📊")
-async def cancel(message: types.Message, state: FSMContext):
+async def statistics_a(message: types.Message, state: FSMContext):
     await state.clear()
     await message.answer(
         f"Here are the bot's statistics 📈:\n\nTotal users in the bot 👥: {get_total_users()}\nBot has been active since 01.03.2024 📅",
         reply_markup=main_menu,
     )
 
-
 @dp.message(F.text == "how to play 📝")
-async def cancel(message: types.Message, state: FSMContext):
+async def how_to_play(message: types.Message, state: FSMContext):
     await state.clear()
     await message.answer(
-        "📔 Game Rules 📔\n\n"
-        "🔴 Each game requires at least 2️⃣ players (up to 4️⃣).\n"
-        "🔴 Each player receives 5️⃣ cards randomly at the start of the game.\n"
-        "🔴 At the beginning of the game, there will be information about the total cards and the table card.\n"
-        "  ⚫️ Table card: This is the card that all players must match.\n\n"
-        "🔴 The first turn will be chosen randomly by the bot. After that, the remaining players take turns in order.\n\n"
-        "Card Details:\n"
-        "⚪️ Each game includes 2️⃣ universal cards 🎴 and a Joker card 🃏.\n"
-        "⚪️ A universal card can be used in place of the current table card.\n\n"
-        "Gameplay:\n"
-        "1. On your turn, you can send up to 3️⃣ cards at once.\n"
-        "2. The next player will receive a message indicating how many cards you sent.\n"
-        "3. They can choose to press the Liar button.\n\n"
-        "   ⚫️ If the Liar button is pressed, the cards you sent will be revealed.\n"
-        "     ⚫️ If there is at least one card that doesn't match either the universal card or the table card, you will be declared a liar and must shoot yourself.\n"
-        "     ⚫️ However, if all your cards are correct, the player who pressed the Liar button will shoot themselves instead.\n\n"
-        "Special Case:\n"
-        "🔵 Joker Card 🃏:\n"
-        "  ⚫️ If the Joker card is sent alone and the next player opens it, all players will shoot themselves except for the player who sent the Joker.\n\n"
-        "Additional Rules:\n"
-        "🔵 If you have no cards left, you will skip your turn until you receive new cards.\n"
-        "🔵 Each time the Liar button is pressed, all cards will be redistributed.\n"
-        "🔵 There are 6 bullets in your gun, but only 1 is real—the others are blanks, and no one knows which bullet is real.\n\n"
-        "The game continues until only one player remains."
+        "📔 Simple Game Rules with Card Suits 📔\n\n"
+        "🔴 Players:\n"
+        "You need 2 to 4 players.\n"
+        "Each player starts with 5 cards.\n\n"
+        "🔴 How to Play:\n"
+        "At the start of the game, one card is placed on the table. This is the Table Card.\n\n"
+        "The suit of this card (like Hearts ❤️, Diamonds ♦️, Clubs ♣️, or Spades ♠️) is what matters.\n"
+        "On your turn, you can play 1, 2, or 3 cards from your hand.\n\n"
+        "Your all cards must match the same suit as the Table Card.\n"
+        "If you don’t have matching cards, you can use a Universal Card 🎴, which matches any suit.\n"
+        "After you play, the next player has two choices:\n\n"
+        "1️⃣ Continue: They accept your move and take their turn.\n"
+        "2️⃣ Press LIAR: They check your cards to see if they match the suit.\n\n"
+        "🔴 What Happens if Someone Presses LIAR?\n"
+        "If your cards don’t match the suit, you’re a Liar and must “shoot yourself.”\n"
+        "If your cards do match, the person who pressed LIAR shoots themselves instead!\n\n"
+        "🔴 Special Cards:\n"
+        "🎴 Universal Card: Matches any suit—it’s always correct.\n"
+        "🃏 Joker Card:\n"
+        "If you play this card alone and someone opens it, everyone except you “shoots themselves”!\n\n"
+        "🔵 Other Rules:\n"
+        "If you run out of cards, you skip your turn until you get new ones.\n"
+        "Every time LIAR is pressed, all cards are reshuffled and dealt again.\n"
+        "The gun has 6 bullets, but only 1 is real—no one knows which!\n\n"
+        "🔴 Winning the Game:\n"
+        "The game ends when only one player is left standing."
     )
