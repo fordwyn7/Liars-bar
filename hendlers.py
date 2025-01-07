@@ -22,11 +22,14 @@ async def send_message_to(message: types.Message, state:FSMContext):
         await message.answer(f"You entered unfamiliar information.")
 @dp.message(messagetouser.messag)
 async def state_send_msg(message: types.Message, state: FSMContext):
-    user_id_va = message.text.split("\n")[0]
-    await bot.send_message(chat_id=int(user_id_va), text=message.text.split("\n")[1])
-    await message.answer("Your message has been sent successfully ✅")
-    await state.clear()
-
+    try: 
+        user_id_va = message.text.split("\n")[0]
+        await bot.send_message(chat_id=int(user_id_va), text=message.text.split("\n")[1])
+        await message.answer("Your message has been sent successfully ✅")
+        await state.clear()
+    except: 
+        await message.answer(f"You entered wrong information. Try again later")
+        await state.clear()
 @dp.message(F.text == "settings ⚙️")
 async def settings(message: types.Message):
     await message.answer(f"Choose one of these options: ⬇️", reply_markup=change_name)
