@@ -733,7 +733,6 @@ async def shoot_self(game_id, player_id):
             return None
 
         real_bullet_position, blanks_count = result
-        print(result)
         if int(blanks_count) == int(real_bullet_position):
             cursor.execute(
                 """

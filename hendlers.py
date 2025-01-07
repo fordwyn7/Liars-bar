@@ -25,6 +25,7 @@ async def state_send_msg(message: types.Message, state: FSMContext):
     user_id_va = message.text.split("\n")[0]
     await bot.send_message(chat_id=int(user_id_va), text=message.text.split("\n")[1])
     await message.answer("Your message has been sent successfully ✅")
+    await state.clear()
 
 @dp.message(F.text == "settings ⚙️")
 async def settings(message: types.Message):

@@ -359,7 +359,14 @@ async def handle_continue_or_liar(callback_query: types.CallbackQuery):
                         game_id,
                         f"Player {get_user_nfgame(player)} shot himself and is dead by the real bullet!!!",
                     )
-
+                    winner = get_alive_number(game_id)
+                    if winner != 0:
+                        await bot.send_message(
+                            chat_id=player,
+                            text=f"Game has finished. \nWinner is {get_user_nfgame(winner)}\nYou lose in this game.",
+                            reply_markup=main_menu,
+                        )
+                        
                 else:
                     await send_message_to_all_players(
                         game_id,
