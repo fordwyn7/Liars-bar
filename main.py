@@ -18,6 +18,7 @@ from aiogram.types import Update
 
 conn = sqlite3.connect("users_database.db")
 cursor = conn.cursor()
+
 cursor.execute(
     """
 CREATE TABLE IF NOT EXISTS users_database (
@@ -31,13 +32,14 @@ CREATE TABLE IF NOT EXISTS users_database (
 )
 """
 )
+
 cursor.execute(
     """
 CREATE TABLE IF NOT EXISTS users_game_states (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     user_id INTEGER UNIQUE NOT NULL,
     game_id_user TEXT,
-    messages_ingame TEXT,
+    messages_ingame TEXT
 )
 """
 )
