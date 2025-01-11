@@ -102,7 +102,9 @@ def get_user_nfgame(user_id):
     try:
         with connect_db() as conn:
             cursor = conn.cursor()
-            cursor.execute("SELECT nfgame FROM users_database WHERE user_id = ?", (user_id,))
+            cursor.execute(
+                "SELECT nfgame FROM users_database WHERE user_id = ?", (user_id,)
+            )
             result = cursor.fetchone()
         return result[0] if result else None
     except sqlite3.Error as e:
@@ -271,7 +273,8 @@ async def send_message_to_all_players(game_id, message: str):
             if not player_id:
                 continue
             try:
-                await bot.send_message(player_id, message)
+                msg = await bot.send_message(player_id, message)
+                await save_message(player_id, game_id, msg.message_id)
             except Exception as e:
                 print(f"Failed to send message to player {player_id}: {e}")
 
@@ -786,3 +789,65 @@ def get_total_users():
     except sqlite3.Error as e:
         print(f"SQLite error: {e}")
         return 0
+
+
+async def save_message(user_id, game_id, message_id):
+    conn = sqlite3.connect("users_database.db")
+    cursor = conn.cursor()
+    try:
+        cursor.execute(
+            """
+            INSERT INTO users_game_states (user_id, game_id_user, messages_ingame)
+            VALUES (?, ?, ?)
+            ON CONFLICT(user_id)
+            DO UPDATE SET
+                game_id_user = excluded.game_id_user,
+                messages_ingame = COALESCE(
+                    (SELECT messages_ingame FROM users_game_states WHERE user_id = excluded.user_id) || ',' || excluded.messages_ingame,
+                    excluded.messages_ingame
+                )
+            """,
+            (user_id, game_id, message_id),
+        )
+        conn.commit()
+    except sqlite3.Error as e:
+        print(f"Database error: {e}")
+
+
+async def delete_all_game_messages(game_id):
+    conn = sqlite3.connect("users_database.db")
+    cursor = conn.cursor()
+    cursor.execute(
+        "SELECT user_id, messages_ingame FROM users_game_states WHERE game_id_user = ?",
+        (game_id,),
+    )
+    rows = cursor.fetchall()
+
+    for row in rows:
+        user_id = row[0]
+        message_ids = row[1].split(",")
+        for message_id in message_ids:
+            try:
+                await bot.delete_message(chat_id=user_id, message_id=int(message_id))
+            except Exception as e:
+                print(f"Error deleting message {message_id} for user {user_id}: {e}")
+    conn.commit()
+
+async def delete_user_messages(game_id, user_id):
+    conn = sqlite3.connect("users_database.db")
+    cursor = conn.cursor()
+    cursor.execute(
+        "SELECT messages_ingame FROM users_game_states WHERE game_id_user = ? AND user_id = ?",
+        (game_id, user_id)
+    )
+    row = cursor.fetchone()
+    if row:
+        message_ids = row[0].split(',')
+        for message_id in message_ids:
+            try:
+                await bot.delete_message(chat_id=user_id, message_id=int(message_id))
+            except Exception as e:
+                print(f"Error deleting message {message_id} for user {user_id}: {e}")
+        conn.commit()
+    else:
+        print(f"No messages found for user {user_id} in game {game_id}")

@@ -196,6 +196,7 @@ async def can_game(callback_query: types.CallbackQuery):
             "You have canceled the game. All players have been notified.",
             reply_markup=main_menu,
         )
+        await delete_all_game_messages(game_id)
 
 
 async def player_quit_game(user_id, game_id, inviter_id):
@@ -216,7 +217,7 @@ async def player_quit_game(user_id, game_id, inviter_id):
                     inviter_id,
                     f"Player {player_name} has quit the game.\nPlayers left in the game: {get_player_count(game_id)}",
                 )
-                
+                await delete_user_messages(game_id, user_id)
             except Exception as e:
                 print(f"Error sending message to creator {inviter_id}: {e}")
 
@@ -249,10 +250,10 @@ async def handle_quit_game(callback_query: types.CallbackQuery):
             await callback_query.message.answer(
                 f"You have quit the current game.", reply_markup=main_menu
             )
+            await delete_user_messages(game_id, user.id)
             delete_user_from_all_games(user.id)
         else:
             await callback_query.message.answer("You have already quit the game.")
-
 
 stop_incomplete_games = InlineKeyboardMarkup(
     inline_keyboard=[
@@ -313,8 +314,8 @@ async def handle_stop_incomplete_games(callback_query: types.CallbackQuery):
         "Your incomplete games have been stopped.",
         reply_markup=main_menu,
     )
+    await delete_user_messages(game["game_id"], callback_query.from_user.id)
     await callback_query.answer()
-
 
 @dp.callback_query(lambda c: c.data.startswith("exclude_player:"))
 async def exclude_player(callback_query: types.CallbackQuery):
@@ -345,13 +346,13 @@ async def exclude_player(callback_query: types.CallbackQuery):
             (player_to_remove, game_id),
         )
         conn.commit()
-
     try:
         await bot.send_message(
             player_to_remove,
             "Game has finished or been stopped by the creator.",
             reply_markup=main_menu,
         )
+        await delete_user_messages(game_id, player_to_remove)
     except Exception as e:
         print(f"Failed to send message to player {player_to_remove}: {e}")
 

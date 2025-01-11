@@ -33,6 +33,16 @@ CREATE TABLE IF NOT EXISTS users_database (
 )
 cursor.execute(
     """
+CREATE TABLE IF NOT EXISTS users_game_states (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id INTEGER UNIQUE NOT NULL,
+    game_id_user TEXT,
+    messages_ingame TEXT,
+)
+"""
+)
+cursor.execute(
+    """
     CREATE TABLE IF NOT EXISTS invitations (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         inviter_id INTEGER,
@@ -85,7 +95,6 @@ async def cmd_start(message: types.Message, state: FSMContext):
             await message.answer(
                 f"Game has already finished or been stopped. ☹️", reply_markup=main_menu
             )
-
             return
         if game_id == get_game_id_by_user(message.from_user.id):
             if message.from_user.id == get_game_inviter_id(game_id):
@@ -276,6 +285,7 @@ async def any_word(msg: types.Message, state: FSMContext):
 async def main():
     await bot.delete_webhook(drop_pending_updates=True)
     await dp.start_polling(bot)
+
 
 if __name__ == "__main__":
     logging.basicConfig(level=logging.INFO)

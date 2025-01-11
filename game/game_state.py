@@ -44,10 +44,10 @@ async def send_random_cards_to_players(game_id):
     for i in players:
         if is_player_dead(game_id, i):
             players.remove(i)
-            await bot.send_message(
-                chat_id=i,
-                text="You are dead. But you can still watch the game or quit.",
-            )
+            # await bot.send_message(
+            #     chat_id=i,
+            #     text="You are dead. But you can still watch the game or quit.",
+            # )
 
     current_turn_user_id = None
     if is_game_started(game_id):
@@ -85,14 +85,16 @@ async def send_random_cards_to_players(game_id):
             + ([[addition_keyboard]] if is_turn else [])
         )
         if is_player_dead(game_id, player_id):
-            await bot.send_message(
+            message = await bot.send_message(
                 chat_id=i,
                 text="You are dead. But you can still watch the game or quit.",
             )
+            message_id = message.message_id
+            await save_message(player_id, game_id, message_id)
             continue
         else:
             await asyncio.sleep(2)
-            await bot.send_message(
+            message = await bot.send_message(
                 chat_id=player_id,
                 text=(
                     f"Now it's your turn 🫵 \nCurrent table: {get_current_table(game_id)} \nHere are your cards: "
@@ -101,6 +103,8 @@ async def send_random_cards_to_players(game_id):
                 ),
                 reply_markup=keyboard,
             )
+            message_id = message.message_id
+            await save_message(player_id, game_id, message_id)
 
 
 selected_cards_count = {}
@@ -274,10 +278,12 @@ async def send_cards(callback_query: types.CallbackQuery):
         update_current_turn(game_id)
 
     else:
-        await bot.send_message(
+        message = await bot.send_message(
             chat_id=callback_query.from_user.id,
             text="No cards selected! Please choose cards first.",
         )
+        message_id = message.message_id
+        await save_message(callback_query.from_user.id, game_id, message_id)
         return
 
     players = get_all_players_in_game(game_id)
@@ -288,20 +294,24 @@ async def send_cards(callback_query: types.CallbackQuery):
         if not p_id:
             continue
         if p_id != user_id:
-            await bot.send_message(
+            message = await bot.send_message(
                 chat_id=p_id,
                 text=(
                     f"Player {get_user_nfgame(user_id)} sent {len(selected_cards)} cards."
                 ),
             )
+            message_id = message.message_id
+            await save_message(p_id, game_id, message_id)
     for p_id in players:
         if not p_id:
             continue
         if p_id != get_next_player_id(game_id, user_id):
-            await bot.send_message(
+            message = await bot.send_message(
                 chat_id=p_id,
                 text=f"Now {get_user_nfgame(get_next_player_id(game_id, user_id))}'s turn. Please wait until your turn.",
             )
+            message_id = message.message_id
+            await save_message(p_id, game_id, message_id)
     next_player_id = get_next_player_id(game_id, user_id)
     keyboard = InlineKeyboardMarkup(
         inline_keyboard=[
@@ -312,11 +322,13 @@ async def send_cards(callback_query: types.CallbackQuery):
         ]
     )
 
-    await bot.send_message(
+    message = await bot.send_message(
         chat_id=next_player_id,
         text=f"{get_user_nfgame(user_id)} made his turn.",
         reply_markup=keyboard,
     )
+    message_id = message.message_id
+    await save_message(next_player_id, game_id, message_id)
 
 
 @dp.callback_query(lambda c: c.data in ["continue_game", "liar_game"])
@@ -341,23 +353,27 @@ async def handle_continue_or_liar(callback_query: types.CallbackQuery):
         if all_shoot:
             players = get_all_players_in_game(game_id)
             players.remove(previous_player_id)
-            await bot.send_message(
+            message = await bot.send_message(
                 chat_id=previous_player_id,
                 text=f"Player {get_user_nfgame(user_id)} opened the last sent cards and it was a Joker(🃏) card, so all players will shoot themselves.",
             )
+            message_id = message.message_id
+            await save_message(previous_player_id, game_id, message_id)
 
             for player in players:
                 bull = await shoot_self(game_id, player)
-                await bot.send_message(
+                message = await bot.send_message(
                     chat_id=player,
                     text=f"Player {get_user_nfgame(user_id)} opened the last sent cards and it was a Joker(🃏) card, so you all must shoot yourself.",
                 )
+                message_id = message.message_id
+                await save_message(player, game_id, message_id)
 
                 await asyncio.sleep(3)
                 if type(bull) == type(True):
                     await send_message_to_all_players(
                         game_id,
-                        f"Player {get_user_nfgame(player)} shot himself and is dead by the real bullet!!!",
+                        f"Player {get_user_nfgame(player)} shot himself and is dead by the real bullet 😵",
                     )
                     winner = get_alive_number(game_id)
                     if winner != 0:
@@ -366,7 +382,7 @@ async def handle_continue_or_liar(callback_query: types.CallbackQuery):
                             text=f"Game has finished. \nWinner is {get_user_nfgame(winner)}\nYou lose in this game.",
                             reply_markup=main_menu,
                         )
-                        
+
                 else:
                     await send_message_to_all_players(
                         game_id,
@@ -447,12 +463,14 @@ async def handle_continue_or_liar(callback_query: types.CallbackQuery):
                 reply_markup=main_menu,
             )
             delete_game(game_id)
+            await delete_all_game_messages(game_id)
             return
         ms = f"Game has restarted! You all receive full cards again. Now {get_user_nfgame(get_current_turn_user_id(game_id))}'s turn."
         players = get_all_players_in_game(game_id)
         for play in players:
             if not is_player_dead(game_id, play):
-                await bot.send_message(chat_id=play, text=ms)
+                mss = await bot.send_message(chat_id=play, text=ms)
+                await save_message(play, game_id, mss.message_id)
         await reset_game_for_all_players(game_id)
     elif callback_query.data == "continue_game":
 
@@ -466,14 +484,16 @@ async def handle_continue_or_liar(callback_query: types.CallbackQuery):
             pls = get_all_players_in_game(game_id)
             for i in pls:
                 if i and i != user_id:
-                    await bot.send_message(
+                    mss = await bot.send_message(
                         chat_id=i,
                         text=f"Player {get_user_nfgame(user_id)} has no other cards so he skips his turn.",
                     )
-                    await bot.send_message(
+                    await save_message(i, game_id, mss.message_id)
+                    mss2 = await bot.send_message(
                         chat_id=user_id,
                         text=f"You have no other cards. You skipped your turn. ",
                     )
+                    await save_message(user_id, game_id, mss2.message_id)
                     update_current_turn(game_id)
             rm = get_player_cards(game_id, get_current_turn_user_id(game_id))
             user_id = get_current_turn_user_id(game_id)
@@ -484,7 +504,8 @@ async def handle_continue_or_liar(callback_query: types.CallbackQuery):
             players = get_all_players_in_game(game_id)
             for play in players:
                 if not is_player_dead(game_id, play):
-                    await bot.send_message(chat_id=play, text=ms)
+                    mss = await bot.send_message(chat_id=play, text=ms)
+                    await save_message(play, game_id, mss.message_id)
             await reset_game_for_all_players(game_id)
             return
         rm = rm[0]
@@ -507,11 +528,12 @@ async def handle_continue_or_liar(callback_query: types.CallbackQuery):
             ]
             + ([[addition_keyboard]])
         )
-        await bot.send_message(
+        mss = await bot.send_message(
             chat_id=user_id,
             text=f"Here are your remaining cards. \nCurrent table: {get_current_table(game_id)}",
             reply_markup=keyboard,
         )
+        await save_message(user_id, game_id, mss.message_id)
 
     await callback_query.answer()
 
@@ -599,7 +621,7 @@ async def send_cards_update_to_players(game_id, player_id, num_cards_sent):
     if not cre_id in players:
         players.append(cre_id)
     for p_id in players:
-        await bot.send_message(
+        mss = await bot.send_message(
             chat_id=p_id,
             text=(
                 f"Player {player_id} sent {num_cards_sent} cards."
@@ -607,3 +629,5 @@ async def send_cards_update_to_players(game_id, player_id, num_cards_sent):
                 else "You sent your cards!"
             ),
         )
+        await save_message(p_id, game_id, mss.message_id)
+        
