@@ -239,10 +239,11 @@ async def send_cards(callback_query: types.CallbackQuery):
         await bot.delete_message(
             callback_query.from_user.id, callback_query.message.message_id
         )
-        await bot.send_message(
+        mss = await bot.send_message(
             chat_id=callback_query.from_user.id,
             text=f"You sent the following cards: {', '.join(selected_cards)} ",
         )
+        await save_message(callback_query.from_user.id, game_id, mss.message_id)
         with sqlite3.connect("users_database.db") as conn:
             cursor = conn.cursor()
             cursor.execute(
@@ -410,7 +411,8 @@ async def handle_continue_or_liar(callback_query: types.CallbackQuery):
             players = get_all_players_in_game(game_id)
             for play in players:
                 if not is_player_dead(game_id, play):
-                    await bot.send_message(chat_id=play, text=ms)
+                    msss = await bot.send_message(chat_id=play, text=ms)
+                    await save_message(play, game_id, msss.message_id)
             await reset_game_for_all_players(game_id)
             return
         if not liar_bool:
