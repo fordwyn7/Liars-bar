@@ -632,4 +632,3 @@ async def send_cards_update_to_players(game_id, player_id, num_cards_sent):
             ),
         )
         await save_message(p_id, game_id, mss.message_id)
-        

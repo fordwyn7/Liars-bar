@@ -77,11 +77,6 @@ cursor.execute(
         )
     """
 )
-cursor.execute(
-    """
-    ALTER TABLE users_database ADD COLUMN language TEXT DEFAULT NULL
-    """
-)
 
 conn.commit()
 conn.close()
@@ -297,5 +292,4 @@ async def main():
 
 if __name__ == "__main__":
     logging.basicConfig(level=logging.INFO)
-    set_default_language_to_english()
     asyncio.run(main())

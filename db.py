@@ -833,16 +833,17 @@ async def delete_all_game_messages(game_id):
                 print(f"Error deleting message {message_id} for user {user_id}: {e}")
     conn.commit()
 
+
 async def delete_user_messages(game_id, user_id):
     conn = sqlite3.connect("users_database.db")
     cursor = conn.cursor()
     cursor.execute(
         "SELECT messages_ingame FROM users_game_states WHERE game_id_user = ? AND user_id = ?",
-        (game_id, user_id)
+        (game_id, user_id),
     )
     row = cursor.fetchone()
     if row:
-        message_ids = row[0].split(',')
+        message_ids = row[0].split(",")
         for message_id in message_ids:
             try:
                 await bot.delete_message(chat_id=user_id, message_id=int(message_id))
@@ -851,11 +852,11 @@ async def delete_user_messages(game_id, user_id):
         conn.commit()
     else:
         print(f"No messages found for user {user_id} in game {game_id}")
+
+
 def set_default_language_to_english():
     conn = sqlite3.connect("users_database.db")
     cursor = conn.cursor()
-    cursor.execute(
-        "UPDATE users_database SET language = 'en' WHERE language IS NULL"
-    )
+    cursor.execute("UPDATE users_database SET language = 'en' WHERE language IS NULL")
     conn.commit()
     conn.close()
