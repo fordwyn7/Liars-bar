@@ -77,6 +77,11 @@ cursor.execute(
         )
     """
 )
+cursor.execute(
+    """
+    ALTER TABLE users_database ADD COLUMN language TEXT DEFAULT NULL
+    """
+)
 
 conn.commit()
 conn.close()
@@ -85,6 +90,7 @@ conn.close()
 @dp.message(Command("start"))
 async def cmd_start(message: types.Message, state: FSMContext):
     await state.clear()
+    
     payload = message.text.split(" ", 1)[-1] if " " in message.text else ""
     await state.update_data(payload=payload)
     if "game_" in payload:
@@ -291,4 +297,5 @@ async def main():
 
 if __name__ == "__main__":
     logging.basicConfig(level=logging.INFO)
+    set_default_language_to_english()
     asyncio.run(main())

@@ -851,3 +851,11 @@ async def delete_user_messages(game_id, user_id):
         conn.commit()
     else:
         print(f"No messages found for user {user_id} in game {game_id}")
+def set_default_language_to_english():
+    conn = sqlite3.connect("users_database.db")
+    cursor = conn.cursor()
+    cursor.execute(
+        "UPDATE users_database SET language = 'en' WHERE language IS NULL"
+    )
+    conn.commit()
+    conn.close()

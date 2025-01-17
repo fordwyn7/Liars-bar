@@ -360,3 +360,11 @@ async def exclude_player(callback_query: types.CallbackQuery):
         f"Player excluded successfully. Remaining players: {get_player_count(game_id)}",
         reply_markup=generate_exclude_keyboard(game_id),
     )
+
+def language_selection_keyboard():
+    keyboard = InlineKeyboardMarkup(inline_keyboard=[
+        [InlineKeyboardButton(text="English 🇺🇸", callback_data="lang_en")],
+        [InlineKeyboardButton(text="Русский 🇷🇺", callback_data="lang_ru")],
+        [InlineKeyboardButton(text="Uzbek 🇺🇿", callback_data="lang_uz")],
+    ])
+    return keyboard
