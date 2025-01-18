@@ -364,9 +364,9 @@ async def list_users(message: types.Message):
 async def paginate_users(callback_query: types.CallbackQuery):
     page = int(callback_query.data.split("_")[1])
     try:
-        with sqlite3.connect("users.db") as conn:
+        with sqlite3.connect("users_database.db") as conn:
             cursor = conn.cursor()
-            cursor.execute("SELECT user_id, phone FROM users")
+            cursor.execute("SELECT user_id, nfgame FROM users_database")
             users = cursor.fetchall()
     except sqlite3.Error as e:
         print(e)

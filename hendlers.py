@@ -14,6 +14,7 @@ from db import (
     get_total_users,
 )
 
+
 @dp.message(F.text == "settings ⚙️")
 async def settings(message: types.Message):
     await message.answer(f"Choose one of these options: ⬇️", reply_markup=change_name)
@@ -73,13 +74,13 @@ async def set_new_nfgame(message: types.Message, state: FSMContext):
         return
     if new_nfgame == "back to main menu 🔙":
         await state.clear()
-        await message.answer(f"You are in main menu ⬇️", reply_markup=get_main_menu(message.from_user.id))
+        await message.answer(
+            f"You are in main menu ⬇️", reply_markup=get_main_menu(message.from_user.id)
+        )
         return
     h = is_name_valid(new_nfgame)
     if h == 1:
-        await message.answer(
-            f"The length of the name must not exceed 30 characters."
-        )
+        await message.answer(f"The length of the name must not exceed 30 characters.")
     else:
         user_id = message.from_user.id
         with sqlite3.connect("users_database.db") as conn:
@@ -101,7 +102,8 @@ async def set_new_nfgame(message: types.Message, state: FSMContext):
 async def cancel(message: types.Message, state: FSMContext):
     await state.clear()
     await message.answer(
-        f"You have canceled changing the name.", reply_markup=get_main_menu(message.from_user.id)
+        f"You have canceled changing the name.",
+        reply_markup=get_main_menu(message.from_user.id),
     )
 
 
@@ -112,6 +114,7 @@ async def statistics_a(message: types.Message, state: FSMContext):
         f"Here are the bot's statistics 📈:\n\nTotal users in the bot 👥: {get_total_users()}\nBot has been active since 01.03.2025 📅",
         reply_markup=get_main_menu(message.from_user.id),
     )
+
 
 @dp.message(F.text == "how to play 📝")
 async def how_to_play(message: types.Message, state: FSMContext):
@@ -145,6 +148,7 @@ async def how_to_play(message: types.Message, state: FSMContext):
         "The game ends when only one player is left standing."
     )
 
+
 def get_user_game_archive(user_id: int):
     conn = sqlite3.connect("users_database.db")
     cursor = conn.cursor()
@@ -166,6 +170,7 @@ def get_user_game_archive(user_id: int):
     finally:
         conn.close()
 
+
 @dp.message(F.text == "🎯 Game Archive")
 async def show_game_archive(message: types.Message):
     user_id = message.from_user.id
@@ -173,10 +178,6 @@ async def show_game_archive(message: types.Message):
     if not games:
         await message.answer(
             "No games found in your archive.",
-            reply_markup=ReplyKeyboardMarkup(
-                keyboard=[[KeyboardButton(text="back to main menu 🔙")]],
-                resize_keyboard=True,
-            ),
         )
         return
     response = "📜 *Your Game Archive:*\n\n"
@@ -191,9 +192,5 @@ async def show_game_archive(message: types.Message):
 
     await message.answer(
         response,
-        reply_markup=ReplyKeyboardMarkup(
-            keyboard=[[KeyboardButton(text="back to main menu 🔙")]],
-            resize_keyboard=True,
-        ),
         parse_mode="Markdown",
     )

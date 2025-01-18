@@ -64,6 +64,8 @@ async def start_game(callback_query: types.CallbackQuery):
                 continue
             create_game_record_if_not_exists(game_id, player)
             tasks.append(send_game_start_messages(player, ms1, ms2, len(players)))
+        create_game_record_if_not_exists(game_id, cr_id)
+
         if callback_query.from_user.id is None:
             await callback_query.answer("Invalid creator ID.", show_alert=True)
             return
