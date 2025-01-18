@@ -1,6 +1,13 @@
 from aiogram.types import ReplyKeyboardMarkup, KeyboardButton
-from config import is_user_admin
+import sqlite3
 
+def is_user_admin(user_id):
+    conn = sqlite3.connect("users.db")
+    cursor = conn.cursor()
+    cursor.execute("SELECT 1 FROM admins WHERE user_id = ?", (user_id,))
+    result = cursor.fetchone()
+    conn.close()
+    return result is not None
 def get_main_menu(user_id: int):
     is_admin = is_user_admin(user_id)
     keyboard = [

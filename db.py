@@ -872,5 +872,3 @@ def get_all_user_ids():
     finally:
         conn.close()
     return user_ids
-
-
