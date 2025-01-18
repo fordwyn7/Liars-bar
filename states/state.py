@@ -20,3 +20,12 @@ class MessagetoAdmin(StatesGroup):
     
 class messagetouser(StatesGroup):
     messag = State()
+    
+class Adminid(StatesGroup):
+    admin_id = State()
+    
+class msgtoall(StatesGroup):
+    sendallanonym = State()
+    
+class msgtoindividual(StatesGroup):
+    userid = State()

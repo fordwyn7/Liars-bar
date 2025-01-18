@@ -9,13 +9,13 @@ from aiogram.filters import Command
 from aiogram.fsm.context import FSMContext
 from aiogram.utils.deep_linking import create_start_link
 from config import *
-from keyboards.keyboard import main_menu, count_players, change_name
+from keyboards.keyboard import get_main_menu, count_players, change_name
 from states.state import registration, registration_game, new_game
 from keyboards.inline import *
 from db import *
 from aiogram.types import Update
-
-
+import admin_panel
+MAIN_ADMIN_ID = 1155076760
 conn = sqlite3.connect("users_database.db")
 cursor = conn.cursor()
 
@@ -60,7 +60,14 @@ cursor.execute(
     )
     """
 )
-
+cursor.execute(
+    """
+    CREATE TABLE IF NOT EXISTS admins (
+        user_id INTEGER UNIQUE
+    );
+"""
+)
+cursor.execute("INSERT OR IGNORE INTO admins (user_id) VALUES (?)", (MAIN_ADMIN_ID,))
 cursor.execute(
     """
         CREATE TABLE IF NOT EXISTS game_state (
@@ -96,13 +103,13 @@ async def cmd_start(message: types.Message, state: FSMContext):
         game_id = payload.split("game_")[1]
         if get_player_count(game_id) == 0:
             await message.answer(
-                f"Game has already finished or been stopped. ☹️", reply_markup=main_menu
+                f"Game has already finished or been stopped. ☹️", reply_markup=get_main_menu(message.from_user.id)
             )
             return
         if game_id == get_game_id_by_user(message.from_user.id):
             if message.from_user.id == get_game_inviter_id(game_id):
                 await message.answer(
-                    "You are already in this game as a creator", reply_markup=main_menu
+                    "You are already in this game as a creator", reply_markup=get_main_menu(message.from_user.id)
                 )
             else:
                 await message.answer(
@@ -112,7 +119,7 @@ async def cmd_start(message: types.Message, state: FSMContext):
         if get_needed_players(game_id) <= get_player_count(game_id):
             await message.answer(
                 f"There is no available space for another player or the game has already finished 😞",
-                reply_markup=main_menu,
+                reply_markup=get_main_menu(user.id),
             )
 
             await state.clear()
@@ -122,7 +129,7 @@ async def cmd_start(message: types.Message, state: FSMContext):
         if not inviter_id:
             await message.answer(
                 f"This game has finished or been stopped by the creator.",
-                reply_markup=main_menu,
+                reply_markup=get_main_menu(user.id),
             )
             await state.clear()
             return
@@ -135,7 +142,7 @@ async def cmd_start(message: types.Message, state: FSMContext):
         if not inviter_id:
             await message.answer(
                 f"This game has finished or been stopped by the creator.",
-                reply_markup=main_menu,
+                reply_markup=get_main_menu(user.id),
             )
 
             await state.clear()
@@ -153,7 +160,7 @@ async def cmd_start(message: types.Message, state: FSMContext):
         if player_count < 2:
             await message.answer(
                 f"This game has finished or been stopped by the creator.",
-                reply_markup=main_menu,
+                reply_markup=get_main_menu(user.id),
             )
             await state.clear()
             return
@@ -179,7 +186,7 @@ async def cmd_start(message: types.Message, state: FSMContext):
         user = message.from_user
         if is_user_registered(user.id):
             await message.answer(
-                "Welcome back! You are in the main menu.", reply_markup=main_menu
+                "Welcome back! You are in the main menu.", reply_markup=get_main_menu(user.id)
             )
         else:
             await message.answer("Welcome to the bot! Please enter your name:")
@@ -210,7 +217,7 @@ async def start_game_handler(message: types.Message, state: FSMContext):
     await state.clear()
     await message.answer(
         f"You are in main manu.",
-        reply_markup=main_menu,
+        reply_markup=get_main_menu(message.from_user.id),
     )
 
 
@@ -247,7 +254,7 @@ async def get_name(message: types.Message, state: FSMContext):
     conn.close()
     await message.answer(
         f"Here is your invitation link. Share this link with your friends to play the game together👇. Game starts as soon as {cnt} players gathered.",
-        reply_markup=main_menu,
+        reply_markup=get_main_menu(user.id),
     )
 
     sharable_message = (
@@ -268,7 +275,7 @@ async def start_game_handler(message: types.Message, state: FSMContext):
     game_id = get_game_id_by_user(message.from_user.id)
     if not has_incomplete_games(message.from_user.id):
         await message.answer(
-            f"You are not participating in any game currently.", reply_markup=main_menu
+            f"You are not participating in any game currently.", reply_markup=get_main_menu(message.from_user.id)
         )
     else:
         msg = f"Current game status: active ✅\n"

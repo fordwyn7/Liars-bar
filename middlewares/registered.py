@@ -1,6 +1,10 @@
 from aiogram.types import Update
 from aiogram.dispatcher.middlewares.base import BaseMiddleware
 from db import is_user_registered
+from functools import wraps
+from aiogram import types
+
+import sqlite3
 
 from aiogram.fsm.context import FSMContext
 
@@ -30,3 +34,23 @@ class RegistrationMiddleware(BaseMiddleware):
                     )
                 return
         return await handler(event, data)
+def get_admins():
+    conn = sqlite3.connect("users_database.db")
+    cursor = conn.cursor()
+    cursor.execute("SELECT user_id FROM admins")
+    admins = [row[0] for row in cursor.fetchall()]
+    conn.close()
+    return admins
+def admin_required():
+    def decorator(handler):
+        @wraps(handler)
+        async def wrapper(message: types.Message, *args, **kwargs):
+            admin_list = list(get_admins())
+            user_id = message.from_user.id
+            if not user_id in admin_list:
+                await message.answer("Siz noto'g'ri buyruq yubordingiz!")
+                return
+            return await handler(message, *args, **kwargs)
+
+        return wrapper
+    return decorator

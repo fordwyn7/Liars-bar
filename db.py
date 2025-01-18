@@ -4,7 +4,7 @@ import random
 from config import bot, dp
 from aiogram import types
 from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
-from keyboards.keyboard import main_menu
+from keyboards.keyboard import get_main_menu
 
 
 def connect_db():
@@ -38,7 +38,12 @@ def is_user_registered(user_id):
         print(f"Error checking if user is registered: {e}")
         return None
 
-
+def add_admin(user_id):
+    conn = sqlite3.connect("users_database.db")
+    cursor = conn.cursor()
+    cursor.execute("INSERT OR IGNORE INTO admins (user_id) VALUES (?)", (user_id,))
+    conn.commit()
+    conn.close()
 def get_game_inviter_id(game_id):
     try:
         with connect_db() as conn:
@@ -497,7 +502,7 @@ async def periodically_edit_message(
         )
     except Exception as e:
         await bot.send_message(
-            chat_id, f"Something went wrong. Plase try again.", reply_markup=main_menu
+            chat_id, f"Something went wrong. Plase try again.", reply_markup=get_main_menu(chat_id)
         )
         print(f"An error occurred: {e}")
 
@@ -854,9 +859,18 @@ async def delete_user_messages(game_id, user_id):
         print(f"No messages found for user {user_id} in game {game_id}")
 
 
-def set_default_language_to_english():
+def get_all_user_ids():
     conn = sqlite3.connect("users_database.db")
     cursor = conn.cursor()
-    cursor.execute("UPDATE users_database SET language = 'en' WHERE language IS NULL")
-    conn.commit()
-    conn.close()
+
+    try:
+        cursor.execute("SELECT user_id FROM users_database")
+        user_ids = [row[0] for row in cursor.fetchall()]
+    except sqlite3.Error as e:
+        print(f"Database error occurred: {e}")
+        user_ids = []
+    finally:
+        conn.close()
+    return user_ids
+
+

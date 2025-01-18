@@ -381,7 +381,7 @@ async def handle_continue_or_liar(callback_query: types.CallbackQuery):
                         await bot.send_message(
                             chat_id=player,
                             text=f"Game has finished. \nWinner is {get_user_nfgame(winner)}\nYou lose in this game.",
-                            reply_markup=main_menu,
+                            reply_markup=get_main_menu(player),
                         )
 
                 else:
@@ -398,12 +398,12 @@ async def handle_continue_or_liar(callback_query: types.CallbackQuery):
                         await bot.send_message(
                             chat_id=i,
                             text=f"Game has finished. \nWinner is {get_user_nfgame(winner)}\nYou lose in this game.",
-                            reply_markup=main_menu,
+                            reply_markup=get_main_menu(i),
                         )
                 await bot.send_message(
                     chat_id=winner,
                     text=f"Game has finished. \nYou are winner. 🥳🥳🥳🥳🥳\nConguratulation on winning in the game. \n🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉",
-                    reply_markup=main_menu,
+                    reply_markup=get_main_menu(winner),
                 )
                 await delete_game(game_id)
                 return
@@ -457,12 +457,12 @@ async def handle_continue_or_liar(callback_query: types.CallbackQuery):
                     await bot.send_message(
                         chat_id=i,
                         text=f"Game has finished. \nWinner is {get_user_nfgame(winner)}\nYou lose in this game.",
-                        reply_markup=main_menu,
+                        reply_markup=get_main_menu(i),
                     )
             await bot.send_message(
                 chat_id=winner,
                 text=f"Game has finished. \nYou are winner. 🥳🥳🥳🥳🥳\nConguratulation on winning in the game. \n🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉",
-                reply_markup=main_menu,
+                reply_markup=get_main_menu(winner),
             )
             delete_game(game_id)
             await delete_all_game_messages(game_id)

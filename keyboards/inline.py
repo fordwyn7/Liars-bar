@@ -2,7 +2,7 @@ import sqlite3
 import asyncio
 import random
 from config import bot, dp, F
-from keyboards.keyboard import main_menu
+from keyboards.keyboard import get_main_menu
 from aiogram import types
 from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 from aiogram.handlers import CallbackQueryHandler
@@ -176,7 +176,7 @@ async def can_game(callback_query: types.CallbackQuery):
                     await bot.send_message(
                         player_id,
                         "The game has been stopped or finished by the creator.",
-                        reply_markup=main_menu,
+                        reply_markup=get_main_menu(player_id),
                     )
                 except Exception as e:
                     print(f"Error sending message to player {player_id}: {e}")
@@ -194,7 +194,7 @@ async def can_game(callback_query: types.CallbackQuery):
 
         await callback_query.message.answer(
             "You have canceled the game. All players have been notified.",
-            reply_markup=main_menu,
+            reply_markup=get_main_menu(callback_query.from_user.id),
         )
         await delete_all_game_messages(game_id)
 
@@ -248,7 +248,7 @@ async def handle_quit_game(callback_query: types.CallbackQuery):
             inviter_id = get_game_inviter_id(game_id)
             await player_quit_game(user.id, game_id, inviter_id)
             await callback_query.message.answer(
-                f"You have quit the current game.", reply_markup=main_menu
+                f"You have quit the current game.", reply_markup=get_main_menu(callback_query.from_user.id)
             )
             await delete_user_messages(game_id, user.id)
             delete_user_from_all_games(user.id)
@@ -277,7 +277,7 @@ async def handle_stop_incomplete_games(callback_query: types.CallbackQuery):
     if not games:
         await callback_query.message.answer(
             "You have no incomplete games to stop.",
-            reply_markup=main_menu,
+            reply_markup=get_main_menu(user_id),
         )
         await callback_query.answer()
         return
@@ -296,7 +296,7 @@ async def handle_stop_incomplete_games(callback_query: types.CallbackQuery):
                     await bot.send_message(
                         player_id,
                         "The game has been stopped by the creator.",
-                        reply_markup=main_menu,
+                        reply_markup=get_main_menu(player_id),
                     )
                 except Exception as e:
                     print(f"Failed to send message to player {player_id}: {e}")
@@ -306,13 +306,13 @@ async def handle_stop_incomplete_games(callback_query: types.CallbackQuery):
                 await bot.send_message(
                     creator_id,
                     f"A player {get_user_nfgame(callback_query.from_user.id)} has left the game.\nPlayers left in game: {get_player_count(get_game_id_by_user(creator_id))}",
-                    reply_markup=main_menu,
+                    reply_markup=get_main_menu(creator_id),
                 )
             except Exception as e:
                 print(f"Failed to send message to creator {creator_id}: {e}")
     await callback_query.message.answer(
         "Your incomplete games have been stopped.",
-        reply_markup=main_menu,
+        reply_markup=get_main_menu(callback_query.from_user.id),
     )
     await delete_user_messages(game["game_id"], callback_query.from_user.id)
     await callback_query.answer()
@@ -350,7 +350,7 @@ async def exclude_player(callback_query: types.CallbackQuery):
         await bot.send_message(
             player_to_remove,
             "Game has finished or been stopped by the creator.",
-            reply_markup=main_menu,
+            reply_markup=get_main_menu(player_to_remove),
         )
         await delete_user_messages(game_id, player_to_remove)
     except Exception as e:

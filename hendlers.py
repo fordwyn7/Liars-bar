@@ -2,7 +2,7 @@ import sqlite3
 from config import dp, F, bot
 from aiogram import types
 from aiogram.fsm.context import FSMContext
-from keyboards.keyboard import change_name, main_menu, cancel_button
+from keyboards.keyboard import change_name, get_main_menu, cancel_button
 from states.state import NewGameState, MessagetoAdmin, messagetouser
 from db import (
     get_user_nfgame,
@@ -55,7 +55,7 @@ async def help_button_state(message: types.Message, state: FSMContext):
         )
         await message.answer(
             "Your message has been sent successfully ✅",
-            reply_markup=main_menu,
+            reply_markup=get_main_menu(message.from_user.id),
         )
 
         await state.clear()
@@ -63,7 +63,7 @@ async def help_button_state(message: types.Message, state: FSMContext):
         await state.clear()
         await message.answer(
             f"You are in main menu 👇",
-            reply_markup=main_menu,
+            reply_markup=get_main_menu(message.from_user.id),
         )
 
 
@@ -83,13 +83,13 @@ async def set_new_nfgame(message: types.Message, state: FSMContext):
     if is_game_started(get_game_id_by_user(message.from_user.id)):
         await message.answer(
             f"You are currently participating in a game and cannot change your name until the game ends.",
-            reply_markup=main_menu,
+            reply_markup=get_main_menu(message.from_user.id),
         )
         await state.clear()
         return
     if new_nfgame == "back to main menu 🔙":
         await state.clear()
-        await message.answer(f"You are in main menu ⬇️", reply_markup=main_menu)
+        await message.answer(f"You are in main menu ⬇️", reply_markup=get_main_menu(message.from_user.id))
         return
     h = is_name_valid(new_nfgame)
     if h == 1:
@@ -107,7 +107,7 @@ async def set_new_nfgame(message: types.Message, state: FSMContext):
             conn.commit()
         await message.answer(
             f"Your name has been successfully changed to: {new_nfgame} ✅",
-            reply_markup=main_menu,
+            reply_markup=get_main_menu(message.from_user.id),
         )
 
         await state.clear()
@@ -117,7 +117,7 @@ async def set_new_nfgame(message: types.Message, state: FSMContext):
 async def cancel(message: types.Message, state: FSMContext):
     await state.clear()
     await message.answer(
-        f"You have canceled changing the name.", reply_markup=main_menu
+        f"You have canceled changing the name.", reply_markup=get_main_menu(message.from_user.id)
     )
 
 
@@ -126,7 +126,7 @@ async def statistics_a(message: types.Message, state: FSMContext):
     await state.clear()
     await message.answer(
         f"Here are the bot's statistics 📈:\n\nTotal users in the bot 👥: {get_total_users()}\nBot has been active since 01.03.2024 📅",
-        reply_markup=main_menu,
+        reply_markup=get_main_menu(message.from_user.id),
     )
 
 @dp.message(F.text == "how to play 📝")

@@ -2,7 +2,7 @@ from config import bot, dp
 from aiogram import types
 from aiogram.fsm.context import FSMContext
 from states.state import registration, registration_game
-from keyboards.keyboard import main_menu
+from keyboards.keyboard import get_main_menu
 from keyboards.inline import (
     cancel_g,
     ban_user,
@@ -45,7 +45,7 @@ async def get_name(message: types.Message, state: FSMContext):
         )
         await message.answer(
             f"🎉\nCongratulations on successfully registering, {preferred_name}!\nChoose one of these options 👇",
-            reply_markup=main_menu,
+            reply_markup=get_main_menu(message.from_user.id),
         )
 
         await state.clear()
@@ -63,7 +63,7 @@ async def get_name(message: types.Message, state: FSMContext):
         if not inviter_id:
             await message.answer(
                 "No game found with that ID or it has already finished.",
-                reply_markup=main_menu,
+                reply_markup=get_main_menu(message.from_user.id),
             )
             return
 
@@ -86,7 +86,7 @@ async def get_name(message: types.Message, state: FSMContext):
                 if message.from_user.id == get_game_inviter_id(game_id):
                     await message.answer(
                         "You are already in this game as a creator 😇",
-                        reply_markup=main_menu,
+                        reply_markup=get_main_menu(message.from_user.id),
                     )
                 else:
                     await message.answer(
@@ -96,14 +96,14 @@ async def get_name(message: types.Message, state: FSMContext):
             if get_player_count(game_id) == 0:
                 await message.answer(
                     f"Game has already finished or been stopped. ☹️",
-                    reply_markup=main_menu,
+                    reply_markup=get_main_menu(message.from_user.id),
                 )
                 return
 
             if get_needed_players(game_id) <= get_player_count(game_id):
                 await message.answer(
                     f"There is no available space for another player or the game has already finished 😞",
-                    reply_markup=main_menu,
+                    reply_markup=get_main_menu(message.from_user.id),
                 )
 
                 await state.clear()
@@ -112,7 +112,7 @@ async def get_name(message: types.Message, state: FSMContext):
             player_count = get_player_count(game_id)
             await message.answer(
                 f"🎉\nCongratulations on successfully registering, {preferred_name}!",
-                reply_markup=main_menu,
+                reply_markup=get_main_menu(message.from_user.id),
             )
             await message.answer(
                 f"You have successfully joined the game! 🤩\nCurrent number of players: {player_count}\nWaiting for everyone to be ready...",
