@@ -72,12 +72,12 @@ def get_user_statistics(user_id):
         is_admin = "admin 🧑‍💻" if is_user_admin(user_id) else "user 🙍‍♂️"
 
         stats_message = (
-            f"📊 **User Statistics** 📊\n"
-            f"🙇‍♂️ **Role**: {is_admin} \n"
-            f"👤 **Username**: @{username if username else 'N/A'}\n"
-            f"📛 **First Name**: {first_name if first_name else 'N/A'}\n"
-            f"📜 **Last Name**: {last_name if last_name else 'N/A'}\n"
-            f"🗓️ **Registr Date**: {registration_date if registration_date else 'N/A'}\n"
+            f"📊 **User Statistics** 📊\n\n"
+            f"🙇‍♂️ **Role**: {is_admin} \n\n"
+            f"👤 **Username**: {"@" + username if username else 'N/A'}\n\n"
+            f"📛 **First Name**: {first_name if first_name else 'N/A'}\n\n"
+            f"📜 **Last Name**: {last_name if last_name else 'N/A'}\n\n"
+            f"🗓️ **Registr Date**: {registration_date if registration_date else 'N/A'}\n\n"
             f"🎮 **Name in bot**: {nfgame if nfgame else 'N/A'}\n"
         )
     except sqlite3.Error as e:
