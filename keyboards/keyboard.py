@@ -113,3 +113,18 @@ send_messages = ReplyKeyboardMarkup(
     ],
     resize_keyboard=True,
 )
+
+users_control_button = ReplyKeyboardMarkup(
+    keyboard=[
+        [
+            KeyboardButton(text="🪪 List of users"),
+        ],
+        [
+            KeyboardButton(text="🗒 user's information"),
+        ],
+        [
+            KeyboardButton(text="back to admin panel 🔙"),
+        ],
+    ],
+    resize_keyboard=True,
+)

@@ -25,12 +25,76 @@ def get_admins2():
     conn.close()
     return admins
 
+
+USERS_PER_PAGE = 10
+
+
+def generate_user_list(users, page):
+    start_index = (page - 1) * USERS_PER_PAGE
+    end_index = start_index + USERS_PER_PAGE
+    page_users = users[start_index:end_index]
+
+    user_list = []
+    for index, (user_id, phone) in enumerate(page_users, start=start_index + 1):
+        user_list.append(f"{index}. <a href='tg://user?id={user_id}'>{user_id}</a>")
+
+    return user_list
+
+
+def create_pagination_buttons(page, total_users):
+    keyboard = []
+    if page > 1:
+        keyboard.append(
+            InlineKeyboardButton(text="⬅️", callback_data=f"page_{page - 1}")
+        )
+    if page * USERS_PER_PAGE < total_users:
+        keyboard.append(
+            InlineKeyboardButton(text="➡️", callback_data=f"page_{page + 1}")
+        )
+    return InlineKeyboardMarkup(inline_keyboard=[keyboard])
+
+
+def get_user_statistics(user_id):
+    conn = sqlite3.connect("users_database.db")
+    cursor = conn.cursor()
+    try:
+        cursor.execute(
+            """
+            SELECT username, first_name, last_name, registration_date, nfgame 
+            FROM users_database WHERE user_id = ?
+            """,
+            (user_id,),
+        )
+        user_data = cursor.fetchone()
+        if not user_data:
+            return "❌ No user found with the given ID."
+        username, first_name, last_name, registration_date, nfgame = user_data
+        is_admin = "admin 🧑‍💻" if is_user_admin(user_id) else "user 🙍‍♂️"
+        
+        stats_message = (
+            f"📊 **User Statistics** 📊\n"
+            f"📊 **Role**: {is_admin} 📊\n"
+            f"👤 **Username**: @{username if username else 'N/A'}\n"
+            f"📛 **First Name**: {first_name if first_name else 'N/A'}\n"
+            f"📜 **Last Name**: {last_name if last_name else 'N/A'}\n"
+            f"🗓️ **Registration Date**: {registration_date if registration_date else 'N/A'}\n"
+            f"🎮 **Name in bot**: {nfgame if nfgame else 'N/A'}\n"
+        )
+    except sqlite3.Error as e:
+        stats_message = f"❌ Database error occurred: {e}"
+    finally:
+        conn.close()
+
+    return stats_message
+
+
 @dp.message(F.text == "🔙 main menu")
 @admin_required()
 async def main_to_menu(message: types.Message, state: FSMContext):
     await message.answer(
         f"You are in main menu.", reply_markup=await get_main_menu(message.from_user.id)
     )
+
 
 @dp.message(F.text == "🧑‍💻 admin panel")
 @admin_required()
@@ -258,4 +322,93 @@ async def forward_to_individual(message: types.Message, state: FSMContext):
             reply_markup=admin_panel_button,
         )
     finally:
+        await state.clear()
+
+
+@dp.message(F.text == "🪪 List of users")
+@admin_required()
+async def list_users(message: types.Message):
+    try:
+        with sqlite3.connect("users_database.db") as conn:
+            cursor = conn.cursor()
+            cursor.execute("SELECT user_id, phone FROM users")
+            users = cursor.fetchall()
+    except sqlite3.Error as e:
+        await message.answer("An error has occured ...")
+        return
+
+    async def show_users(page=1):
+        user_list = generate_user_list(users, page)
+        user_details = "\n".join(user_list)
+        pagination_buttons = create_pagination_buttons(page, len(users))
+        await message.answer(
+            f"Here is the list of users (page {page}):\n\n{user_details}",
+            parse_mode="HTML",
+            reply_markup=pagination_buttons,
+        )
+
+    await show_users(page=1)
+
+
+@dp.callback_query(lambda c: c.data.startswith("page_"))
+async def paginate_users(callback_query: types.CallbackQuery):
+    page = int(callback_query.data.split("_")[1])
+    try:
+        with sqlite3.connect("users.db") as conn:
+            cursor = conn.cursor()
+            cursor.execute("SELECT user_id, phone FROM users")
+            users = cursor.fetchall()
+    except sqlite3.Error as e:
+        print(e)
+        await callback_query.answer(
+            "An error has occured, please try again later", show_alert=True
+        )
+        return
+    if page < 1 or (page - 1) * USERS_PER_PAGE >= len(users):
+        await callback_query.answer(
+            "You are in the first page!" if page < 1 else "You are in the last page!",
+            show_alert=True,
+        )
+        return
+
+    user_list = generate_user_list(users, page)
+    user_details = "\n".join(user_list)
+    pagination_buttons = create_pagination_buttons(page, len(users))
+    await callback_query.message.edit_text(
+        f"List of users (page {page}):\n\n{user_details}",
+        parse_mode="HTML",
+        reply_markup=pagination_buttons,
+    )
+    await callback_query.answer()
+
+
+
+@dp.message(F.text == "🗒 foydalanuvchi ma'lumotlari")
+@admin_required()
+async def info_users(message: types.Message, state: FSMContext):
+    await message.answer(
+        f"Kerakli foydalanuvchining id raqamini kiriting.", reply_markup=back_button
+    )
+    await state.set_state(UserInformations.userid_state)
+
+
+@dp.message(UserInformations.userid_state)
+@admin_required()
+async def state_info_users(message: types.Message, state: FSMContext):
+    user_id = message.text
+    if not user_id.isdigit():
+        await message.answer(
+            "Siz noto'g'ri ma'lumot kiritdingiz. Qaytadan urinib ko'ring."
+        )
+    else:
+        if not is_user_registered(int(user_id)):
+            await message.answer(
+                f"Berilgan ID orqali hech qanday foydalanuvchi topilmadi.",
+                reply_markup=admin_panel_button,
+            )
+        else:
+            user_id = int(user_id)
+            await message.answer(
+                get_user_statistics(user_id), parse_mode="Markdown", reply_markup=admin_panel_button
+            )
         await state.clear()

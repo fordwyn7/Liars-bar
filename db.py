@@ -872,3 +872,36 @@ def get_all_user_ids():
     finally:
         conn.close()
     return user_ids
+
+import sqlite3
+
+def get_user_statistics(user_id: int) -> str:
+    conn = sqlite3.connect("users_database.db")
+    cursor = conn.cursor()
+
+    try:
+        cursor.execute(
+            """
+            SELECT username, first_name, last_name, registration_date, nfgame 
+            FROM users_database WHERE user_id = ?
+            """,
+            (user_id,),
+        )
+        user_data = cursor.fetchone()
+        if not user_data:
+            return "❌ No user found with the given ID."
+        username, first_name, last_name, registration_date, nfgame = user_data
+        stats_message = (
+            f"📊 **User Statistics** 📊\n"
+            f"👤 **Username**: @{username if username else 'N/A'}\n"
+            f"📛 **First Name**: {first_name if first_name else 'N/A'}\n"
+            f"📜 **Last Name**: {last_name if last_name else 'N/A'}\n"
+            f"🗓️ **Registration Date**: {registration_date if registration_date else 'N/A'}\n"
+            f"🎮 **NFGAME**: {nfgame if nfgame else 'N/A'}\n"
+        )
+    except sqlite3.Error as e:
+        stats_message = f"❌ Database error occurred: {e}"
+    finally:
+        conn.close()
+
+    return stats_message
