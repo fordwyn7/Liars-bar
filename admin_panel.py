@@ -5,11 +5,22 @@ from middlewares.registered import admin_required
 from keyboards.keyboard import *
 from config import *
 from db import *
+
+from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
+from aiogram.utils.keyboard import InlineKeyboardBuilder
+
+
 # from middlewares.registered import get_admins
 from states.state import *
 def generate_callback(action: str, admin_id: int) -> str:
     return f"{action}:{admin_id}"
-
+def get_admins2():
+    conn = sqlite3.connect("users.db")
+    cursor = conn.cursor()
+    cursor.execute("SELECT user_id FROM admins")
+    admins = [{"id": row[0], "name": f"Admin {get_user_nfgame(row[0])}"} for row in cursor.fetchall()]
+    conn.close()
+    return admins
 @dp.message(F.text == "🧑‍💻 admin panel")
 @admin_required()
 async def admin_panel(message: types.Message):
@@ -69,6 +80,7 @@ async def add_admin_state(message: types.Message, state: FSMContext):
                 f"✅ User {user_id} has been added as an admin.",
                 reply_markup=admin_panel_button,
             )
+            await bot.send_message(chat_id=user_id, text="You are given an admin ✅", reply_markup=get_main_menu(user_id))
             await state.clear()
         except ValueError:
             await message.answer(
@@ -76,6 +88,50 @@ async def add_admin_state(message: types.Message, state: FSMContext):
                 reply_markup=back_button,
             )
 
+@dp.message(F.text == "🧾 list of admins")
+async def list_admins(message: types.Message):
+    admins = get_admins2()
+    keyboard = InlineKeyboardBuilder()
+    for admin in admins:
+        callback_data = generate_callback("delete_admin", admin["id"])
+        keyboard.row(
+            InlineKeyboardButton(
+                text=f"❌ {admin['name']}",
+                callback_data=callback_data,
+            )
+        )
+    await message.answer("Here is the list of admins:", reply_markup=keyboard.as_markup())
+
+@dp.callback_query(F.data.startswith("delete_admin"))
+async def delete_admin_callback(query: types.CallbackQuery):
+    callback_data = query.data.split(":")
+    action = callback_data[0]
+    admin_id = int(callback_data[1])
+
+    if int(query.from_user.id) != 1155076760 and int(query.from_user.id) != 6807731973:
+        await query.answer(f"You can not delete admin's because you are not the main admin ❗️")
+        return
+    else:
+        if action == "delete_admin":
+            conn = sqlite3.connect("users_database.db")
+            cursor = conn.cursor()
+            cursor.execute("DELETE FROM admins WHERE user_id = ?", (admin_id,))
+            conn.commit()
+            conn.close()
+            await query.answer("Admin was deleted successfully.")
+
+            conn = sqlite3.connect("users_database.db")
+            cursor = conn.cursor()
+            cursor.execute("SELECT user_id FROM admins")
+            remaining_admins = [get_user_nfgame(row[0]) for row in cursor.fetchall()]
+            conn.close()
+            keyboard_builder = InlineKeyboardBuilder()
+            for admin in remaining_admins:
+                keyboard_builder.button(
+                    text=f"❌ Admin {admin}", callback_data=f"delete_admin:{admin}"
+                )
+            keyboard = keyboard_builder.as_markup()
+            await query.message.edit_reply_markup(reply_markup=keyboard)
 
 
 

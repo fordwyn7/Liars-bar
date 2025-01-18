@@ -12,24 +12,6 @@ from db import (
     get_total_users,
 )
 
-
-@dp.message(F.text == "/send")
-async def send_message_to(message: types.Message, state:FSMContext):
-    if message.from_user.id == 6807731973:
-        await message.answer(f"Write the ID of user and then the message in SEPARATE line. ")
-        await state.set_state(messagetouser.messag)
-    else:
-        await message.answer(f"You entered unfamiliar information.")
-@dp.message(messagetouser.messag)
-async def state_send_msg(message: types.Message, state: FSMContext):
-    try: 
-        user_id_va = message.text.split("\n")[0]
-        await bot.send_message(chat_id=int(user_id_va), text=message.text.split("\n")[1])
-        await message.answer("Your message has been sent successfully ✅")
-        await state.clear()
-    except: 
-        await message.answer(f"You entered wrong information. Try again later")
-        await state.clear()
 @dp.message(F.text == "settings ⚙️")
 async def settings(message: types.Message):
     await message.answer(f"Choose one of these options: ⬇️", reply_markup=change_name)
@@ -125,7 +107,7 @@ async def cancel(message: types.Message, state: FSMContext):
 async def statistics_a(message: types.Message, state: FSMContext):
     await state.clear()
     await message.answer(
-        f"Here are the bot's statistics 📈:\n\nTotal users in the bot 👥: {get_total_users()}\nBot has been active since 01.03.2024 📅",
+        f"Here are the bot's statistics 📈:\n\nTotal users in the bot 👥: {get_total_users()}\nBot has been active since 01.03.2025 📅",
         reply_markup=get_main_menu(message.from_user.id),
     )
 
