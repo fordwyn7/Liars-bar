@@ -391,11 +391,11 @@ async def paginate_users(callback_query: types.CallbackQuery):
     await callback_query.answer()
 
 
-@dp.message(F.text == "🗒 foydalanuvchi ma'lumotlari")
+@dp.message(F.text == "🗒 information of user")
 @admin_required()
 async def info_users(message: types.Message, state: FSMContext):
     await message.answer(
-        f"Kerakli foydalanuvchining id raqamini kiriting.", reply_markup=back_button
+        f"Enter the ID of user that you want to get information", reply_markup=back_button
     )
     await state.set_state(UserInformations.userid_state)
 
@@ -406,12 +406,12 @@ async def state_info_users(message: types.Message, state: FSMContext):
     user_id = message.text
     if not user_id.isdigit():
         await message.answer(
-            "Siz noto'g'ri ma'lumot kiritdingiz. Qaytadan urinib ko'ring."
+            "You entered wrong information! Please try again."
         )
     else:
         if not is_user_registered(int(user_id)):
             await message.answer(
-                f"Berilgan ID orqali hech qanday foydalanuvchi topilmadi.",
+                f"No user found from given ID ☹️",
                 reply_markup=admin_panel_button,
             )
         else:

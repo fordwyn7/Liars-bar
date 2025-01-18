@@ -120,7 +120,7 @@ users_control_button = ReplyKeyboardMarkup(
             KeyboardButton(text="🪪 List of users"),
         ],
         [
-            KeyboardButton(text="🗒 user's information"),
+            KeyboardButton(text="🗒 information of user"),
         ],
         [
             KeyboardButton(text="back to admin panel 🔙"),
