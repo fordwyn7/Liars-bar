@@ -70,7 +70,7 @@ def get_user_statistics(user_id):
             return "❌ No user found with the given ID."
         username, first_name, last_name, registration_date, nfgame = user_data
         is_admin = "admin 🧑‍💻" if is_user_admin(user_id) else "user 🙍‍♂️"
-        
+
         stats_message = (
             f"📊 **User Statistics** 📊\n"
             f"📊 **Role**: {is_admin} 📊\n"
@@ -325,6 +325,15 @@ async def forward_to_individual(message: types.Message, state: FSMContext):
         await state.clear()
 
 
+@dp.message(F.text == "🧑‍🎓 users")
+@admin_required()
+async def users_butn(message: types.Message):
+    await message.answer(
+        f"In this section, you can get information of users.",
+        reply_markup=users_control_button,
+    )
+
+
 @dp.message(F.text == "🪪 List of users")
 @admin_required()
 async def list_users(message: types.Message):
@@ -382,7 +391,6 @@ async def paginate_users(callback_query: types.CallbackQuery):
     await callback_query.answer()
 
 
-
 @dp.message(F.text == "🗒 foydalanuvchi ma'lumotlari")
 @admin_required()
 async def info_users(message: types.Message, state: FSMContext):
@@ -409,6 +417,8 @@ async def state_info_users(message: types.Message, state: FSMContext):
         else:
             user_id = int(user_id)
             await message.answer(
-                get_user_statistics(user_id), parse_mode="Markdown", reply_markup=admin_panel_button
+                get_user_statistics(user_id),
+                parse_mode="Markdown",
+                reply_markup=admin_panel_button,
             )
         await state.clear()
