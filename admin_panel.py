@@ -80,6 +80,7 @@ def get_user_statistics(user_id):
             f"🗓️ **Registr Date**: {registration_date if registration_date else 'N/A'}\n\n"
             f"🎮 **Name in bot**: {nfgame if nfgame else 'N/A'}\n"
         )
+        
     except sqlite3.Error as e:
         stats_message = f"❌ Database error occurred: {e}"
     finally:
@@ -340,7 +341,7 @@ async def list_users(message: types.Message):
     try:
         with sqlite3.connect("users_database.db") as conn:
             cursor = conn.cursor()
-            cursor.execute("SELECT user_id, phone FROM users")
+            cursor.execute("SELECT user_id, nfgame FROM users_database")
             users = cursor.fetchall()
     except sqlite3.Error as e:
         await message.answer("An error has occured ...")

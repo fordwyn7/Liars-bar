@@ -62,6 +62,7 @@ async def start_game(callback_query: types.CallbackQuery):
             if player is None:
                 print(f"Invalid player ID detected: {player}")
                 continue
+            create_game_record_if_not_exists(game_id, player)
             tasks.append(send_game_start_messages(player, ms1, ms2, len(players)))
         if callback_query.from_user.id is None:
             await callback_query.answer("Invalid creator ID.", show_alert=True)
@@ -171,6 +172,7 @@ async def can_game(callback_query: types.CallbackQuery):
         for player in players:
             player_id = player[0]
             if player_id is not None:
+                update_game_details(game_id, player, None)
                 delete_user_from_all_games(player_id)
                 try:
                     await bot.send_message(
@@ -196,6 +198,7 @@ async def can_game(callback_query: types.CallbackQuery):
             "You have canceled the game. All players have been notified.",
             reply_markup=get_main_menu(callback_query.from_user.id),
         )
+        update_game_details(game_id, callback_query.from_user.id, None)
         await delete_all_game_messages(game_id)
 
 
@@ -217,6 +220,7 @@ async def player_quit_game(user_id, game_id, inviter_id):
                     inviter_id,
                     f"Player {player_name} has quit the game.\nPlayers left in the game: {get_player_count(game_id)}",
                 )
+                update_game_details(game_id, user_id, None)
                 await delete_user_messages(game_id, user_id)
             except Exception as e:
                 print(f"Error sending message to creator {inviter_id}: {e}")
@@ -250,6 +254,7 @@ async def handle_quit_game(callback_query: types.CallbackQuery):
             await callback_query.message.answer(
                 f"You have quit the current game.", reply_markup=get_main_menu(callback_query.from_user.id)
             )
+            update_game_details(game_id, user.id, None)
             await delete_user_messages(game_id, user.id)
             delete_user_from_all_games(user.id)
         else:
@@ -302,6 +307,7 @@ async def handle_stop_incomplete_games(callback_query: types.CallbackQuery):
                     print(f"Failed to send message to player {player_id}: {e}")
         else:
             delete_user_from_all_games(user_id)
+            update_game_details(game['game_id'], user_id, None)
             try:
                 await bot.send_message(
                     creator_id,
@@ -346,6 +352,8 @@ async def exclude_player(callback_query: types.CallbackQuery):
             (player_to_remove, game_id),
         )
         conn.commit()
+        update_game_details(game_id, player_to_remove, None)
+        
     try:
         await bot.send_message(
             player_to_remove,

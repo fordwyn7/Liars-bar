@@ -3,6 +3,8 @@ from config import dp, F, bot
 from aiogram import types
 from aiogram.fsm.context import FSMContext
 from keyboards.keyboard import change_name, get_main_menu, cancel_button
+from aiogram.types import ReplyKeyboardMarkup, KeyboardButton
+
 from states.state import NewGameState, MessagetoAdmin, messagetouser
 from db import (
     get_user_nfgame,
@@ -141,4 +143,57 @@ async def how_to_play(message: types.Message, state: FSMContext):
         "The gun has 6 bullets, but only 1 is real—no one knows which!\n\n"
         "🔴 Winning the Game:\n"
         "The game ends when only one player is left standing."
+    )
+
+def get_user_game_archive(user_id: int):
+    conn = sqlite3.connect("users_database.db")
+    cursor = conn.cursor()
+    try:
+        cursor.execute(
+            """
+            SELECT game_id, game_start_time, game_end_time, game_winner
+            FROM game_archive
+            WHERE user_id = ?
+            ORDER BY game_start_time DESC
+            """,
+            (user_id,),
+        )
+        games = cursor.fetchall()
+        return games
+    except sqlite3.Error as e:
+        print(f"❌ Database error: {e}")
+        return []
+    finally:
+        conn.close()
+
+@dp.message(F.text == "🎯 Game Archive")
+async def show_game_archive(message: types.Message):
+    user_id = message.from_user.id
+    games = get_user_game_archive(user_id)
+    if not games:
+        await message.answer(
+            "No games found in your archive.",
+            reply_markup=ReplyKeyboardMarkup(
+                keyboard=[[KeyboardButton(text="back to main menu 🔙")]],
+                resize_keyboard=True,
+            ),
+        )
+        return
+    response = "📜 *Your Game Archive:*\n\n"
+    for idx, (record_id, start_time, end_time, winner) in enumerate(games, start=1):
+        response += (
+            f"🕹 *Game {idx}:*\n"
+            f"🆔 Game ID: `{record_id}`\n"
+            f"⏰ Start Time: {start_time}\n"
+            f"🏁 End Time: {end_time if end_time else 'Has not finished'}\n"
+            f"🏆 Winner: {winner if winner else 'No Winner'}\n\n"
+        )
+
+    await message.answer(
+        response,
+        reply_markup=ReplyKeyboardMarkup(
+            keyboard=[[KeyboardButton(text="back to main menu 🔙")]],
+            resize_keyboard=True,
+        ),
+        parse_mode="Markdown",
     )

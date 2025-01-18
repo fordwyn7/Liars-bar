@@ -43,6 +43,19 @@ CREATE TABLE IF NOT EXISTS users_game_states (
 )
 """
 )
+
+cursor.execute(
+    """
+CREATE TABLE IF NOT EXISTS game_archive (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id INTEGER UNIQUE NOT NULL,
+    game_id TEXT,
+    game_start_time TEXT,
+    game_end_time TEXT,
+    game_winner TEXT 
+)
+"""
+)
 cursor.execute(
     """
     CREATE TABLE IF NOT EXISTS invitations (
