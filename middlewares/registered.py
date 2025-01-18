@@ -5,19 +5,7 @@ from functools import wraps
 from aiogram import types
 
 import sqlite3
-MAIN_ADMIN_ID = 1155076760
-conn = sqlite3.connect("users_database.db")
-cursor = conn.cursor()
-cursor.execute(
-    """
-    CREATE TABLE IF NOT EXISTS admins (
-        user_id INTEGER UNIQUE
-    );
-"""
-)
-cursor.execute("INSERT OR IGNORE INTO admins (user_id) VALUES (?)", (MAIN_ADMIN_ID,))
-conn.commit()
-conn.close()
+
 from aiogram.fsm.context import FSMContext
 
 class RegistrationMiddleware(BaseMiddleware):

@@ -1,20 +1,7 @@
 from aiogram.types import ReplyKeyboardMarkup, KeyboardButton
 import sqlite3
-MAIN_ADMIN_ID = 1155076760
-conn = sqlite3.connect("users_database.db")
-cursor = conn.cursor()
-cursor.execute(
-    """
-    CREATE TABLE IF NOT EXISTS admins (
-        user_id INTEGER UNIQUE
-    );
-"""
-)
-cursor.execute("INSERT OR IGNORE INTO admins (user_id) VALUES (?)", (MAIN_ADMIN_ID,))
-conn.commit()
-conn.close()
 def is_user_admin(user_id):
-    conn = sqlite3.connect("users.db")
+    conn = sqlite3.connect("users_database.db")
     cursor = conn.cursor()
     cursor.execute("SELECT 1 FROM admins WHERE user_id = ?", (user_id,))
     result = cursor.fetchone()
