@@ -29,3 +29,4 @@ class msgtoall(StatesGroup):
     
 class msgtoindividual(StatesGroup):
     userid = State()
+    sendtoone = State()
