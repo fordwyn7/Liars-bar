@@ -15,7 +15,7 @@ from states.state import *
 def generate_callback(action: str, admin_id: int) -> str:
     return f"{action}:{admin_id}"
 def get_admins2():
-    conn = sqlite3.connect("users.db")
+    conn = sqlite3.connect("users_database.db")
     cursor = conn.cursor()
     cursor.execute("SELECT user_id FROM admins")
     admins = [{"id": row[0], "name": f"Admin {get_user_nfgame(row[0])}"} for row in cursor.fetchall()]
