@@ -128,7 +128,7 @@ async def delete_admin_callback(query: types.CallbackQuery):
             keyboard_builder = InlineKeyboardBuilder()
             for admin in remaining_admins:
                 keyboard_builder.button(
-                    text=f"❌ Admin {admin}", callback_data=f"delete_admin:{admin}"
+                    text=f"❌ {admin}", callback_data=f"delete_admin:{admin}"
                 )
             keyboard = keyboard_builder.as_markup()
             await query.message.edit_reply_markup(reply_markup=keyboard)
