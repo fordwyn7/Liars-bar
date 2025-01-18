@@ -55,7 +55,7 @@ async def add_admin_state(message: types.Message, state: FSMContext):
             f"❌ You entered wrong information. Please try again.",
             reply_markup=back_button,
         )
-    elif not is_user_registered(message.from_user.id):
+    elif not is_user_registered(i_d):
         await message.answer(
             f"❌ User not found or is not membor of the bot",
             reply_markup=admin_panel_button,
