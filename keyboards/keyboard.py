@@ -11,6 +11,8 @@ cursor.execute(
 """
 )
 cursor.execute("INSERT OR IGNORE INTO admins (user_id) VALUES (?)", (MAIN_ADMIN_ID,))
+conn.commit()
+conn.close()
 def is_user_admin(user_id):
     conn = sqlite3.connect("users.db")
     cursor = conn.cursor()
