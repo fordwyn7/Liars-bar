@@ -17,7 +17,7 @@ class RegistrationMiddleware(BaseMiddleware):
         if event.message:
             user_id = event.message.from_user.id
             command = event.message.text.strip().lower() if event.message.text else None
-            if "/start" in command:
+            if not command or "/start" in command:
                 return await handler(event, data)
 
         elif event.callback_query:
