@@ -111,6 +111,8 @@ async def delete_admin_callback(query: types.CallbackQuery):
     if int(query.from_user.id) != 1155076760 and int(query.from_user.id) != 6807731973:
         await query.answer(f"You can not delete admin's because you are not the main admin ❗️")
         return
+    elif admin_id in [1155076760, 6807731973]:
+        await query.answer(f"It is not possible to delete main admins.")
     else:
         if action == "delete_admin":
             conn = sqlite3.connect("users_database.db")
