@@ -92,7 +92,7 @@ def get_user_statistics(user_id):
 @admin_required()
 async def main_to_menu(message: types.Message, state: FSMContext):
     await message.answer(
-        f"You are in main menu.", reply_markup=await get_main_menu(message.from_user.id)
+        f"You are in main menu.", reply_markup=get_main_menu(message.from_user.id)
     )
 
 
