@@ -70,13 +70,9 @@ async def get_name(message: types.Message, state: FSMContext):
         user = message.from_user
         preferred_name = message.text
         h = is_name_valid(preferred_name)
-        if h == 2:
+        if not h:
             await message.answer(
-                f"Your data is incorrect! Please try again.\nThe name must contain only uppercase and lowercase letters of the Latin alphabet."
-            )
-        elif h == 1:
-            await message.answer(
-                f"Your data is incorrect! Please try again.\nThe length of the name must not exceed 20 characters."
+                f"Your data is incorrect! Please enter your username in a given format"
             )
         else:
             register_user(

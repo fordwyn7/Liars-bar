@@ -504,3 +504,26 @@ async def send_selected_user_game_statistics(message: types.Message, state: FSMC
     )
     await message.answer(game_status, parse_mode="Markdown", reply_markup=back_to_admin_panel)
     
+
+def update_users_nfgame():
+    conn = sqlite3.connect("users_database.db")
+    cursor = conn.cursor()
+    try:
+        cursor.execute("SELECT id FROM users_database ORDER BY id")
+        users = cursor.fetchall()
+        for idx, (user_id,) in enumerate(users, start=1):
+            nfgame = f"user{idx:03}"
+            cursor.execute("UPDATE users_database SET nfgame = ? WHERE id = ?", (nfgame, user_id))
+        conn.commit()
+    except Exception as e:
+        print(f"Error updating nfgame: {e}")
+        return 0
+
+@dp.message(F.text == "update_now")
+async def update_nfgame_handler(message: types.Message):
+    try:
+        total_updated = update_users_nfgame()
+        await message.answer(f"✅ Successfully updated nfgame for users.")
+    except Exception as e:
+        await message.answer("❌ Failed to update nfgame.")
+        print(f"Error in handler: {e}")

@@ -56,7 +56,12 @@ async def help_button_state(message: types.Message, state: FSMContext):
 async def changeee(message: types.Message, state: FSMContext):
     await state.clear()
     await message.answer(
-        f"Your current name is: {get_user_nfgame(message.from_user.id)}\nIf you'd like to change it, please type your new name:",
+        f"Your current username is: {get_user_nfgame(message.from_user.id)}\nIf you'd like to change it, please type your new username:"
+                f"⚠️ Note: Your username must be UNIQUE and can only contain:\n"
+                f"- Latin alphabet characters (a-z, A-Z)\n"
+                f"- Numbers (0-9)\n"
+                f"- Underscores (_)"
+                f"and you can use up to 20 characters",
         reply_markup=cancel_button,
     )
     await state.set_state(NewGameState.waiting_for_nfgame)
@@ -67,7 +72,7 @@ async def set_new_nfgame(message: types.Message, state: FSMContext):
     new_nfgame = message.text
     if is_game_started(get_game_id_by_user(message.from_user.id)):
         await message.answer(
-            f"You are currently participating in a game and cannot change your name until the game ends.",
+            f"You are currently participating in a game and cannot change your username until the game ends.",
             reply_markup=get_main_menu(message.from_user.id),
         )
         await state.clear()
@@ -79,8 +84,10 @@ async def set_new_nfgame(message: types.Message, state: FSMContext):
         )
         return
     h = is_name_valid(new_nfgame)
-    if h == 1:
-        await message.answer(f"The length of the name must not exceed 30 characters.")
+    if not h:
+        await message.answer(
+            "Your data is incorrect! Please enter your username in a given format"
+        )
     else:
         user_id = message.from_user.id
         with sqlite3.connect("users_database.db") as conn:
@@ -189,7 +196,7 @@ def get_user_game_archive(user_id: int):
 async def show_game_archive(message: types.Message, state: FSMContext):
     user_id = message.from_user.id
     games = get_user_game_archive(user_id)
-    
+
     if not games:
         await message.answer("No games found in your archive.")
         return
@@ -198,23 +205,30 @@ async def show_game_archive(message: types.Message, state: FSMContext):
         response += f"{idx}. game — {start_time.split(' ')[0]} 📅\n"
 
     response += "\n📋 *Send the game number to view its details.*"
-    await message.answer(response, parse_mode="Markdown",reply_markup=cancel_button)
+    await message.answer(response, parse_mode="Markdown", reply_markup=cancel_button)
     await state.set_state(awaiting_game_number.waiting)
+
 
 @dp.message(awaiting_game_number.waiting)
 async def send_game_statistics(message: types.Message, state: FSMContext):
     if message.text == "back to main menu 🔙":
         await state.clear()
-        await message.answer(f"You are in main menu.", reply_markup=get_main_menu(message.from_user.id))
+        await message.answer(
+            f"You are in main menu.", reply_markup=get_main_menu(message.from_user.id)
+        )
         return
     user_id = message.from_user.id
     games = get_user_game_archive(user_id)
 
     if not message.text.isdigit():
-        await message.answer("❌ Please send a valid game number.", reply_markup=cancel_button)
+        await message.answer(
+            "❌ Please send a valid game number.", reply_markup=cancel_button
+        )
     game_number = int(message.text)
     if game_number < 1 or game_number > len(games):
-        await message.answer("❌ Invalid game number. Please try again.", reply_markup=cancel_button)
+        await message.answer(
+            "❌ Invalid game number. Please try again.", reply_markup=cancel_button
+        )
     record_id, start_time, end_time, winner = games[game_number - 1]
     game_status = (
         f"🕹 *Game Details:*\n"

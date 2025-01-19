@@ -1,6 +1,7 @@
 import sqlite3
 import asyncio
 import random
+import re
 from config import bot, dp
 from aiogram import types
 from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
@@ -312,11 +313,14 @@ def mark_game_as_started(game_id):
         conn.commit()
 
 
+
 def is_name_valid(name):
-    if len(name) < 31:
-        return 0
-    else:
-        return 1
+    if len(name) > 20 or len(name) < 1:
+        return False
+    if not re.match(r"^[a-zA-Z0-9_]+$", name):
+        return False
+    return True
+
 
 
 def get_all_players_nfgame(game_id):

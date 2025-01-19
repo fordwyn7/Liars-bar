@@ -15,6 +15,7 @@ from keyboards.inline import *
 from db import *
 from aiogram.types import Update
 import admin_panel
+
 MAIN_ADMIN_ID = 1155076760
 conn = sqlite3.connect("users_database.db")
 cursor = conn.cursor()
@@ -105,24 +106,34 @@ conn.close()
 @dp.message(Command("start"))
 async def cmd_start(message: types.Message, state: FSMContext):
     await state.clear()
-    
+
     payload = message.text.split(" ", 1)[-1] if " " in message.text else ""
     await state.update_data(payload=payload)
     if "game_" in payload:
         if not is_user_registered(message.from_user.id):
-            await message.answer("Welcome to the bot! Please enter your name:")
+            await message.answer(
+                "Welcome to the bot! Please enter your username.\n\n"
+                "⚠️ Note: Your username must be UNIQUE and can only contain:\n"
+                "- Latin alphabet characters (a-z, A-Z)\n"
+                "- Numbers (0-9)\n"
+                "- Underscores (_)"
+                "and you can use up to 20 characters"
+            )
+
             await state.set_state(registration_game.pref1_name)
             return
         game_id = payload.split("game_")[1]
         if get_player_count(game_id) == 0:
             await message.answer(
-                f"Game has already finished or been stopped. ☹️", reply_markup=get_main_menu(message.from_user.id)
+                f"Game has already finished or been stopped. ☹️",
+                reply_markup=get_main_menu(message.from_user.id),
             )
             return
         if game_id == get_game_id_by_user(message.from_user.id):
             if message.from_user.id == get_game_inviter_id(game_id):
                 await message.answer(
-                    "You are already in this game as a creator", reply_markup=get_main_menu(message.from_user.id)
+                    "You are already in this game as a creator",
+                    reply_markup=get_main_menu(message.from_user.id),
                 )
             else:
                 await message.answer(
@@ -199,10 +210,18 @@ async def cmd_start(message: types.Message, state: FSMContext):
         user = message.from_user
         if is_user_registered(user.id):
             await message.answer(
-                "Welcome back! You are in the main menu.", reply_markup=get_main_menu(user.id)
+                "Welcome back! You are in the main menu.",
+                reply_markup=get_main_menu(user.id),
             )
         else:
-            await message.answer("Welcome to the bot! Please enter your name:")
+            await message.answer(
+                "Welcome to the bot! Please enter your username.\n\n"
+                "⚠️ Note: Your username must be UNIQUE and can only contain:\n"
+                "- Latin alphabet characters (a-z, A-Z)\n"
+                "- Numbers (0-9)\n"
+                "- Underscores (_)"
+                "and you can use up to 20 characters"
+            )
             await state.clear()
             await state.set_state(registration.pref_name)
 
@@ -288,7 +307,8 @@ async def start_game_handler(message: types.Message, state: FSMContext):
     game_id = get_game_id_by_user(message.from_user.id)
     if not has_incomplete_games(message.from_user.id):
         await message.answer(
-            f"You are not participating in any game currently.", reply_markup=get_main_menu(message.from_user.id)
+            f"You are not participating in any game currently.",
+            reply_markup=get_main_menu(message.from_user.id),
         )
     else:
         msg = f"Current game status: active ✅\n"
