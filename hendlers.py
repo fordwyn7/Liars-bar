@@ -195,7 +195,7 @@ async def show_game_archive(message: types.Message, state: FSMContext):
         return
     response = "📜 *Your Game Archive:*\n\n"
     for idx, (_, start_time, _, _) in enumerate(games, start=1):
-        response += f"{idx}. 📅 {start_time.split(' ')[0]}\n"
+        response += f"{idx}. game — {start_time.split(' ')[0]} 📅\n"
 
     response += "\n📋 *Send the game number to view its details.*"
     await message.answer(response, parse_mode="Markdown",reply_markup=cancel_button)
