@@ -27,17 +27,14 @@ import sqlite3
 async def get_name(message: types.Message, state: FSMContext):
     preferred_name = message.text.strip()
     if "/start" in message.text:
-        await message.answer("Please enter your name first.")
+        await message.answer("Please enter your username first.")
         return
     h = is_name_valid(preferred_name)
-    if h == 2:
+    if not h:
         await message.answer(
-            f"Your data is incorrect! Please try again.\nThe name must contain only uppercase and lowercase letters of the Latin alphabet."
-        )
-    elif h == 1:
-        await message.answer(
-            f"Your data is incorrect! Please try again.\nThe length of the name must not exceed 20 characters."
-        )
+            "Your data is incorrect! Please enter your username in a given format")
+    elif h == 2:
+        await message.answer("There is already user with this username in the bot. Please enter another username.")
     else:
         user = message.from_user
         register_user(
@@ -56,17 +53,10 @@ async def get_name(message: types.Message, state: FSMContext):
     user_data = await state.get_data()
     payload = user_data.get("payload", "")
     if "/start" in message.text:
-        await message.answer("Please enter your name first.")
+        await message.answer("Please enter your username first.")
     if payload.startswith("game_"):
         game_id = payload.split("game_")[1]
         inviter_id = get_game_inviter_id(game_id)
-        if not inviter_id:
-            await message.answer(
-                "No game found with that ID or it has already finished.",
-                reply_markup=get_main_menu(message.from_user.id),
-            )
-            return
-
         user = message.from_user
         preferred_name = message.text
         h = is_name_valid(preferred_name)
@@ -74,10 +64,20 @@ async def get_name(message: types.Message, state: FSMContext):
             await message.answer(
                 f"Your data is incorrect! Please enter your username in a given format"
             )
+        elif h == 2:
+            await message.answer(
+                "There is already user with this username in the bot. Please enter another username."
+            )
         else:
             register_user(
                 user.id, user.username, user.first_name, user.last_name, preferred_name
             )
+            if not inviter_id:
+                await message.answer(
+                    "No game found with that ID or it has already finished.",
+                    reply_markup=get_main_menu(message.from_user.id),
+                )
+                return
             if game_id == get_game_id_by_user(message.from_user.id):
                 if message.from_user.id == get_game_inviter_id(game_id):
                     await message.answer(

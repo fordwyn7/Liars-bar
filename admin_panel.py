@@ -107,7 +107,7 @@ def get_user_statistics(user_id):
             f"📛 **First Name**: {first_name if first_name else 'N/A'}\n\n"
             f"📜 **Last Name**: {last_name if last_name else 'N/A'}\n\n"
             f"🗓️ **Registr Date**: {registration_date if registration_date else 'N/A'}\n\n"
-            f"🎮 **Name in bot**: {nfgame if nfgame else 'N/A'}\n"
+            f"🎮 **Username in bot**: {nfgame if nfgame else 'N/A'}\n"
         )
         
     except sqlite3.Error as e:
@@ -504,26 +504,3 @@ async def send_selected_user_game_statistics(message: types.Message, state: FSMC
     )
     await message.answer(game_status, parse_mode="Markdown", reply_markup=back_to_admin_panel)
     
-
-def update_users_nfgame():
-    conn = sqlite3.connect("users_database.db")
-    cursor = conn.cursor()
-    try:
-        cursor.execute("SELECT id FROM users_database ORDER BY id")
-        users = cursor.fetchall()
-        for idx, (user_id,) in enumerate(users, start=1):
-            nfgame = f"user{idx:03}"
-            cursor.execute("UPDATE users_database SET nfgame = ? WHERE id = ?", (nfgame, user_id))
-        conn.commit()
-    except Exception as e:
-        print(f"Error updating nfgame: {e}")
-        return 0
-
-@dp.message(F.text == "update_now")
-async def update_nfgame_handler(message: types.Message):
-    try:
-        total_updated = update_users_nfgame()
-        await message.answer(f"✅ Successfully updated nfgame for users.")
-    except Exception as e:
-        await message.answer("❌ Failed to update nfgame.")
-        print(f"Error in handler: {e}")

@@ -52,11 +52,11 @@ async def help_button_state(message: types.Message, state: FSMContext):
         )
 
 
-@dp.message(F.text == "change name 🖌")
+@dp.message(F.text == "change username 🖌")
 async def changeee(message: types.Message, state: FSMContext):
     await state.clear()
     await message.answer(
-        f"Your current username is: {get_user_nfgame(message.from_user.id)}\nIf you'd like to change it, please type your new username:"
+        f"Your current username is: {get_user_nfgame(message.from_user.id)}\nIf you'd like to change it, please type your new username:\n"
                 f"⚠️ Note: Your username must be UNIQUE and can only contain:\n"
                 f"- Latin alphabet characters (a-z, A-Z)\n"
                 f"- Numbers (0-9)\n"
@@ -86,8 +86,9 @@ async def set_new_nfgame(message: types.Message, state: FSMContext):
     h = is_name_valid(new_nfgame)
     if not h:
         await message.answer(
-            "Your data is incorrect! Please enter your username in a given format"
-        )
+            "Your data is incorrect! Please enter your username in a given format", reply_markup=cancel_button)
+    elif h == 2:
+        await message.answer("There is already user with this username in the bot. Please enter another username.", reply_markup=cancel_button)
     else:
         user_id = message.from_user.id
         with sqlite3.connect("users_database.db") as conn:
@@ -109,7 +110,7 @@ async def set_new_nfgame(message: types.Message, state: FSMContext):
 async def cancel(message: types.Message, state: FSMContext):
     await state.clear()
     await message.answer(
-        f"You have canceled changing the name.",
+        f"You have canceled changing the username.",
         reply_markup=get_main_menu(message.from_user.id),
     )
 

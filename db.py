@@ -316,10 +316,15 @@ def mark_game_as_started(game_id):
 
 def is_name_valid(name):
     if len(name) > 20 or len(name) < 1:
-        return False
+        return 0
     if not re.match(r"^[a-zA-Z0-9_]+$", name):
-        return False
-    return True
+        return 0
+    conn = sqlite3.connect("users_database.db")
+    cursor = conn.cursor()
+    cursor.execute("SELECT COUNT(*) FROM users_database WHERE nfgame = ?", (name,))
+    if cursor.fetchone()[0] > 0:
+        return 2 
+    return 1
 
 
 
@@ -900,7 +905,7 @@ def get_user_statistics(user_id: int) -> str:
             f"📛 **First Name**: {first_name if first_name else 'N/A'}\n"
             f"📜 **Last Name**: {last_name if last_name else 'N/A'}\n"
             f"🗓️ **Registration Date**: {registration_date if registration_date else 'N/A'}\n"
-            f"🎮 **NFGAME**: {nfgame if nfgame else 'N/A'}\n"
+            f"🎮 **Username in bot**: {nfgame if nfgame else 'N/A'}\n"
         )
     except sqlite3.Error as e:
         stats_message = f"❌ Database error occurred: {e}"
