@@ -186,25 +186,42 @@ def get_user_game_archive(user_id: int):
 
 
 @dp.message(F.text == "🎯 game archive")
-async def show_game_archive(message: types.Message):
+async def show_game_archive(message: types.Message, state: FSMContext):
     user_id = message.from_user.id
     games = get_user_game_archive(user_id)
+    
     if not games:
-        await message.answer(
-            "No games found in your archive.",
-        )
+        await message.answer("No games found in your archive.")
         return
     response = "📜 *Your Game Archive:*\n\n"
-    for idx, (record_id, start_time, end_time, winner) in enumerate(games, start=1):
-        response += (
-            f"🕹 *Game {idx}:*\n"
-            f"🆔 Game ID: `{record_id}`\n"
-            f"⏰ Start Time: {start_time}\n"
-            f"🏁 End Time: {end_time if end_time else 'Has not finished'}\n"
-            f"🏆 Winner: {winner if winner else 'No Winner'}\n\n"
-        )
+    for idx, (_, start_time, _, _) in enumerate(games, start=1):
+        response += f"{idx}. 📅 {start_time.split(' ')[0]}\n"
 
-    await message.answer(
-        response,
-        parse_mode="Markdown",
+    response += "\n📋 *Send the game number to view its details.*"
+    await message.answer(response, parse_mode="Markdown")
+    await state.set_state("awaiting_game_number")
+
+@dp.message(state="awaiting_game_number")
+async def send_game_statistics(message: types.Message, state: FSMContext):
+    user_id = message.from_user.id
+    games = get_user_game_archive(user_id)
+
+    if not message.text.isdigit():
+        await message.answer("❌ Please send a valid game number.")
+        return
+
+    game_number = int(message.text)
+    if game_number < 1 or game_number > len(games):
+        await message.answer("❌ Invalid game number. Please try again.")
+        return
+
+    record_id, start_time, end_time, winner = games[game_number - 1]
+    game_status = (
+        f"🕹 *Game Details:*\n"
+        f"⏰ Start Time: {start_time}\n"
+        f"🏁 End Time: {end_time if end_time else 'Has not finished'}\n"
+        f"🏆 Winner: {winner if winner else 'No Winner'}"
     )
+    await message.answer(game_status, parse_mode="Markdown")
+
+    await state.clear()

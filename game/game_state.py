@@ -402,7 +402,7 @@ async def handle_continue_or_liar(callback_query: types.CallbackQuery):
                             text=f"Game has finished. \nWinner is {get_user_nfgame(winner)}\nYou lose in this game.",
                             reply_markup=get_main_menu(i),
                         )
-                        update_game_details(game_id, i, get_user_nfgame(winner)+str(winner))
+                        update_game_details(game_id, i, get_user_nfgame(winner)+" - " +str(winner))
                         
                 await bot.send_message(
                     chat_id=winner,
@@ -410,7 +410,7 @@ async def handle_continue_or_liar(callback_query: types.CallbackQuery):
                     reply_markup=get_main_menu(winner),
                 )
                 await delete_game(game_id)
-                update_game_details(game_id, player, get_user_nfgame(winner)+str(winner))
+                update_game_details(game_id, player, get_user_nfgame(winner)+" - " + str(winner))
                 
                 return
             ms = f"Game has restarted! You all receive full cards again. Now {get_user_nfgame(get_current_turn_user_id(game_id))}'s turn."
@@ -465,7 +465,7 @@ async def handle_continue_or_liar(callback_query: types.CallbackQuery):
                         text=f"Game has finished. \nWinner is {get_user_nfgame(winner)}\nYou lose in this game.",
                         reply_markup=get_main_menu(i),
                     )
-                    update_game_details(game_id, i, get_user_nfgame(winner)+str(winner))
+                    update_game_details(game_id, i, get_user_nfgame(winner)+" - " + str(winner))
                     
             await bot.send_message(
                 chat_id=winner,
@@ -473,7 +473,7 @@ async def handle_continue_or_liar(callback_query: types.CallbackQuery):
                 reply_markup=get_main_menu(winner),
             )
             delete_game(game_id)
-            update_game_details(game_id, winner, get_user_nfgame(winner)+str(winner))
+            update_game_details(game_id, winner, get_user_nfgame(winner)+" - " +str(winner))
             await delete_all_game_messages(game_id)
             return
         ms = f"Game has restarted! You all receive full cards again. Now {get_user_nfgame(get_current_turn_user_id(game_id))}'s turn."
