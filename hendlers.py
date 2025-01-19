@@ -107,7 +107,7 @@ async def cancel(message: types.Message, state: FSMContext):
     )
 
 
-@dp.message(F.text == "Information 📚")
+@dp.message(F.text == "information 📚")
 async def statistics_a(message: types.Message, state: FSMContext):
     await state.clear()
     
