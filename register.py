@@ -37,8 +37,6 @@ async def get_name(message: types.Message, state: FSMContext):
         await message.answer("There is already user with this username in the bot. Please enter another username.")
     else:
         user = message.from_user
-        if preferred_name[0] != "@":
-            preferred_name = "@" + preferred_name
         register_user(
             user.id, user.username, user.first_name, user.last_name, preferred_name
         )
@@ -71,8 +69,6 @@ async def get_name(message: types.Message, state: FSMContext):
                 "There is already user with this username in the bot. Please enter another username."
             )
         else:
-            if preferred_name[0] != "@":
-                preferred_name = "@" + preferred_name
             register_user(
                 user.id, user.username, user.first_name, user.last_name, preferred_name
             )
