@@ -226,6 +226,4 @@ async def send_game_statistics(message: types.Message, state: FSMContext):
         f"🏁 End Time: {end_time if end_time else 'Has not finished'}\n"
         f"🏆 Winner: {winner if winner else 'No Winner'}"
     )
-    await message.answer(game_status, parse_mode="Markdown")
-
-    await state.clear()
+    await message.answer(game_status, parse_mode="Markdown", reply_markup=cancel_button)
