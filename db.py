@@ -315,15 +315,17 @@ def mark_game_as_started(game_id):
 
 
 def is_name_valid(name):
-    if len(name) > 20 or len(name) < 1:
-        return 0
-    if not re.match(r"^[a-zA-Z0-9_]+$", name):
-        return 0
     conn = sqlite3.connect("users_database.db")
     cursor = conn.cursor()
     cursor.execute("SELECT COUNT(*) FROM users_database WHERE nfgame = ?", (name,))
     if cursor.fetchone()[0] > 0:
         return 2 
+    if len(name) > 20 or len(name) < 1:
+        return 0
+    if (re.match(r"^[a-zA-Z0-9_]+$", name[1:]) and name[0] == "@"):
+        return 1
+    if not re.match(r"^[a-zA-Z0-9_]+$", name):
+        return 0
     return 1
 
 

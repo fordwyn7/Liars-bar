@@ -91,6 +91,8 @@ async def set_new_nfgame(message: types.Message, state: FSMContext):
         await message.answer("There is already user with this username in the bot. Please enter another username.", reply_markup=cancel_button)
     else:
         user_id = message.from_user.id
+        if new_nfgame[0] != "@":
+            new_nfgame = "@" + new_nfgame
         with sqlite3.connect("users_database.db") as conn:
             cursor = conn.cursor()
             cursor.execute(
