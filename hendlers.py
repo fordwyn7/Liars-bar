@@ -211,14 +211,10 @@ async def send_game_statistics(message: types.Message, state: FSMContext):
     games = get_user_game_archive(user_id)
 
     if not message.text.isdigit():
-        await message.answer("❌ Please send a valid game number.")
-        return
-
+        await message.answer("❌ Please send a valid game number.", reply_markup=cancel_button)
     game_number = int(message.text)
     if game_number < 1 or game_number > len(games):
-        await message.answer("❌ Invalid game number. Please try again.")
-        return
-
+        await message.answer("❌ Invalid game number. Please try again.", reply_markup=cancel_button)
     record_id, start_time, end_time, winner = games[game_number - 1]
     game_status = (
         f"🕹 *Game Details:*\n"
