@@ -9,7 +9,7 @@ from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 from aiogram.utils.keyboard import InlineKeyboardBuilder
 from states.state import *
 from hendlers import get_user_game_archive
-
+from datetime import datetime, timedelta
 def generate_callback(action: str, admin_id: int) -> str:
     return f"{action}:{admin_id}"
 
@@ -26,6 +26,35 @@ def get_admins2():
     return admins
 
 
+def get_statistics():
+    conn = sqlite3.connect('users_database.db')
+    cursor = conn.cursor()
+    cursor.execute("SELECT COUNT(*) FROM users_database")
+    total_users = cursor.fetchone()[0]
+    cursor.execute("SELECT COUNT(DISTINCT game_id) FROM game_archive")
+    total_games = cursor.fetchone()[0]
+    week_start = (datetime.now() - timedelta(days=datetime.now().weekday())).strftime("%Y-%m-%d")
+    cursor.execute("SELECT COUNT(*) FROM users_database WHERE registration_date >= ?", (week_start,))
+    users_joined_this_week = cursor.fetchone()[0]
+    stats_message = (
+        "📊 *Game Statistics*\n\n"
+        f"👥 *Total Users:* {total_users}\n"
+        f"🎮 *Total Games Played:* {total_games}\n"
+        f"🆕 *Users Joined This Week:* {users_joined_this_week}\n"
+    )
+    conn.close()
+    return stats_message
+    
+
+@dp.message(F.text == "📊 statistics")
+@admin_required()
+async def main_to_menu(message: types.Message, state: FSMContext):
+    try:
+        stats_message = get_statistics()
+        await message.answer(stats_message, parse_mode="Markdown")
+    except Exception as e:
+        await message.answer("❌ An error occurred while fetching statistics.")
+        print(f"Error: {e}")
 USERS_PER_PAGE = 10
 
 
@@ -474,3 +503,4 @@ async def send_selected_user_game_statistics(message: types.Message, state: FSMC
         f"🏆 Winner: {winner if winner else 'No Winner'}"
     )
     await message.answer(game_status, parse_mode="Markdown", reply_markup=back_to_admin_panel)
+    
