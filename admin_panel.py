@@ -35,8 +35,8 @@ def generate_user_list(users, page):
     page_users = users[start_index:end_index]
 
     user_list = []
-    for index, (user_id, phone) in enumerate(page_users, start=start_index + 1):
-        user_list.append(f"{index}. <a href='tg://user?id={user_id}'>{user_id}</a>")
+    for index, (user_id, nfgame) in enumerate(page_users, start=start_index + 1):
+        user_list.append(f"{index}. <a href='tg://user?id={user_id}'>{user_id}</a> — {nfgame}")
 
     return user_list
 
