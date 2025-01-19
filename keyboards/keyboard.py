@@ -102,6 +102,14 @@ back_button = ReplyKeyboardMarkup(
     ],
     resize_keyboard=True,
 )
+back_to_admin_panel = ReplyKeyboardMarkup(
+    keyboard=[
+        [
+            KeyboardButton(text="back to admin panel 🔙"),
+        ],
+    ],
+    resize_keyboard=True,
+)
 
 send_messages = ReplyKeyboardMarkup(
     keyboard=[

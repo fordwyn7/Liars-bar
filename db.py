@@ -933,7 +933,7 @@ def update_game_details(game_id: str, user_id: int,winner: str) -> str:
     end_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     try:
         if not winner:
-            winner = "user quited the game before game ended"
+            winner = "Game had not been finished"
         cursor.execute(
             """
             UPDATE game_archive 

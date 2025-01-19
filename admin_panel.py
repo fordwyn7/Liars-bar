@@ -8,7 +8,7 @@ from db import *
 from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 from aiogram.utils.keyboard import InlineKeyboardBuilder
 from states.state import *
-
+from hendlers import get_user_game_archive
 
 def generate_callback(action: str, admin_id: int) -> str:
     return f"{action}:{admin_id}"
@@ -423,3 +423,55 @@ async def state_info_users(message: types.Message, state: FSMContext):
                 reply_markup=admin_panel_button,
             )
         await state.clear()
+
+@dp.message(F.text == "🎯 Game archive")
+@admin_required()  # Assuming you have an admin check decorator
+async def admin_game_archive(message: types.Message, state: FSMContext):
+    await message.answer(
+        "Please send me the user ID to view their game archive 📋.",
+        reply_markup=back_button,  # Assuming you have a back button for navigation
+    )
+    await state.set_state("awaiting_user_id")
+
+@dp.message(state="awaiting_user_id")
+async def get_user_archive_by_id(message: types.Message, state: FSMContext):
+    if not message.text.isdigit():
+        await message.answer("❌ Please send a valid user ID.")
+        return
+
+    user_id = int(message.text)
+    games = get_user_game_archive(user_id) 
+    if not games:
+        await message.answer("No games found for this user.", reply_markup=admin_panel_button)
+        await state.clear()
+        return
+
+    response = f"📜 *Game Archive for User {user_id}:*\n\n"
+    for idx, (_, start_time, _, _) in enumerate(games, start=1):
+        response += f"{idx}. game — {start_time.split(' ')[0]} 📅\n"
+
+    response += "\n📋 *Send the game number to view its details.*"
+    await message.answer(response, parse_mode="Markdown")
+    await state.update_data(selected_user_id=user_id)
+    await state.set_state(awaiting_admin_game_number.selected_user)
+
+@dp.message(awaiting_admin_game_number.selected_user)
+async def send_selected_user_game_statistics(message: types.Message, state: FSMContext):
+    data = await state.get_data()
+    user_id = data.get("selected_user_id")
+    games = get_user_game_archive(user_id)
+    if not message.text.isdigit():
+        await message.answer("❌ Please send a valid game number.", reply_markup=back_to_admin_panel)
+
+    game_number = int(message.text)
+    if game_number < 1 or game_number > len(games):
+        await message.answer("❌ Invalid game number. Please try again.", reply_markup=back_to_admin_panel)
+    record_id, start_time, end_time, winner = games[game_number - 1]
+    game_status = (
+        f"🕹 *Game Details:*\n"
+        f"🆔 Game ID: {record_id}\n"
+        f"⏰ Start Time: {start_time}\n"
+        f"🏁 End Time: {end_time if end_time else 'Has not finished'}\n"
+        f"🏆 Winner: {winner if winner else 'No Winner'}"
+    )
+    await message.answer(game_status, parse_mode="Markdown", reply_markup=back_to_admin_panel)
