@@ -222,6 +222,7 @@ async def send_game_statistics(message: types.Message, state: FSMContext):
     record_id, start_time, end_time, winner = games[game_number - 1]
     game_status = (
         f"🕹 *Game Details:*\n"
+        f"🆔 Game ID: {record_id}\n"
         f"⏰ Start Time: {start_time}\n"
         f"🏁 End Time: {end_time if end_time else 'Has not finished'}\n"
         f"🏆 Winner: {winner if winner else 'No Winner'}"
