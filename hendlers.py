@@ -110,25 +110,24 @@ async def cancel(message: types.Message, state: FSMContext):
 @dp.message(F.text == "information 📚")
 async def statistics_a(message: types.Message, state: FSMContext):
     await state.clear()
-    
+
     inline_buttons = InlineKeyboardMarkup(
         inline_keyboard=[
             [
                 InlineKeyboardButton(
                     text="📢 Bot's Channel", url="https://t.me/liars_bar_game_channel"
                 ),
-                InlineKeyboardButton(
-                    text="👨‍💻 Creator", url="https://t.me/TechBotsy"
-                ),
-            ]
+            ],
+            [
+                InlineKeyboardButton(text="👨‍💻 Creator", url="https://t.me/TechBotsy"),
+            ],
         ]
     )
-    
+
     await message.answer(
         f"Here are the bot's statistics 📈:\n\nTotal users in the bot 👥: {get_total_users()}\nBot has been active since 01.03.2025 📅",
         reply_markup=inline_buttons,
     )
-
 
 
 @dp.message(F.text == "how to play 📝")
