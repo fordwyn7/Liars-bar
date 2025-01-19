@@ -60,7 +60,7 @@ async def changeee(message: types.Message, state: FSMContext):
                 f"⚠️ Note: Your username must be UNIQUE and can only contain:\n"
                 f"- Latin alphabet characters (a-z, A-Z)\n"
                 f"- Numbers (0-9)\n"
-                f"- Underscores (_)"
+                f"- Underscores (_)\n"
                 f"and you can use up to 20 characters",
         reply_markup=cancel_button,
     )

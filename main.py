@@ -116,7 +116,7 @@ async def cmd_start(message: types.Message, state: FSMContext):
                 "⚠️ Note: Your username must be UNIQUE and can only contain:\n"
                 "- Latin alphabet characters (a-z, A-Z)\n"
                 "- Numbers (0-9)\n"
-                "- Underscores (_)"
+                "- Underscores (_)\n"
                 "and you can use up to 20 characters"
             )
 
@@ -219,7 +219,7 @@ async def cmd_start(message: types.Message, state: FSMContext):
                 "⚠️ Note: Your username must be UNIQUE and can only contain:\n"
                 "- Latin alphabet characters (a-z, A-Z)\n"
                 "- Numbers (0-9)\n"
-                "- Underscores (_)"
+                "- Underscores (_)\n"
                 "and you can use up to 20 characters"
             )
             await state.clear()
