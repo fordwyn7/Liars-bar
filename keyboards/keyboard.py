@@ -32,7 +32,7 @@ def get_main_menu(user_id: int):
 change_name = ReplyKeyboardMarkup(
     keyboard=[
         [
-            KeyboardButton(text="change name 🖌"),
+            KeyboardButton(text="change username 🖌"),
             KeyboardButton(text="❓ help"),
         ],
         [
