@@ -201,7 +201,7 @@ async def show_game_archive(message: types.Message, state: FSMContext):
     await message.answer(response, parse_mode="Markdown")
     await state.set_state("awaiting_game_number")
 
-@dp.message(state="awaiting_game_number")
+@dp.message("awaiting_game_number")
 async def send_game_statistics(message: types.Message, state: FSMContext):
     user_id = message.from_user.id
     games = get_user_game_archive(user_id)
