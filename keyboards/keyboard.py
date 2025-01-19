@@ -11,14 +11,14 @@ def get_main_menu(user_id: int):
     is_admin = is_user_admin(user_id)
     keyboard = [
         [
-            KeyboardButton(text="start game 🎮"),            
+            KeyboardButton(text="start game 🎮"),      
+            KeyboardButton(text="game status 🌟"),      
         ],
         [
-            KeyboardButton(text="game status 🌟"),
             KeyboardButton(text="🎯 Game Archive"),
+            KeyboardButton(text="how to play 📝"),
         ],
         [
-            KeyboardButton(text="how to play 📝"),
             KeyboardButton(text="statistics 📊"),
             KeyboardButton(text="settings ⚙️"),
             
