@@ -425,19 +425,18 @@ async def state_info_users(message: types.Message, state: FSMContext):
         await state.clear()
 
 @dp.message(F.text == "🎯 Game archive")
-@admin_required()  # Assuming you have an admin check decorator
+@admin_required()
 async def admin_game_archive(message: types.Message, state: FSMContext):
     await message.answer(
         "Please send me the user ID to view their game archive 📋.",
-        reply_markup=back_button,  # Assuming you have a back button for navigation
+        reply_markup=back_to_admin_panel,
     )
-    await state.set_state("awaiting_user_id")
+    await state.set_state(awaiting_user_id.await_id)
 
-@dp.message(state="awaiting_user_id")
+@dp.message(awaiting_user_id.await_id)
 async def get_user_archive_by_id(message: types.Message, state: FSMContext):
     if not message.text.isdigit():
-        await message.answer("❌ Please send a valid user ID.")
-        return
+        await message.answer("❌ Please send a valid user ID.", reply_markup=back_to_admin_panel)
 
     user_id = int(message.text)
     games = get_user_game_archive(user_id) 
@@ -451,7 +450,7 @@ async def get_user_archive_by_id(message: types.Message, state: FSMContext):
         response += f"{idx}. game — {start_time.split(' ')[0]} 📅\n"
 
     response += "\n📋 *Send the game number to view its details.*"
-    await message.answer(response, parse_mode="Markdown")
+    await message.answer(response, parse_mode="Markdown", reply_markup=back_to_admin_panel)
     await state.update_data(selected_user_id=user_id)
     await state.set_state(awaiting_admin_game_number.selected_user)
 

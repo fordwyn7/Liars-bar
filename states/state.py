@@ -39,3 +39,6 @@ class awaiting_game_number(StatesGroup):
     
 class awaiting_admin_game_number(StatesGroup):
     selected_user = State()
+    
+class awaiting_user_id(StatesGroup):
+    await_id = State()
