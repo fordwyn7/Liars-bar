@@ -33,3 +33,6 @@ class msgtoindividual(StatesGroup):
     
 class UserInformations(StatesGroup):
     userid_state = State()
+    
+class awaiting_game_number(StatesGroup):
+    waiting = State()

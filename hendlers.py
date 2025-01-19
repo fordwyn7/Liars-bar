@@ -5,7 +5,7 @@ from aiogram.fsm.context import FSMContext
 from keyboards.keyboard import change_name, get_main_menu, cancel_button
 from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 
-from states.state import NewGameState, MessagetoAdmin
+from states.state import NewGameState, MessagetoAdmin, awaiting_game_number
 from db import (
     get_user_nfgame,
     is_name_valid,
@@ -198,11 +198,15 @@ async def show_game_archive(message: types.Message, state: FSMContext):
         response += f"{idx}. 📅 {start_time.split(' ')[0]}\n"
 
     response += "\n📋 *Send the game number to view its details.*"
-    await message.answer(response, parse_mode="Markdown")
-    await state.set_state("awaiting_game_number")
+    await message.answer(response, parse_mode="Markdown",reply_markup=cancel_button)
+    await state.set_state(awaiting_game_number.waiting)
 
-@dp.message("awaiting_game_number")
+@dp.message(awaiting_game_number.waiting)
 async def send_game_statistics(message: types.Message, state: FSMContext):
+    if message.text == "back to main menu 🔙":
+        await state.clear()
+        await message.answer(f"You are in main menu.", reply_markup=get_main_menu(message.from_user.id))
+        return
     user_id = message.from_user.id
     games = get_user_game_archive(user_id)
 
