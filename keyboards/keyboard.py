@@ -15,11 +15,11 @@ def get_main_menu(user_id: int):
             KeyboardButton(text="game status 🌟"),      
         ],
         [
-            KeyboardButton(text="🎯 Game Archive"),
+            KeyboardButton(text="🎯 game archive"),
             KeyboardButton(text="how to play 📝"),
         ],
         [
-            KeyboardButton(text="statistics 📊"),
+            KeyboardButton(text="information 📚"),
             KeyboardButton(text="settings ⚙️"),
             
         ],
@@ -63,7 +63,7 @@ cancel_button = ReplyKeyboardMarkup(
 admin_panel_button = ReplyKeyboardMarkup(
     keyboard=[
         [
-            KeyboardButton(text="🎯 game archive"),
+            KeyboardButton(text="🎯 Game archive"),
             KeyboardButton(text="🏆 tournaments"),
         ],
         [

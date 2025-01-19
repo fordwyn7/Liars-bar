@@ -3,9 +3,9 @@ from config import dp, F, bot
 from aiogram import types
 from aiogram.fsm.context import FSMContext
 from keyboards.keyboard import change_name, get_main_menu, cancel_button
-from aiogram.types import ReplyKeyboardMarkup, KeyboardButton
+from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 
-from states.state import NewGameState, MessagetoAdmin, messagetouser
+from states.state import NewGameState, MessagetoAdmin
 from db import (
     get_user_nfgame,
     is_name_valid,
@@ -107,13 +107,28 @@ async def cancel(message: types.Message, state: FSMContext):
     )
 
 
-@dp.message(F.text == "statistics 📊")
+@dp.message(F.text == "Information 📚")
 async def statistics_a(message: types.Message, state: FSMContext):
     await state.clear()
+    
+    inline_buttons = InlineKeyboardMarkup(
+        inline_keyboard=[
+            [
+                InlineKeyboardButton(
+                    text="📢 Bot's Channel", url="https://t.me/liars_bar_game_channel"
+                ),
+                InlineKeyboardButton(
+                    text="👨‍💻 Creator", url="https://t.me/TechBotsy"
+                ),
+            ]
+        ]
+    )
+    
     await message.answer(
         f"Here are the bot's statistics 📈:\n\nTotal users in the bot 👥: {get_total_users()}\nBot has been active since 01.03.2025 📅",
-        reply_markup=get_main_menu(message.from_user.id),
+        reply_markup=inline_buttons,
     )
+
 
 
 @dp.message(F.text == "how to play 📝")
@@ -171,7 +186,7 @@ def get_user_game_archive(user_id: int):
         conn.close()
 
 
-@dp.message(F.text == "🎯 Game Archive")
+@dp.message(F.text == "🎯 game archive")
 async def show_game_archive(message: types.Message):
     user_id = message.from_user.id
     games = get_user_game_archive(user_id)
