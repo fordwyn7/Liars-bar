@@ -39,12 +39,15 @@ def is_user_registered(user_id):
         print(f"Error checking if user is registered: {e}")
         return None
 
+
 def add_admin(user_id):
     conn = sqlite3.connect("users_database.db")
     cursor = conn.cursor()
     cursor.execute("INSERT OR IGNORE INTO admins (user_id) VALUES (?)", (user_id,))
     conn.commit()
     conn.close()
+
+
 def get_game_inviter_id(game_id):
     try:
         with connect_db() as conn:
@@ -313,21 +316,19 @@ def mark_game_as_started(game_id):
         conn.commit()
 
 
-
 def is_name_valid(name):
     conn = sqlite3.connect("users_database.db")
     cursor = conn.cursor()
     cursor.execute("SELECT COUNT(*) FROM users_database WHERE nfgame = ?", (name,))
     if cursor.fetchone()[0] > 0:
-        return 2 
+        return 2
     if len(name) > 20 or len(name) < 1:
         return 0
-    if (re.match(r"^[a-zA-Z0-9_]+$", name[1:]) and name[0] == "@"):
+    if re.match(r"^[a-zA-Z0-9_]+$", name[1:]) and name[0] == "@":
         return 1
     if not re.match(r"^[a-zA-Z0-9_]+$", name):
         return 0
     return 1
-
 
 
 def get_all_players_nfgame(game_id):
@@ -513,7 +514,9 @@ async def periodically_edit_message(
         )
     except Exception as e:
         await bot.send_message(
-            chat_id, f"Something went wrong. Plase try again.", reply_markup=get_main_menu(chat_id)
+            chat_id,
+            f"Something went wrong. Plase try again.",
+            reply_markup=get_main_menu(chat_id),
         )
         print(f"An error occurred: {e}")
 
@@ -916,7 +919,9 @@ def get_user_statistics(user_id: int) -> str:
 
     return stats_message
 
+
 from datetime import datetime
+
 
 def create_game_record_if_not_exists(game_id: str, user_id: int):
     conn = sqlite3.connect("users_database.db")
@@ -933,13 +938,14 @@ def create_game_record_if_not_exists(game_id: str, user_id: int):
 
         conn.commit()
         conn.close()
-        
+
     except sqlite3.Error as e:
         print(f"❌ Database error occurred while creating game record: {e}")
     conn.close()
 
-def update_game_details(game_id: str, user_id: int,winner: str):
-    
+
+def update_game_details(game_id: str, user_id: int, winner: str):
+
     end_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     try:
         conn = sqlite3.connect("users_database.db")
@@ -947,19 +953,20 @@ def update_game_details(game_id: str, user_id: int,winner: str):
         if not winner:
             winner = "Game had not been finished"
             cursor.execute(
-            """
+                """
             UPDATE game_archive 
             SET game_end_time = ?, game_winner = ?
             WHERE game_id = ? AND user_id = ?
             """,
-            (end_time, winner, game_id, user_id),
-        )
+                (end_time, winner, game_id, user_id),
+            )
         if cursor.rowcount == 0:
             return f"❌ Failed to update game details for ID '{game_id}'."
 
         conn.commit()
         conn.close()
-        return 
+        return
     except sqlite3.Error as e:
         return f"❌ Database error occurred: {e}"
-    conn.close()
+    finally:
+        conn.close()
