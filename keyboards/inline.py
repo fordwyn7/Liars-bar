@@ -182,7 +182,6 @@ async def can_game(callback_query: types.CallbackQuery):
                     )
                 except Exception as e:
                     print(f"Error sending message to player {player_id}: {e}")
-        update_game_details(game_id, callback_query.from_user.id, None)
         cursor.execute(
             """
             DELETE FROM invitations 
@@ -193,7 +192,7 @@ async def can_game(callback_query: types.CallbackQuery):
             (user.id,),
         )
         conn.commit()
-
+        update_game_details(game_id, callback_query.from_user.id, None)
         await callback_query.message.answer(
             "You have canceled the game. All players have been notified.",
             reply_markup=get_main_menu(callback_query.from_user.id),
