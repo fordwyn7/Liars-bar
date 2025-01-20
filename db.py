@@ -918,10 +918,9 @@ def get_user_statistics(user_id: int) -> str:
 
 from datetime import datetime
 
-def create_game_record_if_not_exists(game_id: str, user_id: int) -> None:
+def create_game_record_if_not_exists(game_id: str, user_id: int):
     conn = sqlite3.connect("users_database.db")
     cursor = conn.cursor()
-
     try:
         start_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         cursor.execute(
@@ -933,12 +932,11 @@ def create_game_record_if_not_exists(game_id: str, user_id: int) -> None:
         )
 
         conn.commit()
+        conn.close()
     except sqlite3.Error as e:
         print(f"❌ Database error occurred while creating game record: {e}")
-    finally:
-        conn.close()
 
-def update_game_details(game_id: str, user_id: int,winner: str) -> str:
+def update_game_details(game_id: str, user_id: int,winner: str):
     conn = sqlite3.connect("users_database.db")
     cursor = conn.cursor()
     end_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
@@ -957,8 +955,7 @@ def update_game_details(game_id: str, user_id: int,winner: str) -> str:
             return f"❌ Failed to update game details for ID '{game_id}'."
 
         conn.commit()
-        return f"✅ Game ID '{game_id}' updated successfully with end time and winner."
+        conn.close()
+        return 
     except sqlite3.Error as e:
         return f"❌ Database error occurred: {e}"
-    finally:
-        conn.close()
