@@ -935,7 +935,6 @@ def create_game_record_if_not_exists(game_id: str, user_id: int):
             """,
             (game_id, user_id, start_time),
         )
-
         conn.commit()
         conn.close()
 
@@ -960,11 +959,10 @@ def update_game_details(game_id: str, user_id: int, winner: str):
             """,
                 (end_time, winner, game_id, user_id),
             )
+            conn.commit()
+            conn.close()
         if cursor.rowcount == 0:
             return f"❌ Failed to update game details for ID '{game_id}'."
-
-        conn.commit()
-        conn.close()
         return
     except sqlite3.Error as e:
         return f"❌ Database error occurred: {e}"
