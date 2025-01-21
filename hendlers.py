@@ -255,8 +255,8 @@ async def show_games_handler(message: types.Message):
         response = "Game Archive:\n"
         for row in rows:
             response += (
-                f"ID: {row[0]}, User ID: {row[1]}, Game ID: {row[2]}, "
-                f"Start Time: {row[3]}, End Time: {row[4]}, Winner: {row[5]}\n"
+                f"ID: {row[0]}\nUser ID: {row[1]}, \nGame ID: {row[2]}, \n"
+                f"Start Time: {row[3]}, \nEnd Time: {row[4]}, \nWinner: {row[5]}\n"
             )
     else:
         response = "The game archive is empty."
