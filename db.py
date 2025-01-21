@@ -961,15 +961,15 @@ def update_game_details(game_id: str, user_id: int, winner: str):
         )
         
         conn.commit()
-        
-        # Check if any row was affected
         if cursor.rowcount == 0:
+            print("❌ Failed to update game details for ID '{game_id}'.")
             return f"❌ Failed to update game details for ID '{game_id}'."
         
         print(f"Game details updated for {user_id}, game_id: {game_id}")
         return "Game details updated successfully."
 
     except sqlite3.Error as e:
+        print("❌ Database error occurred: {e}")
         return f"❌ Database error occurred: {e}"
     finally:
         conn.close()
