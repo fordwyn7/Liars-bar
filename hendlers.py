@@ -246,10 +246,6 @@ async def send_game_statistics(message: types.Message, state: FSMContext):
 
 @dp.message(F.text == "show")
 async def show_games_handler(message: types.Message):
-    conn = sqlite3.connect("users_database.db")
-    cursor = conn.cursor()
-    cursor.execute("DROP TABLE IF EXISTS game_archive")
-    conn.commit()
     with sqlite3.connect("users_database.db") as conn:
         cursor = conn.cursor()
         cursor = conn.execute("SELECT * FROM game_archive")
