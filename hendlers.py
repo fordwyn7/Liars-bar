@@ -180,7 +180,6 @@ def get_user_game_archive(user_id: int):
             SELECT game_id, game_start_time, game_end_time, game_winner
             FROM game_archive
             WHERE user_id = ?
-            ORDER BY game_start_time DESC
             """,
             (user_id,),
         )

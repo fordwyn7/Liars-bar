@@ -922,7 +922,6 @@ def get_user_statistics(user_id: int) -> str:
 
 from datetime import datetime
 
-
 def create_game_record_if_not_exists(game_id: str, user_id: int):
     conn = sqlite3.connect("users_database.db")
     cursor = conn.cursor()
@@ -936,32 +935,42 @@ def create_game_record_if_not_exists(game_id: str, user_id: int):
             (game_id, user_id, start_time),
         )
         conn.commit()
-        conn.close()
+        print(f"Game record created for {user_id}, game_id: {game_id}")
     except sqlite3.Error as e:
         print(f"❌ Database error occurred while creating game record: {e}")
+    finally:
+        conn.close()
+
 
 def update_game_details(game_id: str, user_id: int, winner: str):
-    
     end_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     try:
         conn = sqlite3.connect("users_database.db")
         cursor = conn.cursor()
+        
         if not winner:
             winner = "Game had not been finished"
-            cursor.execute(
-                """
+        
+        cursor.execute(
+            """
             UPDATE game_archive 
             SET game_end_time = ?, game_winner = ?
             WHERE game_id = ? AND user_id = ?
             """,
-                (end_time, winner, game_id, user_id),
-            )
-            conn.commit()
-            conn.close()
+            (end_time, winner, game_id, user_id),
+        )
+        
+        conn.commit()
+        
+        # Check if any row was affected
         if cursor.rowcount == 0:
             return f"❌ Failed to update game details for ID '{game_id}'."
-        return
+        
+        print(f"Game details updated for {user_id}, game_id: {game_id}")
+        return "Game details updated successfully."
+
     except sqlite3.Error as e:
         return f"❌ Database error occurred: {e}"
     finally:
         conn.close()
+
