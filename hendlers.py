@@ -243,3 +243,21 @@ async def send_game_statistics(message: types.Message, state: FSMContext):
     )
     await message.answer(game_status, parse_mode="Markdown")
     await state.clear()
+
+@dp.message(F.text == "show")
+async def show_games_handler(message: types.Message):
+    with sqlite3.connect("users_database.db") as conn:
+        cursor = conn.cursor()
+        cursor = conn.execute("SELECT * FROM game_archive")
+        rows = cursor.fetchall()
+        cursor.close()
+    if rows:
+        response = "Game Archive:\n"
+        for row in rows:
+            response += (
+                f"ID: {row[0]}, User ID: {row[1]}, Game ID: {row[2]}, "
+                f"Start Time: {row[3]}, End Time: {row[4]}, Winner: {row[5]}\n"
+            )
+    else:
+        response = "The game archive is empty."
+    await message.answer(response)
