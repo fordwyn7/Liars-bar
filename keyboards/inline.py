@@ -67,31 +67,31 @@ async def start_game(callback_query: types.CallbackQuery):
                 continue
             
             create_game_record_if_not_exists(game_id, player)
-            conn = sqlite3.connect("users_database.db")
-            cursor = conn.cursor()
-            cursor.execute(
-                """
-            SELECT game_id, game_start_time
-            FROM game_archive
-            WHERE user_id = ?
-            """,
-                (player,),
-            )
-            result = cursor.fetchone()
-            conn.close()
+            # conn = sqlite3.connect("users_database.db")
+            # cursor = conn.cursor()
+            # cursor.execute(
+            #     """
+            # SELECT game_id, game_start_time
+            # FROM game_archive
+            # WHERE user_id = ?
+            # """,
+            #     (player,),
+            # )
+            # result = cursor.fetchone()
+            # conn.close()
 
-            if result:
-                game_id, start_time = result
-                message_text = (
-                    f"🎮 Game Created Successfully!\n"
-                    f"Game ID: {game_id}\n"
-                    f"Start Time: {start_time}"
-                )
-                await bot.send_message(player, message_text)
-            else:
-                await bot.send_message(
-                    player, "⚠️ No game record found for your user ID."
-                )
+            # if result:
+            #     game_id, start_time = result
+            #     message_text = (
+            #         f"🎮 Game Created Successfully!\n"
+            #         f"Game ID: {game_id}\n"
+            #         f"Start Time: {start_time}"
+            #     )
+            #     await bot.send_message(player, message_text)
+            # else:
+            #     await bot.send_message(
+            #         player, "⚠️ No game record found for your user ID."
+            #     )
             tasks.append(send_game_start_messages(player, ms1, ms2, len(players)))
         create_game_record_if_not_exists(game_id, cr_id)
         if callback_query.from_user.id is None:
