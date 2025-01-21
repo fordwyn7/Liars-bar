@@ -49,7 +49,7 @@ cursor.execute(
     """
 CREATE TABLE IF NOT EXISTS game_archive (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
-    user_id INTEGER UNIQUE NOT NULL,
+    user_id INTEGER,
     game_id TEXT,
     game_start_time TEXT,
     game_end_time TEXT,
