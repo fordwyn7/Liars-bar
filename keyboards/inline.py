@@ -7,7 +7,11 @@ from aiogram import types
 from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 from aiogram.handlers import CallbackQueryHandler
 from db import *
-from game.game_state import send_random_cards_to_players, get_current_turn_user_id,get_next_player_id
+from game.game_state import (
+    send_random_cards_to_players,
+    get_current_turn_user_id,
+    get_next_player_id,
+)
 
 start_stop_game = InlineKeyboardMarkup(
     inline_keyboard=[
@@ -61,7 +65,33 @@ async def start_game(callback_query: types.CallbackQuery):
         for player in players:
             if player is None:
                 continue
+            
             create_game_record_if_not_exists(game_id, player)
+            conn = sqlite3.connect("users_database.db")
+            cursor = conn.cursor()
+            cursor.execute(
+                """
+            SELECT game_id, game_start_time
+            FROM game_archive
+            WHERE user_id = ?
+            """,
+                (player,),
+            )
+            result = cursor.fetchone()
+            conn.close()
+
+            if result:
+                game_id, start_time = result
+                message_text = (
+                    f"🎮 Game Created Successfully!\n"
+                    f"Game ID: {game_id}\n"
+                    f"Start Time: {start_time}"
+                )
+                await bot.send_message(player, message_text)
+            else:
+                await bot.send_message(
+                    player, "⚠️ No game record found for your user ID."
+                )
             tasks.append(send_game_start_messages(player, ms1, ms2, len(players)))
         create_game_record_if_not_exists(game_id, cr_id)
         if callback_query.from_user.id is None:
@@ -173,7 +203,7 @@ async def can_game(callback_query: types.CallbackQuery):
             player_id = player[0]
             if player_id is not None:
                 # await callback_query.message.answer(game_id + "       6")
-                
+
                 update_game_details(game_id, player, None)
                 delete_user_from_all_games(player_id)
                 try:
@@ -213,7 +243,9 @@ async def player_quit_game(user_id, game_id, inviter_id):
             (user_id, game_id),
         )
         conn.commit()
-        cursor.execute("SELECT nfgame FROM users_database WHERE user_id = ?", (user_id,))
+        cursor.execute(
+            "SELECT nfgame FROM users_database WHERE user_id = ?", (user_id,)
+        )
         player_name = cursor.fetchone()
 
         if player_name:
@@ -241,13 +273,16 @@ async def handle_quit_game(callback_query: types.CallbackQuery):
             await callback_query.answer("You are not currently in any game.")
             return
         if has_incomplete_games(user.id):
-            if is_user_in_game(game_id, user.id) and get_current_turn_user_id(game_id) == user.id:
-                await  callback_query.message.answer(
-                f"Now it is your turn! You can't leave the game at that time🙅‍♂️"
-            )
+            if (
+                is_user_in_game(game_id, user.id)
+                and get_current_turn_user_id(game_id) == user.id
+            ):
+                await callback_query.message.answer(
+                    f"Now it is your turn! You can't leave the game at that time🙅‍♂️"
+                )
                 return
             # await callback_query.message.answer(game_id+"    3")
-            
+
             update_game_details(game_id, user.id, None)
             cursor.execute(
                 "DELETE FROM invitations WHERE invitee_id = ? AND game_id = ?",
@@ -257,12 +292,14 @@ async def handle_quit_game(callback_query: types.CallbackQuery):
             inviter_id = get_game_inviter_id(game_id)
             await player_quit_game(user.id, game_id, inviter_id)
             await callback_query.message.answer(
-                f"You have quit the current game.", reply_markup=get_main_menu(callback_query.from_user.id)
+                f"You have quit the current game.",
+                reply_markup=get_main_menu(callback_query.from_user.id),
             )
             await delete_user_messages(game_id, user.id)
             delete_user_from_all_games(user.id)
         else:
             await callback_query.message.answer("You have already quit the game.")
+
 
 stop_incomplete_games = InlineKeyboardMarkup(
     inline_keyboard=[
@@ -311,7 +348,7 @@ async def handle_stop_incomplete_games(callback_query: types.CallbackQuery):
                     print(f"Failed to send message to player {player_id}: {e}")
         else:
             # await callback_query.message.answer(game["game_id"] + "    2")
-            update_game_details(game['game_id'], user_id, None)
+            update_game_details(game["game_id"], user_id, None)
             delete_user_from_all_games(user_id)
             try:
                 await bot.send_message(
@@ -327,6 +364,7 @@ async def handle_stop_incomplete_games(callback_query: types.CallbackQuery):
     )
     await delete_user_messages(game["game_id"], callback_query.from_user.id)
     await callback_query.answer()
+
 
 @dp.callback_query(lambda c: c.data.startswith("exclude_player:"))
 async def exclude_player(callback_query: types.CallbackQuery):
@@ -373,4 +411,3 @@ async def exclude_player(callback_query: types.CallbackQuery):
         f"Player excluded successfully. Remaining players: {get_player_count(game_id)}",
         reply_markup=generate_exclude_keyboard(game_id),
     )
-

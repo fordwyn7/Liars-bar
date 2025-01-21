@@ -226,6 +226,7 @@ async def send_game_statistics(message: types.Message, state: FSMContext):
             "❌ Please send a valid game number.", reply_markup=get_main_menu(user_id)
         )
         await state.clear()
+        return
     game_number = int(message.text)
     if game_number < 1 or game_number > len(games):
         await message.answer(
