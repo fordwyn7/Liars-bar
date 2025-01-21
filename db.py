@@ -937,14 +937,12 @@ def create_game_record_if_not_exists(game_id: str, user_id: int):
         )
         conn.commit()
         conn.close()
-
     except sqlite3.Error as e:
         print(f"❌ Database error occurred while creating game record: {e}")
     conn.close()
 
 
 def update_game_details(game_id: str, user_id: int, winner: str):
-
     end_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     try:
         conn = sqlite3.connect("users_database.db")
