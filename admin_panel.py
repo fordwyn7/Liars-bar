@@ -10,6 +10,8 @@ from aiogram.utils.keyboard import InlineKeyboardBuilder
 from states.state import *
 from hendlers import get_user_game_archive
 from datetime import datetime, timedelta
+
+
 def generate_callback(action: str, admin_id: int) -> str:
     return f"{action}:{admin_id}"
 
@@ -27,14 +29,19 @@ def get_admins2():
 
 
 def get_statistics():
-    conn = sqlite3.connect('users_database.db')
+    conn = sqlite3.connect("users_database.db")
     cursor = conn.cursor()
     cursor.execute("SELECT COUNT(*) FROM users_database")
     total_users = cursor.fetchone()[0]
     cursor.execute("SELECT COUNT(DISTINCT game_id) FROM game_archive")
     total_games = cursor.fetchone()[0]
-    week_start = (datetime.now() - timedelta(days=datetime.now().weekday())).strftime("%Y-%m-%d")
-    cursor.execute("SELECT COUNT(*) FROM users_database WHERE registration_date >= ?", (week_start,))
+    week_start = (datetime.now() - timedelta(days=datetime.now().weekday())).strftime(
+        "%Y-%m-%d"
+    )
+    cursor.execute(
+        "SELECT COUNT(*) FROM users_database WHERE registration_date >= ?",
+        (week_start,),
+    )
     users_joined_this_week = cursor.fetchone()[0]
     stats_message = (
         "📊 *Game Statistics*\n\n"
@@ -44,7 +51,7 @@ def get_statistics():
     )
     conn.close()
     return stats_message
-    
+
 
 @dp.message(F.text == "📊 statistics")
 @admin_required()
@@ -55,6 +62,8 @@ async def main_to_menu(message: types.Message, state: FSMContext):
     except Exception as e:
         await message.answer("❌ An error occurred while fetching statistics.")
         print(f"Error: {e}")
+
+
 USERS_PER_PAGE = 10
 
 
@@ -65,7 +74,9 @@ def generate_user_list(users, page):
 
     user_list = []
     for index, (user_id, nfgame) in enumerate(page_users, start=start_index + 1):
-        user_list.append(f"{index}. <a href='tg://user?id={user_id}'>{user_id}</a> — {nfgame}")
+        user_list.append(
+            f"{index}. <a href='tg://user?id={user_id}'>{user_id}</a> — {nfgame}"
+        )
 
     return user_list
 
@@ -109,7 +120,7 @@ def get_user_statistics(user_id):
             f"🗓️ **Registr Date**: {registration_date if registration_date else 'N/A'}\n\n"
             f"🎮 **Username in bot**: {nfgame if nfgame else 'N/A'}\n"
         )
-        
+
     except sqlite3.Error as e:
         stats_message = f"❌ Database error occurred: {e}"
     finally:
@@ -425,7 +436,8 @@ async def paginate_users(callback_query: types.CallbackQuery):
 @admin_required()
 async def info_users(message: types.Message, state: FSMContext):
     await message.answer(
-        f"Enter the ID of user that you want to get information", reply_markup=back_button
+        f"Enter the ID of user that you want to get information",
+        reply_markup=back_button,
     )
     await state.set_state(UserInformations.userid_state)
 
@@ -435,9 +447,7 @@ async def info_users(message: types.Message, state: FSMContext):
 async def state_info_users(message: types.Message, state: FSMContext):
     user_id = message.text
     if not user_id.isdigit():
-        await message.answer(
-            "You entered wrong information! Please try again."
-        )
+        await message.answer("You entered wrong information! Please try again.")
     else:
         if not is_user_registered(int(user_id)):
             await message.answer(
@@ -453,6 +463,7 @@ async def state_info_users(message: types.Message, state: FSMContext):
             )
         await state.clear()
 
+
 @dp.message(F.text == "🎯 Game archive")
 @admin_required()
 async def admin_game_archive(message: types.Message, state: FSMContext):
@@ -462,15 +473,20 @@ async def admin_game_archive(message: types.Message, state: FSMContext):
     )
     await state.set_state(awaiting_user_id.await_id)
 
+
 @dp.message(awaiting_user_id.await_id)
 async def get_user_archive_by_id(message: types.Message, state: FSMContext):
     if not message.text.isdigit():
-        await message.answer("❌ Please send a valid user ID.", reply_markup=back_to_admin_panel)
+        await message.answer(
+            "❌ Please send a valid user ID.", reply_markup=back_to_admin_panel
+        )
 
     user_id = int(message.text)
-    games = get_user_game_archive(user_id) 
+    games = get_user_game_archive(user_id)
     if not games:
-        await message.answer("No games found for this user.", reply_markup=admin_panel_button)
+        await message.answer(
+            "No games found for this user.", reply_markup=admin_panel_button
+        )
         await state.clear()
         return
 
@@ -479,9 +495,12 @@ async def get_user_archive_by_id(message: types.Message, state: FSMContext):
         response += f"{idx}. game — {start_time.split(' ')[0]} 📅\n"
 
     response += "\n📋 *Send the game number to view its details.*"
-    await message.answer(response, parse_mode="Markdown", reply_markup=back_to_admin_panel)
+    await message.answer(
+        response, parse_mode="Markdown", reply_markup=back_to_admin_panel
+    )
     await state.update_data(selected_user_id=user_id)
     await state.set_state(awaiting_admin_game_number.selected_user)
+
 
 @dp.message(awaiting_admin_game_number.selected_user)
 async def send_selected_user_game_statistics(message: types.Message, state: FSMContext):
@@ -489,11 +508,16 @@ async def send_selected_user_game_statistics(message: types.Message, state: FSMC
     user_id = data.get("selected_user_id")
     games = get_user_game_archive(user_id)
     if not message.text.isdigit():
-        await message.answer("❌ Please send a valid game number.", reply_markup=back_to_admin_panel)
+        await message.answer(
+            "❌ Please send a valid game number.", reply_markup=back_to_admin_panel
+        )
 
     game_number = int(message.text)
     if game_number < 1 or game_number > len(games):
-        await message.answer("❌ Invalid game number. Please try again.", reply_markup=back_to_admin_panel)
+        await message.answer(
+            "❌ Invalid game number. Please try again.",
+            reply_markup=back_to_admin_panel,
+        )
     record_id, start_time, end_time, winner = games[game_number - 1]
     game_status = (
         f"🕹 *Game Details:*\n"
@@ -502,5 +526,59 @@ async def send_selected_user_game_statistics(message: types.Message, state: FSMC
         f"🏁 End Time: {end_time if end_time else 'Has not finished'}\n"
         f"🏆 Winner: {winner if winner else 'No Winner'}"
     )
-    await message.answer(game_status, parse_mode="Markdown", reply_markup=back_to_admin_panel)
-    
+    await message.answer(
+        game_status, parse_mode="Markdown", reply_markup=back_to_admin_panel
+    )
+
+
+from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
+
+
+@dp.message(F.text == "🚫 delete the tournament")
+@admin_required()
+async def delete_tournament_handler(message: types.Message):
+    upcoming_tournament = get_upcoming_tournaments()
+    if upcoming_tournament:
+        tournament = upcoming_tournament[0]
+        tournament_id = tournament["name"]  # Real ID of tournament
+        response = (
+            f"Are you sure you want to delete the tournament '{tournament['name']}'?\n"
+            f"🗓 Starts: {tournament['start_time']}\n"
+            f"🏆 Prize: {tournament['prize']}\n"
+        )
+        keyboard = InlineKeyboardMarkup(
+            inline_keyboard=[
+                [
+                    InlineKeyboardButton(
+                        text="✅ Yes", callback_data=f"confirm_delete:{tournament_id}"
+                    ),
+                    InlineKeyboardButton(text="❌ No", callback_data="cancel_delete"),
+                ]
+            ]
+        )
+        await message.answer(response, reply_markup=keyboard)
+    else:
+        await message.reply("There is no upcoming tournament to delete.")
+
+
+@dp.callback_query(F.data == "cancel_delete")
+async def cancel_delete_tournament(callback_query: types.CallbackQuery):
+    await callback_query.message.answer(
+        "Tournament deletion has been canceled.",
+        reply_markup=upcoming_tournaments_button,
+    )
+
+
+@dp.callback_query_handler(F.data.startswith("confirm_delete:"))
+async def confirm_delete_tournament(callback_query: types.CallbackQuery):
+    tournament_id = callback_query.data.split(":")[1]
+    delete_tournament(tournament_id)
+    await callback_query.message.delete()
+    await callback_query.message.answer(
+        f"Tournament '{tournament_id}' has been deleted. ✅"
+    )
+    await bot.send_message(
+        chat_id=callback_query.from_user.id,
+        text="You are in tournaments section 👇",
+        reply_markup=tournaments_admin_panel_button,
+    )

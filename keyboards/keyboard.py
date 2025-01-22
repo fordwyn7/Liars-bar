@@ -163,6 +163,9 @@ upcoming_tournaments_button = ReplyKeyboardMarkup(
             KeyboardButton(text="📝 edit starting dates"),
         ],
         [
+            KeyboardButton(text="🚫 delete the tournament"),  
+        ],
+        [
             KeyboardButton(text="back to tournaments panel 🔙"),
         ],
     ],
@@ -174,7 +177,6 @@ ongoing_tournaments_button = ReplyKeyboardMarkup(
         [ 
             KeyboardButton(text="👀 watch results"),
             KeyboardButton(text="✏️ edit data"),
-            KeyboardButton(text="🚫 delete the tournament"),
         ],
         [
             KeyboardButton(text="back to tournaments panel 🔙"),

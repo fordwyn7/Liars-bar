@@ -59,12 +59,19 @@ async def tournaments_admin_panel(message: types.Message):
 @dp.message(F.text == "➕ create a new Tournament")
 @admin_required()
 async def tournaments_admin_panel(message: types.Message, state: FSMContext):
+    turnir = get_upcoming_tournaments()
+    if turnir:
+        await message.answer(
+            f"There is upcoming tournament and you can not create a new one unless you delete it.",
+            reply_markup=tournaments_admin_panel_button,
+        )
+        await state.clear()
+        return
     await message.answer(
         f"You are creating a new tournament ❗️\nPlease enter the number of players: ",
         reply_markup=back_to_tournaments_button,
     )
     await state.set_state(AddTournaments.number_of_players)
-
 
 @dp.message(AddTournaments.number_of_players)
 async def set_number_of_players(message: types.Message, state: FSMContext):
@@ -80,6 +87,7 @@ async def set_number_of_players(message: types.Message, state: FSMContext):
     await state.update_data(number_of_players=int(message.text))
     await message.answer("Please enter the registration start date (YYYY-MM-DD HH:MM):")
     await state.set_state(AddTournaments.registr_start_date)
+
 
 @dp.message(AddTournaments.registr_start_date)
 async def set_registration_start_date(message: types.Message, state: FSMContext):
@@ -228,3 +236,5 @@ def save_tournament_to_db(data, tournamnet_link):
 @admin_required()
 async def show_tournaments_menu(message: types.Message):
     await message.answer("Choose an option:", reply_markup=user_tournaments_keyboard)
+
+

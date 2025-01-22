@@ -1106,3 +1106,11 @@ def get_current_players(tournament_id: str) -> int:
         return 0
     finally:
         conn.close()
+
+def delete_tournament(tournament_id: str):
+    conn = sqlite3.connect('users_database.db')
+    cursor = conn.cursor()
+    cursor.execute("DELETE FROM tournament_users WHERE tournament_id = ?", (tournament_id,))
+    cursor.execute("DELETE FROM tournaments_table WHERE tournament_id = ?", (tournament_id,))
+    conn.commit()
+    conn.close()
