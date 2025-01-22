@@ -272,10 +272,10 @@ async def edit_registration_dates_single(message: types.Message, state: FSMConte
             "No upcoming tournaments available to edit.",
             reply_markup=tournaments_admin_panel_button,
         )
+        await state.clear()
         return
     tournament = tournaments[0]
     tournament_id = tournament["name"]
-    await message.answer(tournament["name"])
     await state.update_data(tournament_id=tournament_id)
     await message.answer(
         f"You are editing the REGISTRATION date of current tournament\n\n📅 Current registration time: {tournament['start_time']}.\n\n"
@@ -365,6 +365,7 @@ async def edit_start_and_end_times(message: types.Message, state: FSMContext):
             "No upcoming tournaments available to edit.",
             reply_markup=tournaments_admin_panel_button,
         )
+        await state.clear()
         return
 
     tournament = tournaments[0]
