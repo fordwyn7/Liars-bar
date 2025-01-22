@@ -486,14 +486,14 @@ async def show_upcoming_tournaments(callback_query: types.CallbackQuery):
             f"🌟 Tournament ID:*{tournament['id']}*\n"
             f"🗓 Starts: {tournament['start_time']}\n"
             f"👥 Registered Players: {nop}/{tournament['maximum_players']}\n"
-            f"🏆 Prize: {tournament['prize']}\n"
+            f"🏆 Prize: \n{tournament['prize']}\n"
             f"🔗 Join using the button below:"
         )
         keyboard = InlineKeyboardMarkup(inline_keyboard=[
             [
                 InlineKeyboardButton(
                     text="Join the Tournament",
-                    callback_data=f"join_tournament:{tournament['id']}"
+                    callback_data=f"join_tournament:{tournament['name']}"
                 )
             ]
         ])
