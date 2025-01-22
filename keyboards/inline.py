@@ -486,10 +486,11 @@ async def show_upcoming_tournaments(callback_query: types.CallbackQuery):
         else:
             nop = get_current_players(tournament['name'])
         response = (
-            f"🌟 Tournament ID:*{tournament['id']}*\n"
+            f"🌟 Tournament ID: *{tournament['id']}*\n"
             f"🗓 Starts: {tournament['start_time']}\n"
             f"👥 Registered Players: {nop}/{tournament['maximum_players']}\n"
-            f"🏆 Prize: \n{tournament['prize']}\n"
+            f"🏆 Prize: \n\n{tournament['prize']}\n\n"
+            f"⚠️Once you register for the tournament, you can't quit it ❗️"
             f"🔗 Join using the button below:"
         )
         keyboard = InlineKeyboardMarkup(inline_keyboard=[

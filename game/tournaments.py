@@ -57,7 +57,7 @@ async def tournaments_admin_panel(message: types.Message):
         else:
             nop = get_current_players(tournament['name'])
         response += (
-            f"🏆 {tournament['id']}\n"
+            f"🏆 Tournament ID: {tournament['id']}\n"
             f"🗓 Starts: {tournament['start_time']}\n"
             f"🏅 Prize: \n{tournament['prize']}\n"
             f"👥 Registered Players: {nop}/{tournament['maximum_players']}\n"
