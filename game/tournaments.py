@@ -260,7 +260,7 @@ def save_tournament_to_db(data, tournamnet_link):
 async def show_tournaments_menu(message: types.Message):
     await message.answer("Choose an option:", reply_markup=user_tournaments_keyboard)
 
-@dp.message(F.text == "✏️ Edit Registration Dates")
+@dp.message(F.text == "✏️ edit registration dates")
 @admin_required()
 async def edit_registration_dates_single(message: types.Message, state: FSMContext):
     tournaments = get_upcoming_tournaments()
@@ -353,7 +353,7 @@ def update_registration_dates(tournament_id: str, start_date: str, end_date: str
     finally:
         conn.close()
 
-@dp.message(F.text == "📝 Edit Start and End Times")
+@dp.message(F.text == "📝 edit starting dates")
 @admin_required()
 async def edit_start_and_end_times(message: types.Message, state: FSMContext):
     tournaments = get_upcoming_tournaments()
