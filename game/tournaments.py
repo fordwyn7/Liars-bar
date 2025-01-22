@@ -275,8 +275,8 @@ async def edit_registration_dates_single(message: types.Message, state: FSMConte
         return
     tournament = tournaments[0]
     tournament_id = tournament["name"]
+    await message.answer(tournament["name"])
     await state.update_data(tournament_id=tournament_id)
-
     await message.answer(
         f"You are editing the REGISTRATION date of current tournament\n\n📅 Current registration time: {tournament['start_time']}.\n\n"
         "Please enter the new REGISTRATION *start date* in the format `YYYY-MM-DD HH:MM`:",
@@ -368,7 +368,7 @@ async def edit_start_and_end_times(message: types.Message, state: FSMContext):
         return
 
     tournament = tournaments[0]
-    await state.update_data(tournament_id=tournament["id"])
+    await state.update_data(tournament_id=tournament["name"])
     await message.answer(
         f"Editing the START time  for tournament.\n"
         f"Current Start: {tournament['start_time']} \nCurrent End: {tournament['end_time']}.\n\n"
