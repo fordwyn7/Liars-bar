@@ -480,10 +480,24 @@ async def show_upcoming_tournaments(callback_query: types.CallbackQuery):
         )
         return
 
-    response = "🌟 *Upcoming Tournaments:*\n\n"
     for tournament in tournaments:
-        response += f"🏆 {tournament['name']} (Starts: {tournament['start_time']})\n"
-    await callback_query.message.answer(response, parse_mode="Markdown")
+        response = (
+            f"🌟 *{tournament['name']}*\n"
+            f"🗓 Starts: {tournament['start_time']}\n"
+            f"👥 Registered Players: {tournament['current_players']}/{tournament['maximum_players']}\n"
+            f"🏆 Prize: {tournament['prize']}\n"
+            f"🔗 Join using the button below:"
+        )
+        keyboard = InlineKeyboardMarkup().add(
+            InlineKeyboardButton(
+                text="Join the Tournament",
+                callback_data=f"join_tournament:{tournament['id']}",
+            )
+        )
+
+        await callback_query.message.answer(
+            response, reply_markup=keyboard, parse_mode="Markdown"
+        )
 
 
 async def show_archive_tournaments(callback_query: types.CallbackQuery):
