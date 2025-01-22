@@ -6,6 +6,7 @@ from config import bot, dp
 from aiogram import types
 from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 from keyboards.keyboard import get_main_menu
+from datetime import datetime
 
 
 def connect_db():
@@ -920,8 +921,6 @@ def get_user_statistics(user_id: int) -> str:
     return stats_message
 
 
-from datetime import datetime
-
 def create_game_record_if_not_exists(game_id: str, user_id: int):
     conn = sqlite3.connect("users_database.db")
     cursor = conn.cursor()
@@ -947,10 +946,10 @@ def update_game_details(game_id: str, user_id: int, winner: str):
     try:
         conn = sqlite3.connect("users_database.db")
         cursor = conn.cursor()
-        
+
         if not winner:
             winner = "Game had not been finished"
-        
+
         cursor.execute(
             """
             UPDATE game_archive 
@@ -959,18 +958,88 @@ def update_game_details(game_id: str, user_id: int, winner: str):
             """,
             (end_time, winner, game_id, user_id),
         )
-        
+
         conn.commit()
         if cursor.rowcount == 0:
             print("❌ Failed to update game details for ID '{game_id}'.")
             return f"❌ Failed to update game details for ID '{game_id}'."
-        
+
         print(f"Game details updated for {user_id}, game_id: {game_id}")
         return "Game details updated successfully."
 
     except sqlite3.Error as e:
         print("❌ Database error occurred: {e}")
         return f"❌ Database error occurred: {e}"
+    finally:
+        conn.close()
+
+
+def get_ongoing_tournaments():
+    conn = sqlite3.connect("users_database.db")
+    cursor = conn.cursor()
+    try:
+        cursor.execute(
+            """
+            SELECT id, tournament_id, tournament_prize, tournament_end_time
+            FROM tournaments_table
+            WHERE tournament_start_time <= datetime('now')
+            AND tournament_end_time > datetime('now')
+            """
+        )
+        tournaments = [
+            {"id": row[0], "name": row[1], "prize": row[2], "end_time": row[3]}
+            for row in cursor.fetchall()
+        ]
+        return tournaments
+    except sqlite3.Error as e:
+        print(f"❌ Database error: {e}")
+        return []
+    finally:
+        conn.close()
+
+
+def get_upcoming_tournaments():
+    conn = sqlite3.connect("users_database.db")
+    cursor = conn.cursor()
+    try:
+        cursor.execute(
+            """
+            SELECT id, tournament_id, tournament_prize, tournament_start_time
+            FROM tournaments_table
+            WHERE tournament_start_time > datetime('now')
+            """
+        )
+        tournaments = [
+            {"id": row[0], "name": row[1], "prize": row[2], "start_time": row[3]}
+            for row in cursor.fetchall()
+        ]
+        return tournaments
+    except sqlite3.Error as e:
+        print(f"❌ Database error: {e}")
+        return []
+    finally:
+        conn.close()
+
+
+def get_tournament_archive():
+    conn = sqlite3.connect("users_database.db")
+    cursor = conn.cursor()
+    try:
+        cursor.execute(
+            """
+            SELECT tournament_id, tournament_prize, tournament_winner
+            FROM tournaments_table
+            WHERE tournament_end_time <= datetime('now')
+            """
+        )
+        tournaments = [
+            {"name": row[0], "prize": row[1], "winner": row[2]}
+            for row in cursor.fetchall()
+        ]
+        return tournaments
+    except sqlite3.Error as e:
+        print(f"❌ Database error: {e}")
+        return []
     finally:
         conn.close()
 

@@ -65,7 +65,7 @@ async def start_game(callback_query: types.CallbackQuery):
         for player in players:
             if player is None:
                 continue
-            
+
             create_game_record_if_not_exists(game_id, player)
             # conn = sqlite3.connect("users_database.db")
             # cursor = conn.cursor()
@@ -411,3 +411,91 @@ async def exclude_player(callback_query: types.CallbackQuery):
         f"Player excluded successfully. Remaining players: {get_player_count(game_id)}",
         reply_markup=generate_exclude_keyboard(game_id),
     )
+
+
+def get_join_tournament_button(tournament_id: str):
+    inline_keyboard = InlineKeyboardMarkup()
+    inline_keyboard.add(
+        InlineKeyboardButton(
+            text="🎮 Join the Tournament",
+            callback_data=f"join_tournament:{tournament_id}",
+        )
+    )
+    return inline_keyboard
+
+
+user_tournaments_keyboard = InlineKeyboardMarkup(
+    inline_keyboard=[
+        [
+            InlineKeyboardButton(
+                text="⚡️ Ongoing Tournaments", callback_data="view_ongoing"
+            )
+        ],
+        [
+            InlineKeyboardButton(
+                text="🌟 Upcoming Tournaments", callback_data="view_upcoming"
+            )
+        ],
+        [
+            InlineKeyboardButton(
+                text="📑 Tournament Archive", callback_data="view_archive"
+            )
+        ],
+    ]
+)
+
+
+@dp.callback_query(lambda c: c.data.startswith("view_"))
+async def handle_tournament_action(callback_query: types.CallbackQuery):
+    action = callback_query.data.split("_")[1]
+
+    if action == "ongoing":
+        await show_ongoing_tournaments(callback_query)
+    elif action == "upcoming":
+        await show_upcoming_tournaments(callback_query)
+    elif action == "archive":
+        await show_archive_tournaments(callback_query)
+
+
+async def show_ongoing_tournaments(callback_query: types.CallbackQuery):
+    tournaments = get_ongoing_tournaments()
+    if not tournaments:
+        await callback_query.message.answer(
+            "No ongoing tournaments right now.",
+            reply_markup=get_main_menu(callback_query.from_user.id),
+        )
+        return
+    response = "⚡️ *Ongoing Tournaments:*\n\n"
+    for tournament in tournaments:
+        response += f"🏆 {tournament['name']} (Ends: {tournament['end_time']})\n"
+    await callback_query.message.answer(response, parse_mode="Markdown")
+
+
+async def show_upcoming_tournaments(callback_query: types.CallbackQuery):
+    tournaments = get_upcoming_tournaments()
+    if not tournaments:
+        await callback_query.message.answer(
+            "No upcoming tournaments scheduled.",
+            reply_markup=get_main_menu(callback_query.from_user.id),
+        )
+        return
+
+    response = "🌟 *Upcoming Tournaments:*\n\n"
+    for tournament in tournaments:
+        response += f"🏆 {tournament['name']} (Starts: {tournament['start_time']})\n"
+    await callback_query.message.answer(response, parse_mode="Markdown")
+
+
+async def show_archive_tournaments(callback_query: types.CallbackQuery):
+    tournaments = get_tournament_archive()
+    if not tournaments:
+        await callback_query.message.answer(
+            "No tournaments in the archive.",
+            reply_markup=get_main_menu(callback_query.from_user.id),
+        )
+        return
+
+    response = "📑 *Tournament Archive:*\n\n"
+    for tournament in tournaments:
+        response += f"🏆 {tournament['name']} | Winner: {tournament['winner']}\n"
+    await callback_query.message.answer(response, parse_mode="Markdown")

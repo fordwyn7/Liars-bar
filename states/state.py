@@ -42,3 +42,11 @@ class awaiting_admin_game_number(StatesGroup):
     
 class awaiting_user_id(StatesGroup):
     await_id = State()
+    
+class AddTournaments(StatesGroup):
+    number_of_players = State()
+    registr_start_date = State()
+    registr_end_date = State()
+    turnir_start_date = State()
+    turnir_end_date = State()
+    turnir_prize = State()
