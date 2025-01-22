@@ -23,12 +23,12 @@ async def tournaments_admin_panel(message: types.Message):
 
 @dp.message(F.text == "back to tournaments panel 🔙")
 @admin_required()
-async def tournaments_admin_panel(message: types.Message):
+async def tournaments_admin_panel(message: types.Message, state: FSMContext):
     await message.answer(
         f"You are in tournaments section. \nPlease choose on of these options.",
         reply_markup=tournaments_admin_panel_button,
     )
-
+    await state.clear()
 
 @dp.message(F.text == "⚡️ Ongoing")
 @admin_required()
@@ -367,7 +367,7 @@ async def edit_start_and_end_times(message: types.Message, state: FSMContext):
         )
         await state.clear()
         return
-
+    await state.clear()
     tournament = tournaments[0]
     await state.update_data(tournament_id=tournament["name"])
     await message.answer(
