@@ -176,7 +176,7 @@ async def set_tournament_prize(message: types.Message, state: FSMContext):
     data = await state.get_data()
     unique_id = f"tournament_{uuid.uuid4().hex}"
     await state.update_data(tournament_link=unique_id)
-    save_tournament_to_db(data)
+    save_tournament_to_db(data, unique_id)
 
     await message.answer(
         f"✅ Tournament created successfully:\n\n"
@@ -190,7 +190,7 @@ async def set_tournament_prize(message: types.Message, state: FSMContext):
     await state.clear()
 
 
-def save_tournament_to_db(data):
+def save_tournament_to_db(data, tournamnet_link):
     conn = sqlite3.connect("users_database.db")
     cursor = conn.cursor()
     try:
@@ -214,7 +214,7 @@ def save_tournament_to_db(data):
                 data["tournament_start"],
                 data["tournament_end"],
                 data["prize"],
-                data["tournament_link"],
+                tournamnet_link,
             ),
         )
         conn.commit()
