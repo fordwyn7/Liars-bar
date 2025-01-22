@@ -56,7 +56,7 @@ async def tournaments_admin_panel(message: types.Message):
     )
 
 
-@dp.message(F.text == "🆕 create a new Tournament")
+@dp.message(F.text == "➕ create a new Tournament")
 @admin_required()
 async def tournaments_admin_panel(message: types.Message, state: FSMContext):
     await message.answer(
