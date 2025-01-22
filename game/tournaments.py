@@ -41,10 +41,33 @@ async def tournaments_admin_panel(message: types.Message):
 @dp.message(F.text == "⏳ Upcoming")
 @admin_required()
 async def tournaments_admin_panel(message: types.Message):
+    turnir = get_upcoming_tournaments()
+    
+    if not turnir:
+        await message.answer(
+            f"There are no upcoming tournaments 🤷‍♂️",
+            reply_markup=tournaments_admin_panel_button,
+        )
+        return
+    
+    response = "🌟 *Upcoming Tournaments:*\n\n"
+    for tournament in turnir:
+        if "_" in tournament['name']:
+            nop = get_current_players(tournament['name'].split("_")[1])
+        else:
+            nop = get_current_players(tournament['name'])
+        response += (
+            f"🏆 {tournament['id']}\n"
+            f"🗓 Starts: {tournament['start_time']}\n"
+            f"🏅 Prize: \n{tournament['prize']}\n"
+            f"👥 Registered Players: {nop}/{tournament['maximum_players']}\n"
+        )
     await message.answer(
-        f"Here are what you can do with upcoming tournaments.",
+        response,
+        parse_mode="Markdown",
         reply_markup=upcoming_tournaments_button,
     )
+
 
 
 @dp.message(F.text == "🗂 Archive")
@@ -72,6 +95,7 @@ async def tournaments_admin_panel(message: types.Message, state: FSMContext):
         reply_markup=back_to_tournaments_button,
     )
     await state.set_state(AddTournaments.number_of_players)
+
 
 @dp.message(AddTournaments.number_of_players)
 async def set_number_of_players(message: types.Message, state: FSMContext):
@@ -177,7 +201,6 @@ async def set_tournament_end_date(message: types.Message, state: FSMContext):
         await message.answer("Invalid date format. Please use YYYY-MM-DD HH:MM.")
 
 
-# Step 6: Tournament prize and generate link
 @dp.message(AddTournaments.turnir_prize)
 async def set_tournament_prize(message: types.Message, state: FSMContext):
     await state.update_data(prize=message.text)
@@ -236,5 +259,3 @@ def save_tournament_to_db(data, tournamnet_link):
 @admin_required()
 async def show_tournaments_menu(message: types.Message):
     await message.answer("Choose an option:", reply_markup=user_tournaments_keyboard)
-
-
