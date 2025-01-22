@@ -183,7 +183,7 @@ async def set_tournament_prize(message: types.Message, state: FSMContext):
         f"🎮 Players: {data['number_of_players']}\n"
         f"🗓 Registration: {data['registration_start']} to {data['registration_end']}\n"
         f"🕹 Start: {data['tournament_start']} | End: {data['tournament_end']}\n"
-        f"🏆 Prize: {data['prize']}\n"
+        f"🏆 Prize: \n\n{data['prize']}\n"
         f"🔗 Join Link: {unique_id}",
         reply_markup=admin_panel_button,
     )

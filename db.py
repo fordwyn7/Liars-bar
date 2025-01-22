@@ -1004,13 +1004,21 @@ def get_upcoming_tournaments():
     try:
         cursor.execute(
             """
-            SELECT id, tournament_id, tournament_prize, tournament_start_time
-            FROM tournaments_table
-            WHERE tournament_start_time > datetime('now')
+            SELECT t.id, t.tournament_id, t.tournament_prize, t.tournament_start_time, t.maximum_players,
+                   (SELECT COUNT(*) FROM tournament_users tu WHERE tu.tournament_id = t.tournament_id) AS current_players
+            FROM tournaments_table t
+            WHERE t.tournament_start_time > datetime('now')
             """
         )
         tournaments = [
-            {"id": row[0], "name": row[1], "prize": row[2], "start_time": row[3]}
+            {
+                "id": row[0],
+                "name": row[1],
+                "prize": row[2],
+                "start_time": row[3],
+                "current_players": row[5],
+                "maximum_players": row[4],
+            }
             for row in cursor.fetchall()
         ]
         return tournaments

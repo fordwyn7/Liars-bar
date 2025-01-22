@@ -470,7 +470,6 @@ async def show_ongoing_tournaments(callback_query: types.CallbackQuery):
         response += f"🏆 {tournament['name']} (Ends: {tournament['end_time']})\n"
     await callback_query.message.answer(response, parse_mode="Markdown")
 
-
 async def show_upcoming_tournaments(callback_query: types.CallbackQuery):
     tournaments = get_upcoming_tournaments()
     if not tournaments:
@@ -498,6 +497,7 @@ async def show_upcoming_tournaments(callback_query: types.CallbackQuery):
         await callback_query.message.answer(
             response, reply_markup=keyboard, parse_mode="Markdown"
         )
+
 
 
 async def show_archive_tournaments(callback_query: types.CallbackQuery):
