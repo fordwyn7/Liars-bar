@@ -569,7 +569,7 @@ async def cancel_delete_tournament(callback_query: types.CallbackQuery):
     )
 
 
-@dp.callback_query_handler(F.data.startswith("confirm_delete:"))
+@dp.callback_query(F.data.startswith("confirm_delete:"))
 async def confirm_delete_tournament(callback_query: types.CallbackQuery):
     tournament_id = callback_query.data.split(":")[1]
     delete_tournament(tournament_id)
