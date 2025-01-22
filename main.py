@@ -15,7 +15,7 @@ from keyboards.inline import *
 from db import *
 from aiogram.types import Update
 import admin_panel
-
+import game.tournaments
 MAIN_ADMIN_ID = 1155076760
 conn = sqlite3.connect("users_database.db")
 cursor = conn.cursor()
