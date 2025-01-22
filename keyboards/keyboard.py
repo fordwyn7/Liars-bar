@@ -156,7 +156,7 @@ tournaments_admin_panel_button = ReplyKeyboardMarkup(
     resize_keyboard=True,
 )
 
-ongoing_tournaments_button = ReplyKeyboardMarkup(
+upcoming_tournaments_button = ReplyKeyboardMarkup(
     keyboard=[
         [
             KeyboardButton(text="✏️ edit registration dates"),
@@ -169,7 +169,7 @@ ongoing_tournaments_button = ReplyKeyboardMarkup(
     resize_keyboard=True,
 )
 
-upcoming_tournaments_button = ReplyKeyboardMarkup(
+ongoing_tournaments_button = ReplyKeyboardMarkup(
     keyboard=[
         [
             KeyboardButton(text="👀 watch results"),

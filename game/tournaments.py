@@ -12,7 +12,7 @@ from middlewares.registered import admin_required
 @admin_required()
 async def tournaments_admin_panel(message: types.Message):
     await message.answer(
-        f"You are in tournaments section. \nPlease choose on of these options.",
+        f"You are in tournaments section. \nPlease choose on of these options 👇",
         reply_markup=tournaments_admin_panel_button,
     )
 

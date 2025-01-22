@@ -346,7 +346,7 @@ async def start_game_handler(message: types.Message, state: FSMContext):
 
 @dp.message()
 async def any_word(msg: types.Message):
-    await msg.answer(f"You entered unfamiliar information.", reply_markup=get_main_menu(msg.from_user.id))
+    await msg.answer(f"You entered unfamiliar information.")
 
 
 async def main():
