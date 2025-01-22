@@ -479,8 +479,9 @@ async def show_upcoming_tournaments(callback_query: types.CallbackQuery):
             reply_markup=get_main_menu(callback_query.from_user.id),
         )
         return
-    nop = get_current_players(tournaments['name'].split("_")[1])
+    
     for tournament in tournaments:
+        nop = get_current_players(tournament['name'].split("_")[1])
         response = (
             f"🌟 Tournament ID:*{tournament['id']}*\n"
             f"🗓 Starts: {tournament['start_time']}\n"
