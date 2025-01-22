@@ -1004,10 +1004,9 @@ def get_upcoming_tournaments():
     try:
         cursor.execute(
             """
-            SELECT t.id, t.tournament_id, t.tournament_prize, t.tournament_start_time, t.maximum_players,
-                   (SELECT COUNT(*) FROM tournament_users tu WHERE tu.tournament_id = t.tournament_id) AS current_players
-            FROM tournaments_table t
-            WHERE t.tournament_start_time > datetime('now')
+            SELECT id, tournament_id, tournament_prize, tournament_start_time, maximum_players
+            FROM tournaments_table
+            WHERE tournament_start_time > datetime('now')
             """
         )
         tournaments = [
@@ -1016,7 +1015,6 @@ def get_upcoming_tournaments():
                 "name": row[1],
                 "prize": row[2],
                 "start_time": row[3],
-                "current_players": row[5],
                 "maximum_players": row[4],
             }
             for row in cursor.fetchall()
@@ -1027,6 +1025,7 @@ def get_upcoming_tournaments():
         return []
     finally:
         conn.close()
+
 
 
 def get_tournament_archive():
@@ -1085,5 +1084,25 @@ def add_user_to_tournament(tournament_id: str, user_id: int):
     except sqlite3.Error as e:
         print(f"❌ Database error: {e}")
         raise
+    finally:
+        conn.close()
+
+def get_current_players(tournament_id: str) -> int:
+    conn = sqlite3.connect("users_database.db")
+    cursor = conn.cursor()
+    try:
+        cursor.execute(
+            """
+            SELECT COUNT(*) 
+            FROM tournament_users
+            WHERE tournament_id = ?
+            """,
+            (tournament_id,),
+        )
+        current_players = cursor.fetchone()[0]
+        return current_players
+    except sqlite3.Error as e:
+        print(f"❌ Database error: {e}")
+        return 0
     finally:
         conn.close()

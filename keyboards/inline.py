@@ -479,12 +479,12 @@ async def show_upcoming_tournaments(callback_query: types.CallbackQuery):
             reply_markup=get_main_menu(callback_query.from_user.id),
         )
         return
-
+    nop = get_current_players(tournaments['name'].split("_")[1])
     for tournament in tournaments:
         response = (
-            f"🌟 *{tournament['name']}*\n"
+            f"🌟 Tournament ID:*{tournament['id']}*\n"
             f"🗓 Starts: {tournament['start_time']}\n"
-            f"👥 Registered Players: {tournament['current_players']}/{tournament['maximum_players']}\n"
+            f"👥 Registered Players: {nop}/{tournament['maximum_players']}\n"
             f"🏆 Prize: {tournament['prize']}\n"
             f"🔗 Join using the button below:"
         )
@@ -514,7 +514,7 @@ async def show_archive_tournaments(callback_query: types.CallbackQuery):
 
     response = "📑 *Tournament Archive:*\n\n"
     for tournament in tournaments:
-        response += f"🏆 {tournament['name']} | Winner: {tournament['winner']}\n"
+        response += f"🏆 ID: {tournament['id']} | Winner: {tournament['winner']}\n"
     await callback_query.message.answer(response, parse_mode="Markdown")
 
 @dp.callback_query(lambda c: c.data.startswith("join_tournament:"))
@@ -522,7 +522,7 @@ async def join_tournament(callback_query: types.CallbackQuery):
     tournament_id = callback_query.data.split(":")[1]
     user_id = callback_query.from_user.id
     if is_user_in_tournament(tournament_id, user_id):
-        await callback_query.answer("❌ You are already registered for this tournament.", show_alert=True)
+        await callback_query.answer("❕ You are already registered for this tournament.", show_alert=True)
         return
     try:
         add_user_to_tournament(tournament_id, user_id)
