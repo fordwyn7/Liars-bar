@@ -1004,7 +1004,7 @@ def get_upcoming_tournaments():
     try:
         cursor.execute(
             """
-            SELECT id, tournament_id, tournament_prize, tournament_start_time, maximum_players
+            SELECT id, tournament_id, tournament_prize, tournament_start_time, maximum_players, tournament_end_time, tournament_register_start_time, tournament_register_end_time
             FROM tournaments_table
             WHERE tournament_start_time > datetime('now')
             """
@@ -1016,6 +1016,9 @@ def get_upcoming_tournaments():
                 "prize": row[2],
                 "start_time": row[3],
                 "maximum_players": row[4],
+                "end_time": row[5],
+                "register_start": row[6],
+                "register_end": row[7]
             }
             for row in cursor.fetchall()
         ]

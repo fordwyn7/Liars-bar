@@ -488,9 +488,12 @@ async def show_upcoming_tournaments(callback_query: types.CallbackQuery):
         response = (
             f"🌟 Tournament ID: *{tournament['id']}*\n"
             f"🗓 Starts: {tournament['start_time']}\n"
+            f"🏁 Ends: {tournament['end_time']}\n\n"
+            f"🗓 Registration starts: {tournament['register_start']}\n"
+            f"🏁 Registration ends: {tournament['register_end']}\n\n"
             f"👥 Registered Players: {nop}/{tournament['maximum_players']}\n"
             f"🏆 Prize: \n\n{tournament['prize']}\n\n"
-            f"⚠️Once you register for the tournament, you can't quit it ❗️"
+            f"⚠️Once you register for the tournament, you can't quit it ❗️\n"
             f"🔗 Join using the button below:"
         )
         keyboard = InlineKeyboardMarkup(inline_keyboard=[

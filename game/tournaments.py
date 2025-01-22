@@ -58,10 +58,13 @@ async def tournaments_admin_panel(message: types.Message):
         else:
             nop = get_current_players(tournament["name"])
         response += (
-            f"🏆 Tournament ID: {tournament['id']}\n"
+            f"🌟 Tournament ID: *{tournament['id']}*\n"
             f"🗓 Starts: {tournament['start_time']}\n"
-            f"🏅 Prize: \n{tournament['prize']}\n"
+            f"🏁 Ends: {tournament['end_time']}\n\n"
+            f"🗓 Registration starts: {tournament['register_start']}\n"
+            f"🏁 Registration ends: {tournament['register_end']}\n\n"
             f"👥 Registered Players: {nop}/{tournament['maximum_players']}\n"
+            f"🏆 Prizes: \n\n{tournament['prize']}\n\n"
         )
     await message.answer(
         response,
@@ -300,7 +303,7 @@ async def set_new_start_date_single(message: types.Message, state: FSMContext):
         return
     await state.update_data(new_start_date=new_start_date)
     await message.answer(
-        f"Now, enter the new START *end date* in the format `YYYY-MM-DD HH:MM`: ",
+        f"Now, enter the new REGISTRATION *end date* in the format `YYYY-MM-DD HH:MM`: ",
         parse_mode="Markdown",
         reply_markup=back_to_tournaments_button
     )
