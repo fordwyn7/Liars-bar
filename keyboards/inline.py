@@ -516,3 +516,17 @@ async def show_archive_tournaments(callback_query: types.CallbackQuery):
     for tournament in tournaments:
         response += f"🏆 {tournament['name']} | Winner: {tournament['winner']}\n"
     await callback_query.message.answer(response, parse_mode="Markdown")
+
+@dp.callback_query(lambda c: c.data.startswith("join_tournament:"))
+async def join_tournament(callback_query: types.CallbackQuery):
+    tournament_id = callback_query.data.split(":")[1]
+    user_id = callback_query.from_user.id
+    if is_user_in_tournament(tournament_id, user_id):
+        await callback_query.answer("❌ You are already registered for this tournament.", show_alert=True)
+        return
+    try:
+        add_user_to_tournament(tournament_id, user_id)
+        await callback_query.answer("✅ You have successfully joined the tournament!", show_alert=True)
+    except Exception as e:
+        print(f"❌ Error adding user to tournament: {e}")
+        await callback_query.answer("❌ Failed to join the tournament. Please try again later.", show_alert=True)

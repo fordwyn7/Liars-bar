@@ -1051,3 +1051,39 @@ def get_tournament_archive():
     finally:
         conn.close()
 
+def is_user_in_tournament(tournament_id: str, user_id: int) -> bool:
+    conn = sqlite3.connect("users_database.db")
+    cursor = conn.cursor()
+    try:
+        cursor.execute(
+            """
+            SELECT 1 FROM tournament_users
+            WHERE tournament_id = ? AND user_id = ?
+            """,
+            (tournament_id, user_id),
+        )
+        result = cursor.fetchone()
+        return result is not None
+    except sqlite3.Error as e:
+        print(f"❌ Database error: {e}")
+        return False
+    finally:
+        conn.close()
+
+def add_user_to_tournament(tournament_id: str, user_id: int):
+    conn = sqlite3.connect("users_database.db")
+    cursor = conn.cursor()
+    try:
+        cursor.execute(
+            """
+            INSERT INTO tournament_users (tournament_id, user_id)
+            VALUES (?, ?)
+            """,
+            (tournament_id, user_id),
+        )
+        conn.commit()
+    except sqlite3.Error as e:
+        print(f"❌ Database error: {e}")
+        raise
+    finally:
+        conn.close()
