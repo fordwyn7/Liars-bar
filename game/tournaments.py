@@ -174,7 +174,7 @@ async def set_tournament_end_date(message: types.Message, state: FSMContext):
 async def set_tournament_prize(message: types.Message, state: FSMContext):
     await state.update_data(prize=message.text)
     data = await state.get_data()
-    unique_id = f"tournament_{uuid.uuid4().hex}"
+    unique_id = f"{uuid.uuid4().hex}"
     await state.update_data(tournament_link=unique_id)
     save_tournament_to_db(data, unique_id)
 
@@ -184,7 +184,7 @@ async def set_tournament_prize(message: types.Message, state: FSMContext):
         f"🗓 Registration: {data['registration_start']} to {data['registration_end']}\n"
         f"🕹 Start: {data['tournament_start']} | End: {data['tournament_end']}\n"
         f"🏆 Prize: \n\n{data['prize']}\n"
-        f"🔗 Join Link: {unique_id}",
+        f"🔗 tournament id: {unique_id}",
         reply_markup=admin_panel_button,
     )
     await state.clear()
