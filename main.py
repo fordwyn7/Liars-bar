@@ -99,6 +99,30 @@ cursor.execute(
     """
 )
 
+cursor.execute(
+    """
+CREATE TABLE IF NOT EXISTS tournaments_table (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    tournament_id TEXT,
+    tournament_prize TEXT,
+    tournament_start_time TEXT,
+    tournament_end_time TEXT,
+    tournament_register_start_time TEXT,
+    tournament_register_end_time TEXT,
+    tournament_winner TEXT,
+    maximum_players INTEGER
+)
+"""
+)
+cursor.execute(
+    """
+CREATE TABLE IF NOT EXISTS tournament_users (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    tournament_id TEXT,
+    user_id INTEGER
+)
+"""
+)
 conn.commit()
 conn.close()
 

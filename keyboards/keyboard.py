@@ -138,3 +138,61 @@ users_control_button = ReplyKeyboardMarkup(
     ],
     resize_keyboard=True,
 )
+
+tournaments_admin_panel_button = ReplyKeyboardMarkup(
+    keyboard=[
+        [
+            KeyboardButton(text="⚡️ Ongoing"),
+            KeyboardButton(text="⏳ Upcoming"),
+            KeyboardButton(text="🗂 Archive"),
+        ],
+        [
+            KeyboardButton(text="🆕 create a new Tournament"),
+        ],
+        [
+            KeyboardButton(text="back to admin panel 🔙"),
+        ],
+    ],
+    resize_keyboard=True,
+)
+
+ongoing_tournaments_button = ReplyKeyboardMarkup(
+    keyboard=[
+        [
+            KeyboardButton(text="✏️ edit registration dates"),
+            KeyboardButton(text="📝 edit starting dates"),
+        ],
+        [
+            KeyboardButton(text="back to tournaments panel 🔙"),
+        ],
+    ],
+    resize_keyboard=True,
+)
+
+upcoming_tournaments_button = ReplyKeyboardMarkup(
+    keyboard=[
+        [
+            KeyboardButton(text="👀 watch results"),
+            KeyboardButton(text="✏️ edit data"),
+            KeyboardButton(text="🚫 delete the tournament"),
+        ],
+        [
+            KeyboardButton(text="back to tournaments panel 🔙"),
+        ],
+    ],
+    resize_keyboard=True,
+)
+
+creating_tournament_button = ReplyKeyboardMarkup(
+    keyboard=[
+        [
+            KeyboardButton(text="➕ create a tournament"),
+        ],
+        [
+            KeyboardButton(text="back to tournaments panel 🔙"),
+        ],
+    ],
+    resize_keyboard=True,
+)
+
+
