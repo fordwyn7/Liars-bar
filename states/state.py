@@ -50,3 +50,13 @@ class AddTournaments(StatesGroup):
     turnir_start_date = State()
     turnir_end_date = State()
     turnir_prize = State()
+    
+class EditRegistrationDates(StatesGroup):
+    select_tournament = State()
+    new_start_date = State()
+    new_end_date = State()
+    
+class EditStartAndEndTimes(StatesGroup):
+    new_start_date = State()
+    new_end_date = State()
+    
