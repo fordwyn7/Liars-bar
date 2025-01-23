@@ -39,8 +39,6 @@ cursor.execute(
     ADD COLUMN unity_coin INTEGER DEFAULT 0
     """
 )
-
-\
 cursor.execute(
     """
 CREATE TABLE IF NOT EXISTS users_game_states (
