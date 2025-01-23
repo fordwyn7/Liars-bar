@@ -29,7 +29,7 @@ CREATE TABLE IF NOT EXISTS users_database (
     first_name TEXT,
     last_name TEXT,
     registration_date TEXT, 
-    nfgame TEXT,
+    nfgame TEXT
 )
 """
 )
@@ -39,6 +39,7 @@ cursor.execute(
     ADD COLUMN unity_coin INTEGER DEFAULT 0
     """
 )
+
 cursor.execute(
     """
 CREATE TABLE IF NOT EXISTS users_game_states (
