@@ -63,7 +63,7 @@ async def tournaments_admin_panel(message: types.Message):
             f"🏁 Ends: {tournament['end_time']}\n\n"
             f"🗓 Registration starts: {tournament['register_start']}\n"
             f"🏁 Registration ends: {tournament['register_end']}\n\n"
-            f"👥 Registered Players: {nop}/{tournament['maximum_players']}\n"
+            f"👥 Registered Players: {nop}/{tournament['maximum_players']}\n\n"
             f"🏆 Prizes: \n\n{tournament['prize']}\n\n"
         )
     await message.answer(
