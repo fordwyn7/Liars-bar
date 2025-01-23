@@ -31,10 +31,16 @@ def get_admins2():
 def get_statistics():
     conn = sqlite3.connect("users_database.db")
     cursor = conn.cursor()
+
+    # Total users
     cursor.execute("SELECT COUNT(*) FROM users_database")
     total_users = cursor.fetchone()[0]
+
+    # Total games played
     cursor.execute("SELECT COUNT(DISTINCT game_id) FROM game_archive")
     total_games = cursor.fetchone()[0]
+
+    # Users joined this week
     week_start = (datetime.now() - timedelta(days=datetime.now().weekday())).strftime(
         "%Y-%m-%d"
     )
@@ -42,15 +48,21 @@ def get_statistics():
         "SELECT COUNT(*) FROM users_database WHERE registration_date >= ?",
         (week_start,),
     )
+    users_joined_this_week = cursor.fetchone()[0]
+
+    # Number of tournaments ended
     cursor.execute(
         "SELECT COUNT(*) FROM tournaments_table WHERE tournament_end_time <= datetime('now')"
     )
     tournaments_ended = cursor.fetchone()[0]
+
+    # Number of upcoming tournaments
     cursor.execute(
         "SELECT COUNT(*) FROM tournaments_table WHERE tournament_start_time > datetime('now')"
     )
     upcoming_tournaments = cursor.fetchone()[0]
-    users_joined_this_week = cursor.fetchone()[0]
+
+    # Create the statistics message
     stats_message = (
         "📊 *Game Statistics*\n\n"
         f"👥 *Total Users:* {total_users}\n"
@@ -59,8 +71,10 @@ def get_statistics():
         f"🏁 *Tournaments Ended:* {tournaments_ended}\n"
         f"⏳ *Upcoming Tournaments:* {upcoming_tournaments}\n"
     )
+
     conn.close()
     return stats_message
+
 
 
 @dp.message(F.text == "📊 statistics")
