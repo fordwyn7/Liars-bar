@@ -546,7 +546,7 @@ async def delete_tournament_handler(message: types.Message):
             nop = get_current_players(tournament['name'])
         tournament_id = tournament["name"]
         response = (
-            f"🌟 Tournament ID: *{tournament['id']}*\n\n"
+            f"🌟 Tournament ID: {tournament['id']}\n\n"
             f"🗓 Starts: {tournament['start_time']}\n"
             f"🏁 Ends: {tournament['end_time']}\n\n"
             f"🗓 Registration starts: {tournament['register_start']}\n"
@@ -585,7 +585,7 @@ async def confirm_delete_tournament(callback_query: types.CallbackQuery):
     delete_tournament(tournament_id)
     await callback_query.message.delete()
     await callback_query.message.answer(
-        f"Tournament '{tournament_id}' has been deleted. ✅"
+        f"Tournament has been deleted. ✅"
     )
     await bot.send_message(
         chat_id=callback_query.from_user.id,

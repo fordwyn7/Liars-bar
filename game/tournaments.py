@@ -94,7 +94,7 @@ async def tournaments_admin_panel(message: types.Message, state: FSMContext):
         await state.clear()
         return
     await message.answer(
-        f"You are creating a new tournament ❗️\nPlease enter the number of players: ",
+        f"You are creating a new tournament ❗️\nPlease enter the maximum number of players: ",
         reply_markup=back_to_tournaments_button,
     )
     await state.set_state(AddTournaments.number_of_players)
@@ -214,10 +214,10 @@ async def set_tournament_prize(message: types.Message, state: FSMContext):
 
     await message.answer(
         f"✅ Tournament created successfully:\n\n"
-        f"🎮 Players: {data['number_of_players']}\n"
+        f"🎮 Players: {data['number_of_players']}\n\n"
         f"🗓 Registration: {data['registration_start']} to {data['registration_end']}\n"
-        f"🕹 Start: {data['tournament_start']} | End: {data['tournament_end']}\n"
-        f"🏆 Prize: \n\n{data['prize']}\n"
+        f"🕹 Start: {data['tournament_start']} | End: {data['tournament_end']}\n\n"
+        f"🏆 Prize: \n{data['prize']}\n\n"
         f"🔗 tournament id: {unique_id}",
         reply_markup=admin_panel_button,
     )
@@ -278,7 +278,7 @@ async def edit_registration_dates_single(message: types.Message, state: FSMConte
     tournament_id = tournament["name"]
     await state.update_data(tournament_id=tournament_id)
     await message.answer(
-        f"You are editing the REGISTRATION date of current tournament\n\n📅 Current registration time: {tournament['start_time']}.\n\n"
+        f"You are editing the REGISTRATION date of current tournament\n\n📅 Current registration time: {tournament['register_start']}.\n\n"
         "Please enter the new REGISTRATION *start date* in the format `YYYY-MM-DD HH:MM`:",
         parse_mode="Markdown",
         reply_markup=back_to_tournaments_button
@@ -302,8 +302,10 @@ async def set_new_start_date_single(message: types.Message, state: FSMContext):
         await message.answer("Invalid date format. Please use `YYYY-MM-DD HH:MM`. Try again.", reply_markup=back_to_tournaments_button)
         return
     await state.update_data(new_start_date=new_start_date)
+    tournaments = get_upcoming_tournaments()
+    tournament = tournaments[0]
     await message.answer(
-        f"Now, enter the new REGISTRATION *end date* in the format `YYYY-MM-DD HH:MM`: ",
+        f"Now, enter the new REGISTRATION *end date* in the format `YYYY-MM-DD HH:MM`: \n\n📅 Current registration time: {tournament['register_end']}.\n\n",
         parse_mode="Markdown",
         reply_markup=back_to_tournaments_button
     )
@@ -346,7 +348,7 @@ def update_registration_dates(tournament_id: str, start_date: str, end_date: str
             """
             UPDATE tournaments_table
             SET tournament_register_start_time = ?, tournament_register_end_time = ?
-            WHERE id = ?
+            WHERE tournament_id = ?
             """,
             (start_date, end_date, tournament_id),
         )
@@ -371,8 +373,8 @@ async def edit_start_and_end_times(message: types.Message, state: FSMContext):
     tournament = tournaments[0]
     await state.update_data(tournament_id=tournament["name"])
     await message.answer(
-        f"Editing the START time  for tournament.\n"
-        f"Current Start: {tournament['start_time']} \nCurrent End: {tournament['end_time']}.\n\n"
+        f"Editing the START time  for tournament.\n\n"
+        f"Current Start time: {tournament['start_time']}"
         "Please enter the new *start date* in the format `YYYY-MM-DD HH:MM`:",
         parse_mode="Markdown",
         reply_markup=back_to_tournaments_button
@@ -395,8 +397,10 @@ async def set_new_start_date(message: types.Message, state: FSMContext):
         await message.answer("Invalid date format. Please use `YYYY-MM-DD HH:MM`. Try again.", reply_markup=back_to_tournaments_button)
         return
     await state.update_data(new_start_date=new_start_date)
+    tournaments = get_upcoming_tournaments()
+    tournament = tournaments[0]
     await message.answer(
-        "Now, enter the new *end date* in the format `YYYY-MM-DD HH:MM`:",
+        f"Now, enter the new *end date* in the format `YYYY-MM-DD HH:MM`: \n\nCurrent End: {tournament['end_time']}.\n\n",
         parse_mode="Markdown",
         reply_markup=back_to_tournaments_button
     )
@@ -438,7 +442,7 @@ def update_start_and_end_dates(tournament_id: str, start_date: str, end_date: st
             """
             UPDATE tournaments_table
             SET tournament_start_time = ?, tournament_end_time = ?
-            WHERE id = ?
+            WHERE tournament_id = ?
             """,
             (start_date, end_date, tournament_id),
         )
