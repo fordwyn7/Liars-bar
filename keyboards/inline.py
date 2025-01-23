@@ -462,7 +462,7 @@ async def show_ongoing_tournaments(callback_query: types.CallbackQuery):
     tournaments = get_ongoing_tournaments()
     if not tournaments:
         await callback_query.answer(
-            "No ongoing tournaments right now.",
+            "No ongoing tournaments right now. 🤷‍♂️",
             show_alert=True,
             reply_markup=get_main_menu(callback_query.from_user.id),
         )
@@ -517,8 +517,9 @@ async def show_upcoming_tournaments(callback_query: types.CallbackQuery):
 async def show_archive_tournaments(callback_query: types.CallbackQuery):
     tournaments = get_tournament_archive()
     if not tournaments:
-        await callback_query.message.answer(
-            "No tournaments in the archive.",
+        await callback_query.answer(
+            "No tournaments in the archive 🤷‍♂️",
+            show_alert=True,
             reply_markup=get_main_menu(callback_query.from_user.id),
         )
         return
