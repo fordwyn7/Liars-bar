@@ -9,8 +9,7 @@ from middlewares.registered import admin_required
 from keyboards.inline import get_join_tournament_button, user_tournaments_keyboard
 from db import *
 from states.state import AddTournaments, EditRegistrationDates, EditStartAndEndTimes
-
-
+from datetime import datetime, timezone, timedelta
 
 @dp.message(F.text == "🏆 tournaments")
 @admin_required()
@@ -29,14 +28,14 @@ async def tournaments_admin_panel(message: types.Message, state: FSMContext):
         reply_markup=tournaments_admin_panel_button,
     )
     await state.clear()
-from datetime import datetime
+
 
 @dp.message(F.text == "⚡️ Ongoing")
 @admin_required()
 async def tournaments_admin_panel(message: types.Message):
     ongoing_tournaments = get_ongoing_tournaments()
     if not ongoing_tournaments:
-        await message.answer(f"{datetime.now()}")
+        await message.answer(f"{datetime.now(timezone.utc) + timedelta(hours=5)}")
         await message.answer(
             f"There are no ongoing tournaments 🤷‍♂️",
             reply_markup=tournaments_admin_panel_button,
