@@ -606,8 +606,32 @@ async def cancel_delete_tournament(callback_query: types.CallbackQuery):
 @dp.callback_query(F.data.startswith("confirm_delete:"))
 async def confirm_delete_tournament(callback_query: types.CallbackQuery):
     tournament_id = callback_query.data.split(":")[1]
+    
+    conn = sqlite3.connect("users_database.db")
+    cursor = conn.cursor()
+    try:
+        cursor.execute(
+            """
+            SELECT user_id FROM tournament_users WHERE tournament_id = ?
+            """,
+            (tournament_id,),
+        )
+        registered_users = cursor.fetchall()
+    finally:
+        conn.close()
+    
     delete_tournament(tournament_id)
     await callback_query.message.delete()
+
+    for user in registered_users:
+        try:
+            await bot.send_message(
+                chat_id=user[0],
+                text=f"⚠️ The tournament you registered has been canceled. We apologize for any inconvenience. 😕"
+            )
+        except Exception as e:
+            print(f"Failed to send message to user {user[0]}: {e}")
+
     await callback_query.message.answer(
         f"Tournament has been deleted. ✅"
     )
