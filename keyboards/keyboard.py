@@ -100,6 +100,20 @@ users_balance_button = ReplyKeyboardMarkup(
     resize_keyboard=True,
 )
 
+change_users_balance = ReplyKeyboardMarkup(
+    keyboard=[
+        [
+            KeyboardButton(text="➕ Add Unity Coins"),
+            KeyboardButton(text="➖ Subtract Unity Coins"),
+        ],
+        [
+            KeyboardButton(text="back to admin panel 🔙"),
+        ],
+    ],
+    resize_keyboard=True,
+)
+
+
 admins_list_button = ReplyKeyboardMarkup(
     keyboard=[
         [

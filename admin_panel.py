@@ -665,12 +665,8 @@ async def process_coin_amount(message: types.Message, state: FSMContext):
         return
     try:
         coin_amount = int(message.text.strip())
-        if coin_amount <= 0:
-            await message.answer("Please enter a valid positive number of Unity Coins.")
-            return
     except ValueError:
-        await message.answer("Please enter a valid number of Unity Coins.")
-        return
+        await message.answer("Please enter a valid number of Unity Coins.", reply_markup=back_to_admin_panel)
     conn = sqlite3.connect("users_database.db")
     cursor = conn.cursor()
     cursor.execute("SELECT user_id FROM users_database")
@@ -693,4 +689,140 @@ async def process_coin_amount(message: types.Message, state: FSMContext):
         reply_markup=users_balance_button,
     )
     await state.clear()
+
+@dp.message(F.text == "👀 View User Unity Coins")
+@admin_required()
+async def view_users_balance(message: types.Message, state: FSMContext):
+    await message.answer(
+        "Please provide the user ID or username to view the Unity coin balance.",
+        reply_markup=back_to_admin_panel
+    )
+    await state.set_state(waiting_for_user_id_or_username.waiting_amount)
+
+@dp.message(waiting_for_user_id_or_username.waiting_amount)
+async def handle_user_input_for_balance(message: types.Message, state: FSMContext):
+    if message.text == "back to admin panel 🔙":
+        await message.answer(
+            f"You are in admin panel 👇", reply_markup=admin_panel_button
+        )
+        await state.clear()
+        return
+    user_input = message.text.strip()
+    conn = sqlite3.connect("users_database.db")
+    cursor = conn.cursor()
+    cursor.execute(
+        "SELECT user_id, nfgame, unity_coin FROM users_database WHERE user_id = ? OR nfgame = ?",
+        (user_input, user_input)
+    )
+    user = cursor.fetchone()
+    
+    if user:
+        user_id, username, unity_coin = user
+        await message.answer(
+            f"📊 *User Information:*\n\n"
+            f"👤 *Username:* {username}\n"
+            f"💰 *Unity Coins:* {unity_coin}\n"
+            f"🆔 *User ID:* {user_id}\n\n"
+            "Choose an action below:",
+            reply_markup=change_users_balance
+        )
+        await state.update_data(user_id=user_id)
+    else:
+        await message.answer("❌ User not found.", reply_markup=users_balance_button)
+        await state.clear()
+        return
+
+@dp.message(F.text == "➕ Add Unity Coins")
+@admin_required()
+async def add_unity_coins(message: types.Message, state: FSMContext):
+    user_data = await state.get_data()
+    user_id = user_data.get("user_id")
+    if user_id:
+        await message.answer(
+            "Please provide the amount of Unity coins to add.",
+            reply_markup=back_to_admin_panel
+        )
+        await state.set_state(waiting_for_user_id_or_username.waiting_for_add_coin_amount)
+    else:
+        await message.answer("❌ No user selected. Please try again.")
+
+@dp.message(waiting_for_user_id_or_username.waiting_for_add_coin_amount)
+async def handle_add_unity_coins(message: types.Message, state: FSMContext):
+    if message.text == "back to admin panel 🔙":
+        await message.answer(
+            f"You are in admin panel 👇", reply_markup=admin_panel_button
+        )
+        await state.clear()
+        return
+    try:
+        add_amount = int(message.text.strip())
+        if add_amount <= 0:
+            await message.answer("❌ The amount must be greater than 0.", reply_markup=back_to_admin_panel)
+            return
+        
+        user_data = await state.get_data()
+        user_id = user_data.get("user_id")
+
+        conn = sqlite3.connect("users_database.db")
+        cursor = conn.cursor()
+        cursor.execute(
+            "UPDATE users_database SET unity_coin = unity_coin + ? WHERE user_id = ?",
+            (add_amount, user_id)
+        )
+        conn.commit()
+        conn.close()
+    
+        await message.answer(f"✅ {add_amount} Unity Coins have been added to the user's balance!")
+        await state.clear()
+    except ValueError:
+        await message.answer("❌ Please provide a valid number for Unity coins.", reply_markup=back_to_admin_panel)
+
+@dp.message(F.text == "➖ Subtract Unity Coins")
+@admin_required()
+async def subtract_unity_coins(message: types.Message, state: FSMContext):
+    user_data = await state.get_data()
+    user_id = user_data.get("user_id")
+    
+    if user_id:
+        await message.answer(
+            "Please provide the amount of Unity coins to subtract.",
+            reply_markup=back_to_admin_panel
+        )
+        await state.set_state(waiting_for_user_id_or_username.waiting_for_subtract_coin_amount)
+    else:
+        await message.answer("❌ No user selected. Please try again.")
+
+@dp.message(waiting_for_user_id_or_username.waiting_for_subtract_coin_amount)
+async def handle_subtract_unity_coins(message: types.Message, state: FSMContext):
+    if message.text == "back to admin panel 🔙":
+        await message.answer(
+            f"You are in admin panel 👇", reply_markup=admin_panel_button
+        )
+        await state.clear()
+        return
+    try:
+        subtract_amount = int(message.text.strip())
+
+        if subtract_amount <= 0:
+            await message.answer("❌ The amount must be greater than 0.")
+            return
+
+        user_data = await state.get_data()
+        user_id = user_data.get("user_id")
+
+        conn = sqlite3.connect("users_database.db")
+        cursor = conn.cursor()
+        cursor.execute("SELECT unity_coin FROM users_database WHERE user_id = ?", (user_id,))
+        current_balance = cursor.fetchone()[0]
+        cursor.execute(
+            "UPDATE users_database SET unity_coin = unity_coin - ? WHERE user_id = ?",
+            (subtract_amount, user_id)
+        )
+        conn.commit()
+        conn.close()
+
+        await message.answer(f"✅ {subtract_amount} Unity Coins have been subtracted from the user's balance!")
+        await state.finish()
+    except ValueError:
+        await message.answer("❌ Please provide a valid number for Unity coins.", reply_markup=back_to_admin_panel)
 
