@@ -36,7 +36,7 @@ from datetime import datetime
 async def tournaments_admin_panel(message: types.Message):
     ongoing_tournaments = get_ongoing_tournaments()
     if not ongoing_tournaments:
-        await message.answer(f"{datetime('now')}")
+        await message.answer(f"{datetime.now()}")
         await message.answer(
             f"There are no ongoing tournaments 🤷‍♂️",
             reply_markup=tournaments_admin_panel_button,
