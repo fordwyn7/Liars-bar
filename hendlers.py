@@ -2,7 +2,8 @@ import sqlite3
 from config import dp, F, bot
 from aiogram import types
 from aiogram.fsm.context import FSMContext
-from keyboards.keyboard import change_name, get_main_menu, cancel_button,user_tournaments_keyboard
+from keyboards.keyboard import change_name, get_main_menu, cancel_button
+from keyboards.inline import user_tournaments_keyboard
 from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 
 from states.state import NewGameState, MessagetoAdmin, awaiting_game_number
