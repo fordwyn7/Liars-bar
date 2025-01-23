@@ -535,6 +535,8 @@ async def join_tournament(callback_query: types.CallbackQuery):
     user_id = callback_query.from_user.id
     current_time = datetime.now(timezone.utc) + timedelta(hours=5)
     tournament = get_upcoming_tournaments()
+    if not tournament:
+        await callback_query.answer(f"Tournament not found or already started/finished 😕")
     await bot.send_message(chat_id=callback_query.from_user.id, text=f"{tournament["register_start_date"]}")
     register_start = datetime.strptime(tournament["register_start_date"], "%Y-%m-%d %H:%M:%S")
     register_end = datetime.strptime(tournament["register_end_date"], "%Y-%m-%d %H:%M:%S")
