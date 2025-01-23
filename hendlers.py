@@ -268,7 +268,7 @@ async def my_cabinet(message: types.Message):
     conn = sqlite3.connect("users_database.db")
     cursor = conn.cursor()
     
-    cursor.execute("SELECT registration_date, nfgame, unity_coins FROM users_database WHERE user_id = ?", (user_id,))
+    cursor.execute("SELECT registration_date, nfgame, unity_coin FROM users_database WHERE user_id = ?", (user_id,))
     user_info = cursor.fetchone()
     if not user_info:
         await message.answer("❌ You are not registered in the database.")
