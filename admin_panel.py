@@ -42,12 +42,22 @@ def get_statistics():
         "SELECT COUNT(*) FROM users_database WHERE registration_date >= ?",
         (week_start,),
     )
+    cursor.execute(
+        "SELECT COUNT(*) FROM tournaments_table WHERE tournament_end_time <= datetime('now')"
+    )
+    tournaments_ended = cursor.fetchone()[0]
+    cursor.execute(
+        "SELECT COUNT(*) FROM tournaments_table WHERE tournament_start_time > datetime('now')"
+    )
+    upcoming_tournaments = cursor.fetchone()[0]
     users_joined_this_week = cursor.fetchone()[0]
     stats_message = (
         "📊 *Game Statistics*\n\n"
         f"👥 *Total Users:* {total_users}\n"
         f"🎮 *Total Games Played:* {total_games}\n"
         f"🆕 *Users Joined This Week:* {users_joined_this_week}\n"
+        f"🏁 *Tournaments Ended:* {tournaments_ended}\n"
+        f"⏳ *Upcoming Tournaments:* {upcoming_tournaments}\n"
     )
     conn.close()
     return stats_message
