@@ -278,7 +278,7 @@ async def edit_registration_dates_single(message: types.Message, state: FSMConte
     tournament_id = tournament["name"]
     await state.update_data(tournament_id=tournament_id)
     await message.answer(
-        f"You are editing the REGISTRATION date of current tournament\n\n📅 Current registration time: {tournament['register_start']}.\n\n"
+        f"You are editing the REGISTRATION date of current tournament\n\n📅 Current registration start time: {tournament['register_start']}.\n\n"
         "Please enter the new REGISTRATION *start date* in the format `YYYY-MM-DD HH:MM`:",
         parse_mode="Markdown",
         reply_markup=back_to_tournaments_button
@@ -305,7 +305,7 @@ async def set_new_start_date_single(message: types.Message, state: FSMContext):
     tournaments = get_upcoming_tournaments()
     tournament = tournaments[0]
     await message.answer(
-        f"Now, enter the new REGISTRATION *end date* in the format `YYYY-MM-DD HH:MM`: \n\n📅 Current registration time: {tournament['register_end']}.\n\n",
+        f"📅 Current registration end time: {tournament['register_end']}.\n\nNow, enter the new REGISTRATION *end date* in the format `YYYY-MM-DD HH:MM`:",
         parse_mode="Markdown",
         reply_markup=back_to_tournaments_button
     )
@@ -374,7 +374,7 @@ async def edit_start_and_end_times(message: types.Message, state: FSMContext):
     await state.update_data(tournament_id=tournament["name"])
     await message.answer(
         f"Editing the START time  for tournament.\n\n"
-        f"Current Start time: {tournament['start_time']}"
+        f"📅 Current Start time: {tournament['start_time']}\n\n"
         "Please enter the new *start date* in the format `YYYY-MM-DD HH:MM`:",
         parse_mode="Markdown",
         reply_markup=back_to_tournaments_button
@@ -400,7 +400,7 @@ async def set_new_start_date(message: types.Message, state: FSMContext):
     tournaments = get_upcoming_tournaments()
     tournament = tournaments[0]
     await message.answer(
-        f"Now, enter the new *end date* in the format `YYYY-MM-DD HH:MM`: \n\nCurrent End: {tournament['end_time']}.\n\n",
+        f"📅 Current End time: {tournament['end_time']}.\n\nNow, enter the new *end date* in the format `YYYY-MM-DD HH:MM`:",
         parse_mode="Markdown",
         reply_markup=back_to_tournaments_button
     )
