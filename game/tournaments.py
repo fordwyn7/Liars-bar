@@ -35,7 +35,7 @@ async def tournaments_admin_panel(message: types.Message, state: FSMContext):
 async def tournaments_admin_panel(message: types.Message):
     ongoing_tournaments = get_ongoing_tournaments()
     if not ongoing_tournaments:
-        await message.answer(f"{(datetime.now(timezone.utc) + timedelta(hours=5)).strftime('%Y-%m-%d %H:%M:%S')}")
+        # await message.answer(f"{(datetime.now(timezone.utc) + timedelta(hours=5)).strftime('%Y-%m-%d %H:%M:%S')}")
         await message.answer(
             f"There are no ongoing tournaments 🤷‍♂️",
             reply_markup=tournaments_admin_panel_button,
