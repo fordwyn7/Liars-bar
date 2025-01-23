@@ -491,7 +491,7 @@ async def state_info_users(message: types.Message, state: FSMContext):
 @admin_required()
 async def admin_game_archive(message: types.Message, state: FSMContext):
     await message.answer(
-        "Please send me the user ID to view their game archive 📋.",
+        "Please send me the user ID or username to view their game archive 📋.",
         reply_markup=back_to_admin_panel,
     )
     await state.set_state(awaiting_user_id.await_id)
@@ -499,12 +499,7 @@ async def admin_game_archive(message: types.Message, state: FSMContext):
 
 @dp.message(awaiting_user_id.await_id)
 async def get_user_archive_by_id(message: types.Message, state: FSMContext):
-    if not message.text.isdigit():
-        await message.answer(
-            "❌ Please send a valid user ID.", reply_markup=back_to_admin_panel
-        )
-
-    user_id = int(message.text)
+    user_id = message.text
     games = get_user_game_archive(user_id)
     if not games:
         await message.answer(
@@ -719,10 +714,10 @@ async def handle_user_input_for_balance(message: types.Message, state: FSMContex
     if user:
         user_id, username, unity_coin = user
         await message.answer(
-            f"📊 *User Information:*\n\n"
-            f"👤 *Username:* {username}\n"
-            f"💰 *Unity Coins:* {unity_coin}\n"
-            f"🆔 *User ID:* {user_id}\n\n"
+            f"📊 User Information: \n\n"
+            f"👤 Username: {username}\n"
+            f"💰 Unity Coins: {unity_coin}\n"
+            f"🆔 User ID: {user_id}\n\n"
             "Choose an action below:",
             reply_markup=change_users_balance
         )

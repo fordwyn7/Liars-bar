@@ -180,9 +180,9 @@ def get_user_game_archive(user_id: int):
             """
             SELECT game_id, game_start_time, game_end_time, game_winner
             FROM game_archive
-            WHERE user_id = ?
+            WHERE user_id = ? OR nfgame = ?
             """,
-            (user_id,),
+            (user_id,user_id),
         )
         games = cursor.fetchall()
         return games
