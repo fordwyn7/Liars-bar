@@ -52,13 +52,13 @@ def get_statistics():
 
     # Number of tournaments ended
     cursor.execute(
-        "SELECT COUNT(*) FROM tournaments_table WHERE tournament_end_time <= datetime('now')"
+        "SELECT COUNT(*) FROM tournaments_table WHERE tournament_end_time <= datetime('now',  '+5 hours')"
     )
     tournaments_ended = cursor.fetchone()[0]
 
     # Number of upcoming tournaments
     cursor.execute(
-        "SELECT COUNT(*) FROM tournaments_table WHERE tournament_start_time > datetime('now')"
+        "SELECT COUNT(*) FROM tournaments_table WHERE tournament_start_time > datetime('now',  '+5 hours')"
     )
     upcoming_tournaments = cursor.fetchone()[0]
 

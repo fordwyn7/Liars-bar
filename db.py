@@ -20,7 +20,7 @@ def register_user(user_id, username, first_name, last_name, preferred_name):
             cursor.execute(
                 """
                 INSERT OR IGNORE INTO users_database (user_id, username, first_name, last_name, nfgame, registration_date)
-                VALUES (?, ?, ?, ?, ?, datetime('now'))
+                VALUES (?, ?, ?, ?, ?, datetime('now',  '+5 hours'))
                 """,
                 (user_id, username, first_name, last_name, preferred_name),
             )
@@ -982,7 +982,7 @@ def get_upcoming_tournaments():
             """
             SELECT id, tournament_id, tournament_prize, tournament_start_time, maximum_players, tournament_end_time, tournament_register_start_time, tournament_register_end_time
             FROM tournaments_table
-            WHERE tournament_start_time > datetime('now')
+            WHERE tournament_start_time > datetime('now',  '+5 hours')
             """
         )
         tournaments = [
@@ -1015,7 +1015,7 @@ def get_tournament_archive():
             """
             SELECT tournament_id, tournament_prize, tournament_winner
             FROM tournaments_table
-            WHERE tournament_end_time <= datetime('now')
+            WHERE tournament_end_time <= datetime('now',  '+5 hours')
             """
         )
         tournaments = [
@@ -1104,8 +1104,8 @@ def get_ongoing_tournaments():
                    t.maximum_players, 
                    (SELECT COUNT(*) FROM tournament_users tu WHERE tu.tournament_id = t.tournament_id) AS current_players
             FROM tournaments_table t
-            WHERE t.tournament_start_time <= datetime('now') 
-              AND t.tournament_end_time >= datetime('now')
+            WHERE t.tournament_start_time <= datetime('now', '+5 hours') 
+              AND t.tournament_end_time >= datetime('now',  '+5 hours')
             """
         )
         tournaments = [
