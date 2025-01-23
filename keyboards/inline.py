@@ -534,7 +534,7 @@ async def join_tournament(callback_query: types.CallbackQuery):
     tournament_id = callback_query.data.split(":")[1]
     user_id = callback_query.from_user.id
     current_time = datetime.now(timezone.utc) + timedelta(hours=5)
-    tournament = get_upcoming_tournaments()
+    tournament = get_upcoming_tournaments()[0]
     if not tournament:
         await callback_query.answer(f"Tournament not found or already started/finished 😕", show_alert=True)
         return
