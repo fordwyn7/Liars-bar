@@ -96,10 +96,18 @@ async def tournaments_admin_panel(message: types.Message):
 @dp.message(F.text == "🗂 Archive")
 @admin_required()
 async def tournaments_admin_panel(message: types.Message):
-    await message.answer(
-        f"Here are ended tournaments' statistics: 👇\n\n[List of tournamnets]",
-        reply_markup=tournaments_admin_panel_button,
-    )
+    tournaments = get_tournament_archive()
+    if not tournaments:
+        await message.answer(
+            "No tournaments in the archive.",
+            reply_markup=tournaments_admin_panel
+        )
+        return
+
+    response = "📑 *Tournament Archive:*\n\n"
+    for tournament in tournaments:
+        response += f"🏆 ID: {tournament['id']}\n🌟 Started: {tournament["start_time"]}\n📅 Ended: {tournament["end_time"]}\n🥇 Winner: {tournament['winner']}\n\n"
+    await message.answer(response, parse_mode="Markdown")
 
 
 @dp.message(F.text == "➕ create a new Tournament")
