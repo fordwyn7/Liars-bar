@@ -172,7 +172,7 @@ async def how_to_play(message: types.Message, state: FSMContext):
     )
 
 
-def get_user_game_archive(user_id: int):
+def get_user_game_archive(user_id):
     conn = sqlite3.connect("users_database.db")
     cursor = conn.cursor()
     try:
@@ -182,7 +182,7 @@ def get_user_game_archive(user_id: int):
             FROM game_archive
             WHERE user_id = ? OR nfgame = ?
             """,
-            (user_id,user_id),
+            (user_id, user_id),
         )
         games = cursor.fetchall()
         return games
