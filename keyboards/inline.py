@@ -12,6 +12,7 @@ from game.game_state import (
     get_current_turn_user_id,
     get_next_player_id,
 )
+from datetime import datetime, timezone, timedelta
 
 start_stop_game = InlineKeyboardMarkup(
     inline_keyboard=[
@@ -499,7 +500,7 @@ async def show_upcoming_tournaments(callback_query: types.CallbackQuery):
         keyboard = InlineKeyboardMarkup(inline_keyboard=[
             [
                 InlineKeyboardButton(
-                    text="Join the Tournament",
+                    text="🔥 Join the Tournament 🔥",
                     callback_data=f"join_tournament:{tournament['name']}"
                 )
             ]
@@ -529,12 +530,25 @@ async def show_archive_tournaments(callback_query: types.CallbackQuery):
 async def join_tournament(callback_query: types.CallbackQuery):
     tournament_id = callback_query.data.split(":")[1]
     user_id = callback_query.from_user.id
+    current_time = datetime.now(timezone.utc) + timedelta(hours=5)
+    tournament = get_upcoming_tournaments()
+    register_start = datetime.strptime(tournament["register_start"], "%Y-%m-%d %H:%M:%S")
+    register_end = datetime.strptime(tournament["register_end"], "%Y-%m-%d %H:%M:%S")
+    if not (register_start <= current_time <= register_end):
+        await callback_query.answer(
+            f"❌ Registration is only open between {register_start.strftime('%Y-%m-%d %H:%M:%S')} and {register_end.strftime('%Y-%m-%d %H:%M:%S')}.",
+            show_alert=True,
+        )
+        return
     if is_user_in_tournament(tournament_id, user_id):
         await callback_query.answer("❕ You are already registered for this tournament.", show_alert=True)
         return
+
     try:
         add_user_to_tournament(tournament_id, user_id)
         await callback_query.answer("✅ You have successfully joined the tournament!", show_alert=True)
     except Exception as e:
         print(f"❌ Error adding user to tournament: {e}")
         await callback_query.answer("❌ Failed to join the tournament. Please try again later.", show_alert=True)
+
+

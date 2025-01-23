@@ -45,11 +45,11 @@ async def tournaments_admin_panel(message: types.Message):
     response = "⚡️ *Ongoing Tournaments:*\n\n"
     for tournament in ongoing_tournaments:
         response += (
-            f"🌟 *{tournament['name']}*\n"
+            f"🌟 *{tournament['id']}*\n\n"
             f"🗓 Started: {tournament['start_time']}\n"
-            f"🏁 Ends: {tournament['end_time']}\n"
-            f"👥 Registered Players: {tournament['current_players']}/{tournament['maximum_players']}\n"
-            f"🏆 Prize: {tournament['prize']}\n\n"
+            f"🏁 Ends: {tournament['end_time']}\n\n"
+            f"👥 Registered Players: {tournament['current_players']}/{tournament['maximum_players']}\n\n"
+            f"🏆 Prize: \n{tournament['prize']}\n\n"
         )
 
     await message.answer(
