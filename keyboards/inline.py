@@ -538,6 +538,7 @@ async def join_tournament(callback_query: types.CallbackQuery):
     if not tournament:
         await callback_query.answer(f"Tournament not found or already started/finished 😕", show_alert=True)
         return
+    await bot.send_message(chat_id=callback_query.from_user.id, text=f"{tournament}")
     register_start = datetime.strptime(tournament["register_start"], "%Y-%m-%d %H:%M:%S")
     register_end = datetime.strptime(tournament["register_end"], "%Y-%m-%d %H:%M:%S")
     if not (register_start <= current_time <= register_end):
