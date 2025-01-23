@@ -993,8 +993,8 @@ def get_upcoming_tournaments():
                 "start_time": row[3],
                 "maximum_players": row[4],
                 "end_time": row[5],
-                "register_start_date": row[6],
-                "register_end_date": row[7]
+                "register_start": row[6],
+                "register_end": row[7]
             }
             for row in cursor.fetchall()
         ]
