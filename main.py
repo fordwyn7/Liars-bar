@@ -33,12 +33,12 @@ CREATE TABLE IF NOT EXISTS users_database (
 )
 """
 )
-cursor.execute(
-    """
-    ALTER TABLE users_database
-    ADD COLUMN unity_coin INTEGER DEFAULT 0
-    """
-)
+# cursor.execute(
+#     """
+#     ALTER TABLE users_database
+#     ADD COLUMN unity_coin INTEGER DEFAULT 0
+#     """
+# )
 
 cursor.execute(
     """
