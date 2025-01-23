@@ -76,7 +76,6 @@ def get_statistics():
     return stats_message
 
 
-
 @dp.message(F.text == "📊 statistics")
 @admin_required()
 async def main_to_menu(message: types.Message, state: FSMContext):
@@ -564,10 +563,10 @@ async def delete_tournament_handler(message: types.Message):
     upcoming_tournament = get_upcoming_tournaments()
     if upcoming_tournament:
         tournament = upcoming_tournament[0]
-        if "_" in tournament['name']:
-            nop = get_current_players(tournament['name'].split("_")[1])
+        if "_" in tournament["name"]:
+            nop = get_current_players(tournament["name"].split("_")[1])
         else:
-            nop = get_current_players(tournament['name'])
+            nop = get_current_players(tournament["name"])
         tournament_id = tournament["name"]
         response = (
             f"🌟 Tournament ID: {tournament['id']}\n\n"
@@ -606,7 +605,7 @@ async def cancel_delete_tournament(callback_query: types.CallbackQuery):
 @dp.callback_query(F.data.startswith("confirm_delete:"))
 async def confirm_delete_tournament(callback_query: types.CallbackQuery):
     tournament_id = callback_query.data.split(":")[1]
-    
+
     conn = sqlite3.connect("users_database.db")
     cursor = conn.cursor()
     try:
@@ -619,7 +618,7 @@ async def confirm_delete_tournament(callback_query: types.CallbackQuery):
         registered_users = cursor.fetchall()
     finally:
         conn.close()
-    
+
     delete_tournament(tournament_id)
     await callback_query.message.delete()
 
@@ -627,16 +626,12 @@ async def confirm_delete_tournament(callback_query: types.CallbackQuery):
         try:
             await bot.send_message(
                 chat_id=user[0],
-                text=f"⚠️ The tournament you registered has been canceled. We apologize for any inconvenience. 😕"
+                text=f"⚠️ The tournament you registered has been canceled. We apologize for any inconvenience. 😕",
             )
         except Exception as e:
             print(f"Failed to send message to user {user[0]}: {e}")
 
     await callback_query.message.answer(
-        f"Tournament has been deleted. ✅"
-    )
-    await bot.send_message(
-        chat_id=callback_query.from_user.id,
-        text="You are in tournaments section 👇",
+        f"Tournament has been deleted. ✅\nYou are in tournaments section 👇",
         reply_markup=tournaments_admin_panel_button,
     )
