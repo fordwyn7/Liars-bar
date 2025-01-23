@@ -540,11 +540,19 @@ async def delete_tournament_handler(message: types.Message):
     upcoming_tournament = get_upcoming_tournaments()
     if upcoming_tournament:
         tournament = upcoming_tournament[0]
-        tournament_id = tournament["name"]  # Real ID of tournament
+        if "_" in tournament['name']:
+            nop = get_current_players(tournament['name'].split("_")[1])
+        else:
+            nop = get_current_players(tournament['name'])
+        tournament_id = tournament["name"]
         response = (
-            f"Are you sure you want to delete the tournament '{tournament['name']}'?\n"
+            f"🌟 Tournament ID: *{tournament['id']}*\n\n"
             f"🗓 Starts: {tournament['start_time']}\n"
-            f"🏆 Prize: {tournament['prize']}\n"
+            f"🏁 Ends: {tournament['end_time']}\n\n"
+            f"🗓 Registration starts: {tournament['register_start']}\n"
+            f"🏁 Registration ends: {tournament['register_end']}\n\n"
+            f"👥 Registered Players: {nop}/{tournament['maximum_players']}\n"
+            f"🏆 Prize: \n\n{tournament['prize']}\n\n"
         )
         keyboard = InlineKeyboardMarkup(
             inline_keyboard=[
@@ -567,6 +575,7 @@ async def cancel_delete_tournament(callback_query: types.CallbackQuery):
         "Tournament deletion has been canceled.",
         reply_markup=upcoming_tournaments_button,
     )
+    await callback_query.message.delete()
 
 
 @dp.callback_query(F.data.startswith("confirm_delete:"))

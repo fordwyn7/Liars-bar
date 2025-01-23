@@ -88,7 +88,7 @@ async def tournaments_admin_panel(message: types.Message, state: FSMContext):
     turnir = get_upcoming_tournaments()
     if turnir:
         await message.answer(
-            f"There is upcoming tournament and you can not create a new one unless you delete it.",
+            f"⚠️ There is upcoming tournament and you can not create a new one unless you delete it.",
             reply_markup=tournaments_admin_panel_button,
         )
         await state.clear()
