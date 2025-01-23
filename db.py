@@ -974,30 +974,6 @@ def update_game_details(game_id: str, user_id: int, winner: str):
         conn.close()
 
 
-def get_ongoing_tournaments():
-    conn = sqlite3.connect("users_database.db")
-    cursor = conn.cursor()
-    try:
-        cursor.execute(
-            """
-            SELECT id, tournament_id, tournament_prize, tournament_end_time
-            FROM tournaments_table
-            WHERE tournament_start_time <= datetime('now')
-            AND tournament_end_time > datetime('now')
-            """
-        )
-        tournaments = [
-            {"id": row[0], "name": row[1], "prize": row[2], "end_time": row[3]}
-            for row in cursor.fetchall()
-        ]
-        return tournaments
-    except sqlite3.Error as e:
-        print(f"❌ Database error: {e}")
-        return []
-    finally:
-        conn.close()
-
-
 def get_upcoming_tournaments():
     conn = sqlite3.connect("users_database.db")
     cursor = conn.cursor()
@@ -1117,3 +1093,36 @@ def delete_tournament(tournament_id: str):
     cursor.execute("DELETE FROM tournaments_table WHERE tournament_id = ?", (tournament_id,))
     conn.commit()
     conn.close()
+
+def get_ongoing_tournaments():
+    conn = sqlite3.connect("users_database.db")
+    cursor = conn.cursor()
+    try:
+        cursor.execute(
+            """
+            SELECT t.id, t.tournament_id, t.tournament_prize, t.tournament_start_time, t.tournament_end_time, 
+                   t.maximum_players, 
+                   (SELECT COUNT(*) FROM tournament_users tu WHERE tu.tournament_id = t.tournament_id) AS current_players
+            FROM tournaments_table t
+            WHERE t.tournament_start_time <= datetime('now') 
+              AND t.tournament_end_time >= datetime('now')
+            """
+        )
+        tournaments = [
+            {
+                "id": row[0],
+                "name": row[1],
+                "prize": row[2],
+                "start_time": row[3],
+                "end_time": row[4],
+                "current_players": row[6],
+                "maximum_players": row[5],
+            }
+            for row in cursor.fetchall()
+        ]
+        return tournaments
+    except sqlite3.Error as e:
+        print(f"❌ Database error: {e}")
+        return []
+    finally:
+        conn.close()

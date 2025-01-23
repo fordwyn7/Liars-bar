@@ -33,9 +33,28 @@ async def tournaments_admin_panel(message: types.Message, state: FSMContext):
 @dp.message(F.text == "⚡️ Ongoing")
 @admin_required()
 async def tournaments_admin_panel(message: types.Message):
+    ongoing_tournaments = get_ongoing_tournaments()
+    if not ongoing_tournaments:
+        await message.answer(
+            f"There are no ongoing tournaments 🤷‍♂️",
+            reply_markup=tournaments_admin_panel_button,
+        )
+        return
+
+    response = "⚡️ *Ongoing Tournaments:*\n\n"
+    for tournament in ongoing_tournaments:
+        response += (
+            f"🌟 *{tournament['name']}*\n"
+            f"🗓 Started: {tournament['start_time']}\n"
+            f"🏁 Ends: {tournament['end_time']}\n"
+            f"👥 Registered Players: {tournament['current_players']}/{tournament['maximum_players']}\n"
+            f"🏆 Prize: {tournament['prize']}\n\n"
+        )
+
     await message.answer(
-        f"Here are what you can do with ongoing tournaments.",
+        response,
         reply_markup=ongoing_tournaments_button,
+        parse_mode="Markdown",
     )
 
 
