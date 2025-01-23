@@ -1013,13 +1013,13 @@ def get_tournament_archive():
     try:
         cursor.execute(
             """
-            SELECT tournament_id, tournament_prize, tournament_winner
+            SELECT tournament_id, tournament_prize, tournament_winner, tournament_start_time, tournament_end_time
             FROM tournaments_table
             WHERE tournament_end_time <= datetime('now',  '+5 hours')
             """
         )
         tournaments = [
-            {"name": row[0], "prize": row[1], "winner": row[2]}
+            {"name": row[0], "prize": row[1], "winner": row[2], "start_time": row[3], "end_time":row[4]}
             for row in cursor.fetchall()
         ]
         return tournaments

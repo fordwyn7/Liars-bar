@@ -523,7 +523,7 @@ async def show_archive_tournaments(callback_query: types.CallbackQuery):
 
     response = "📑 *Tournament Archive:*\n\n"
     for tournament in tournaments:
-        response += f"🏆 ID: {tournament['id']} | Winner: {tournament['winner']}\n"
+        response += f"🏆 ID: {tournament['name']}\n🌟 Started: {tournament["start_time"]}\n📅 Ended: {tournament["end_time"]}\n🥇 Winner: {tournament['winner']}\n"
     await callback_query.message.answer(response, parse_mode="Markdown")
 
 @dp.callback_query(lambda c: c.data.startswith("join_tournament:"))
