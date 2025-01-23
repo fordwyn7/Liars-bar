@@ -683,7 +683,7 @@ async def process_coin_amount(message: types.Message, state: FSMContext):
     cursor = conn.cursor()
     for user_id in user_ids:
         cursor.execute(
-            "UPDATE users_database SET unity_coins = unity_coins + ? WHERE user_id = ?",
+            "UPDATE users_database SET unity_coin = unity_coin + ? WHERE user_id = ?",
             (coin_amount, user_id[0]),
         )
     conn.commit()

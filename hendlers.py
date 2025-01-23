@@ -2,7 +2,7 @@ import sqlite3
 from config import dp, F, bot
 from aiogram import types
 from aiogram.fsm.context import FSMContext
-from keyboards.keyboard import change_name, get_main_menu, cancel_button
+from keyboards.keyboard import change_name, get_main_menu, cancel_button,user_tournaments_keyboard
 from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 
 from states.state import NewGameState, MessagetoAdmin, awaiting_game_number
@@ -289,4 +289,7 @@ async def my_cabinet(message: types.Message):
 
 @dp.message(F.text == "🤩 tournaments")
 async def tournaments_users_button(message: types.Message):
-    await message.answer(f"Coming soon ...")
+    if message.from_user.id in [6807731973, 5219280507]:
+        await message.answer("Choose an option:", reply_markup=user_tournaments_keyboard)
+    else:
+        await message.answer(f"Coming soon ...")
