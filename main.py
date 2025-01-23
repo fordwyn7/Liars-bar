@@ -33,12 +33,17 @@ CREATE TABLE IF NOT EXISTS users_database (
 )
 """
 )
-# cursor.execute(
-#     """
-#     ALTER TABLE users_database
-#     ADD COLUMN unity_coin INTEGER DEFAULT 0
-#     """
-# )
+cursor.execute("PRAGMA table_info(users_database);")
+columns = cursor.fetchall()
+column_names = [column[1] for column in columns]
+
+if 'unity_coin' not in column_names:
+    cursor.execute(
+        """
+        ALTER TABLE users_database
+        ADD COLUMN unity_coin INTEGER DEFAULT 0
+        """
+    )
 
 cursor.execute(
     """
