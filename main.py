@@ -29,7 +29,8 @@ CREATE TABLE IF NOT EXISTS users_database (
     first_name TEXT,
     last_name TEXT,
     registration_date TEXT, 
-    nfgame TEXT
+    nfgame TEXT,
+    unity_coin INTEGER DEFAULT 0
 )
 """
 )

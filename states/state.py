@@ -60,3 +60,5 @@ class EditStartAndEndTimes(StatesGroup):
     new_start_date = State()
     new_end_date = State()
     
+class waiting_for_coin_amount(StatesGroup):
+    unity_coin_amount = State()

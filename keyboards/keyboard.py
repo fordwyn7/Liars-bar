@@ -15,6 +15,10 @@ def get_main_menu(user_id: int):
             KeyboardButton(text="game status 🌟"),      
         ],
         [
+            KeyboardButton(text="📱 my cabinet"),
+            KeyboardButton(text="🤩 tournaments"),
+        ],
+        [
             KeyboardButton(text="🎯 game archive"),
             KeyboardButton(text="how to play 📝"),
         ],
@@ -75,7 +79,22 @@ admin_panel_button = ReplyKeyboardMarkup(
             KeyboardButton(text="📤 send message"),
         ],
         [
+            KeyboardButton(text="💳 user's balance"),
             KeyboardButton(text="🔙 main menu"),
+        ],
+    ],
+    resize_keyboard=True,
+)
+
+
+users_balance_button = ReplyKeyboardMarkup(
+    keyboard=[
+        [
+            KeyboardButton(text="➕ Add Unity Coins to All Users"),
+            KeyboardButton(text="👀 View User Unity Coins"),
+        ],
+        [
+            KeyboardButton(text="back to admin panel 🔙"),
         ],
     ],
     resize_keyboard=True,

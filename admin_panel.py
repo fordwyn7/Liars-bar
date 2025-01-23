@@ -635,3 +635,62 @@ async def confirm_delete_tournament(callback_query: types.CallbackQuery):
         f"Tournament has been deleted. ✅\nYou are in tournaments section 👇",
         reply_markup=tournaments_admin_panel_button,
     )
+
+
+@dp.message(F.text == "💳 user's balance")
+@admin_required()
+async def users_balance(message: types.Message, state: FSMContext):
+    await message.answer(
+        f"Here you can do changes with users' balances 👇",
+        reply_markup=users_balance_button,
+    )
+
+@dp.message(F.text == "➕ Add Unity Coins to All Users")
+@admin_required()
+async def add_unity_coins_to_all(message: types.Message, state: FSMContext):
+    await message.answer(
+        "Please enter the amount of Unity Coins you want to add to all users:",
+        reply_markup=back_to_admin_panel
+    )
+    await state.set_state(waiting_for_coin_amount.unity_coin_amount)
+    
+@dp.message(waiting_for_coin_amount.unity_coin_amount)
+@admin_required()
+async def process_coin_amount(message: types.Message, state: FSMContext):
+    if message.text == "back to admin panel 🔙":
+        await message.answer(
+            f"You are in admin panel 👇", reply_markup=admin_panel_button
+        )
+        await state.clear()
+        return
+    try:
+        coin_amount = int(message.text.strip())
+        if coin_amount <= 0:
+            await message.answer("Please enter a valid positive number of Unity Coins.")
+            return
+    except ValueError:
+        await message.answer("Please enter a valid number of Unity Coins.")
+        return
+    conn = sqlite3.connect("users_database.db")
+    cursor = conn.cursor()
+    cursor.execute("SELECT user_id FROM users_database")
+    user_ids = cursor.fetchall()
+    conn.close()
+    if not user_ids:
+        await message.answer("No users found in the database.")
+        return
+    conn = sqlite3.connect("users_database.db")
+    cursor = conn.cursor()
+    for user_id in user_ids:
+        cursor.execute(
+            "UPDATE users_database SET unity_coins = unity_coins + ? WHERE user_id = ?",
+            (coin_amount, user_id[0]),
+        )
+    conn.commit()
+    conn.close()
+    await message.answer(
+        f"✅ Successfully added {coin_amount} Unity Coins to all users.",
+        reply_markup=users_balance_button,
+    )
+    await state.clear()
+

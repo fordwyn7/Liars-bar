@@ -261,3 +261,32 @@ async def show_games_handler(message: types.Message):
     else:
         response = "The game archive is empty."
     await message.answer(response)
+    
+@dp.message(F.text == "📱 my cabinet")
+async def my_cabinet(message: types.Message):
+    user_id = message.from_user.id
+    conn = sqlite3.connect("users_database.db")
+    cursor = conn.cursor()
+    
+    cursor.execute("SELECT registration_date, nfgame, unity_coins FROM users_database WHERE user_id = ?", (user_id,))
+    user_info = cursor.fetchone()
+    if not user_info:
+        await message.answer("❌ You are not registered in the database.")
+        conn.close()
+        return
+    registration_date, nfgame, unity_coins = user_info
+    cursor.execute("SELECT COUNT(*) FROM game_archive WHERE user_id = ?", (user_id,))
+    games_played = cursor.fetchone()[0]
+    conn.close()
+    user_cabinet_message = (
+        f"📱 *Your Cabinet*\n\n"
+        f"👤 *Username:* {nfgame}\n"
+        f"🗓 *Registration Date:* {registration_date}\n"
+        f"🎮 *Games Played:* {games_played}\n"
+        f"💰 *Unity Coins:* {unity_coins}\n"
+    )
+    await message.answer(user_cabinet_message, parse_mode="Markdown")
+
+@dp.message(F.text == "🤩 tournaments")
+async def tournaments_users_button(message: types.Message):
+    await message.answer(f"Coming soon ...")

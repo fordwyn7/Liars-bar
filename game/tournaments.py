@@ -22,7 +22,7 @@ async def tournaments_admin_panel(message: types.Message):
 
 @dp.message(F.text == "back to tournaments panel 🔙")
 @admin_required()
-async def tournaments_admin_panel(message: types.Message, state: FSMContext):
+async def back_to_tournaments_section(message: types.Message, state: FSMContext):
     await message.answer(
         f"You are in tournaments section. \nPlease choose on of these options.",
         reply_markup=tournaments_admin_panel_button,
@@ -32,7 +32,7 @@ async def tournaments_admin_panel(message: types.Message, state: FSMContext):
 
 @dp.message(F.text == "⚡️ Ongoing")
 @admin_required()
-async def tournaments_admin_panel(message: types.Message):
+async def ongoing_tournaments_sekshn(message: types.Message):
     ongoing_tournaments = get_ongoing_tournaments()
     if not ongoing_tournaments:
         # await message.answer(f"{(datetime.now(timezone.utc) + timedelta(hours=5)).strftime('%Y-%m-%d %H:%M:%S')}")
@@ -61,7 +61,7 @@ async def tournaments_admin_panel(message: types.Message):
 
 @dp.message(F.text == "⏳ Upcoming")
 @admin_required()
-async def tournaments_admin_panel(message: types.Message):
+async def upcoming_tournaments_sekshn(message: types.Message):
     turnir = get_upcoming_tournaments()
 
     if not turnir:
@@ -95,12 +95,12 @@ async def tournaments_admin_panel(message: types.Message):
 
 @dp.message(F.text == "🗂 Archive")
 @admin_required()
-async def tournaments_admin_panel(message: types.Message):
+async def archive_tournaments_sekcsh(message: types.Message):
     tournaments = get_tournament_archive()
     if not tournaments:
         await message.answer(
             "No tournaments in the archive.",
-            reply_markup=tournaments_admin_panel
+            reply_markup=tournaments_admin_panel_button
         )
         return
 
@@ -112,7 +112,7 @@ async def tournaments_admin_panel(message: types.Message):
 
 @dp.message(F.text == "➕ create a new Tournament")
 @admin_required()
-async def tournaments_admin_panel(message: types.Message, state: FSMContext):
+async def create_a_new_truine(message: types.Message, state: FSMContext):
     turnir = get_upcoming_tournaments()
     if turnir:
         await message.answer(
@@ -132,7 +132,7 @@ async def tournaments_admin_panel(message: types.Message, state: FSMContext):
 async def set_number_of_players(message: types.Message, state: FSMContext):
     if message.text == "back to tournaments panel 🔙":
         await message.answer(
-            f"You are in tournaments section.", reply_markup=tournaments_admin_panel
+            f"You are in tournaments section.", reply_markup=tournaments_admin_panel_button
         )
         await state.clear()
         return
@@ -148,7 +148,7 @@ async def set_number_of_players(message: types.Message, state: FSMContext):
 async def set_registration_start_date(message: types.Message, state: FSMContext):
     if message.text == "back to tournaments panel 🔙":
         await message.answer(
-            f"You are in tournaments section.", reply_markup=tournaments_admin_panel
+            f"You are in tournaments section.", reply_markup=tournaments_admin_panel_button
         )
         await state.clear()
         return
@@ -167,7 +167,7 @@ async def set_registration_start_date(message: types.Message, state: FSMContext)
 async def set_registration_end_date(message: types.Message, state: FSMContext):
     if message.text == "back to tournaments panel 🔙":
         await message.answer(
-            f"You are in tournaments section.", reply_markup=tournaments_admin_panel
+            f"You are in tournaments section.", reply_markup=tournaments_admin_panel_button
         )
         await state.clear()
         return
@@ -190,7 +190,7 @@ async def set_registration_end_date(message: types.Message, state: FSMContext):
 async def set_tournament_start_date(message: types.Message, state: FSMContext):
     if message.text == "back to tournaments panel 🔙":
         await message.answer(
-            f"You are in tournaments section.", reply_markup=tournaments_admin_panel
+            f"You are in tournaments section.", reply_markup=tournaments_admin_panel_button
         )
         await state.clear()
         return
@@ -213,7 +213,7 @@ async def set_tournament_start_date(message: types.Message, state: FSMContext):
 async def set_tournament_end_date(message: types.Message, state: FSMContext):
     if message.text == "back to tournaments panel 🔙":
         await message.answer(
-            f"You are in tournaments section.", reply_markup=tournaments_admin_panel
+            f"You are in tournaments section.", reply_markup=tournaments_admin_panel_button
         )
         await state.clear()
         return
@@ -319,7 +319,7 @@ async def edit_registration_dates_single(message: types.Message, state: FSMConte
 async def set_new_start_date_single(message: types.Message, state: FSMContext):
     if message.text == "back to tournaments panel 🔙":
         await message.answer(
-            f"You are in tournaments section.", reply_markup=tournaments_admin_panel
+            f"You are in tournaments section.", reply_markup=tournaments_admin_panel_button
         )
         await state.clear()
         return
@@ -344,7 +344,7 @@ async def set_new_start_date_single(message: types.Message, state: FSMContext):
 async def set_new_end_date_single(message: types.Message, state: FSMContext):
     if message.text == "back to tournaments panel 🔙":
         await message.answer(
-            f"You are in tournaments section.", reply_markup=tournaments_admin_panel
+            f"You are in tournaments section.", reply_markup=tournaments_admin_panel_button
         )
         await state.clear()
         return
@@ -414,7 +414,7 @@ async def edit_start_and_end_times(message: types.Message, state: FSMContext):
 async def set_new_start_date(message: types.Message, state: FSMContext):
     if message.text == "back to tournaments panel 🔙":
         await message.answer(
-            f"You are in tournaments section.", reply_markup=tournaments_admin_panel
+            f"You are in tournaments section.", reply_markup=tournaments_admin_panel_button
         )
         await state.clear()
         return
@@ -439,7 +439,7 @@ async def set_new_start_date(message: types.Message, state: FSMContext):
 async def set_new_end_date(message: types.Message, state: FSMContext):
     if message.text == "back to tournaments panel 🔙":
         await message.answer(
-            f"You are in tournaments section.", reply_markup=tournaments_admin_panel
+            f"You are in tournaments section.", reply_markup=tournaments_admin_panel_button
         )
         await state.clear()
         return
