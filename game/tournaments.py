@@ -583,7 +583,7 @@ async def notify_groups(groups, round_number):
                 )
             except Exception as e:
                 print(f"Failed to notify user {user_id}: {e}")
-    asyncio.sleep(5)
+    await asyncio.sleep(5)
     for gn in groups:
         gp = len(gn)
         game_id = str(uuid.uuid4())
