@@ -35,13 +35,12 @@ def is_user_in_tournament_and_active(user_id):
         return False
 
     tournament_start, tournament_end = tournament
-    uzbekistan_tz = timezone(timedelta(hours=5))  # Uzbekistan timezone
+    uzbekistan_tz = timezone(timedelta(hours=5)) 
 
-    # Convert to timezone-aware datetime
     tournament_start = datetime.strptime(tournament_start, "%Y-%m-%d %H:%M:%S").replace(tzinfo=uzbekistan_tz)
     tournament_end = datetime.strptime(tournament_end, "%Y-%m-%d %H:%M:%S").replace(tzinfo=uzbekistan_tz)
 
-    # Get current time in Uzbekistan timezone
+
     current_time = datetime.now(uzbekistan_tz)
 
     # Compare the timezone-aware datetimes
@@ -197,6 +196,20 @@ def delete_user_from_all_games(user_id):
     except sqlite3.Error as e:
         print(f"Error deleting user from games: {e}")
 
+def delete_invitation(invitee_id, game_id):
+    try:
+        with connect_db() as conn:
+            cursor = conn.cursor()
+            cursor.execute(
+                """
+                DELETE FROM invitations
+                WHERE invitee_id = ? AND game_id = ?
+                """,
+                (invitee_id, game_id),
+            )
+            conn.commit()
+    except sqlite3.Error as e:
+        print(f"Error deleting invitation: {e}")
 
 def get_all_players_in_game(game_id):
     with sqlite3.connect("users_database.db") as conn:
@@ -307,7 +320,7 @@ def get_game_creator_id(game_id):
         return result[0] if result else None
 
 
-async def send_message_to_all_players(game_id, message: str):
+async def send_message_to_all_players(game_id, message):
     with sqlite3.connect("users_database.db") as conn:
         cursor = conn.cursor()
         cursor.execute(
@@ -419,11 +432,6 @@ def set_current_turn(game_id, user_id):
 def insert_number_of_cards(game_id, number_of_cards):
     with sqlite3.connect("users_database.db") as conn:
         cursor = conn.cursor()
-
-        cursor.execute("PRAGMA table_info(invitations)")
-        columns = [col[1] for col in cursor.fetchall()]
-        if "number_of_cards" not in columns:
-            cursor.execute("ALTER TABLE invitations ADD COLUMN number_of_cards INTEGER")
         cursor.execute(
             """
             UPDATE invitations
@@ -624,13 +632,6 @@ def save_player_cards(game_id):
     player_cards = {player: generate_random_cards(deck) for player in players}
     with sqlite3.connect("users_database.db") as conn:
         cursor = conn.cursor()
-        cursor.execute("PRAGMA table_info(game_state)")
-        columns = [row[1] for row in cursor.fetchall()]
-        if "player_id" not in columns:
-            cursor.execute("ALTER TABLE game_state ADD COLUMN player_id TEXT")
-        if "cards" not in columns:
-            cursor.execute("ALTER TABLE game_state ADD COLUMN cards TEXT")
-
         for player, cards in player_cards.items():
             cursor.execute(
                 """

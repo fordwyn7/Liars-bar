@@ -38,13 +38,6 @@ def get_player_cards(game_id, player_id):
 
 async def send_random_cards_to_players(game_id):
     players = get_all_players_in_game(game_id)
-    creator_id = get_game_creator_id(game_id)
-    if creator_id not in players:
-        players.append(creator_id)
-    for i in players:
-        if is_player_dead(game_id, i):
-            players.remove(i)
-
     current_turn_user_id = None
     if is_game_started(game_id):
         current_turn_user_id = get_current_turn_user_id(game_id)
@@ -54,7 +47,7 @@ async def send_random_cards_to_players(game_id):
         )
         return
     for player_id in players:
-        if not player_id or is_player_dead(game_id, player_id):
+        if not player_id:
             continue
         pc = get_player_cards(game_id, player_id)
         player_cards = pc[0].split(",")
@@ -82,7 +75,7 @@ async def send_random_cards_to_players(game_id):
         )
         if is_player_dead(game_id, player_id):
             message = await bot.send_message(
-                chat_id=i,
+                chat_id=player_id,
                 text="You are dead. But you can still watch the game or quit.",
             )
             message_id = message.message_id
@@ -285,8 +278,6 @@ async def send_cards(callback_query: types.CallbackQuery):
 
     players = get_all_players_in_game(game_id)
     cre_id = get_game_creator_id(game_id)
-    if not cre_id in players:
-        players.append(cre_id)
     for p_id in players:
         if not p_id:
             continue
@@ -350,16 +341,12 @@ async def handle_continue_or_liar(callback_query: types.CallbackQuery):
         if all_shoot:
             players = get_all_players_in_game(game_id)
             players.remove(previous_player_id)
-            for i in players:
-                if is_player_dead(game_id, i):
-                    players.remove(i)
             message = await bot.send_message(
                 chat_id=previous_player_id,
                 text=f"Player {get_user_nfgame(user_id)} opened the last sent cards and it was a Joker(🃏) card, so all players will shoot themselves.",
             )
             message_id = message.message_id
             await save_message(previous_player_id, game_id, message_id)
-
             for player in players:
                 bull = await shoot_self(game_id, player)
                 message = await bot.send_message(
@@ -376,7 +363,8 @@ async def handle_continue_or_liar(callback_query: types.CallbackQuery):
                         f"Player {get_user_nfgame(player)} shot himself and is dead by the real bullet 😵",
                     )
                     winner = get_alive_number(game_id)
-                    if winner != 0:
+                    if winner == 0:await bot.send_message(chat_id=player, text="Your are dead by real bullet, and eliminated from game 😕")
+                    elif winner != 0:
                         await bot.send_message(
                             chat_id=player,
                             text=f"Game has finished. \nWinner is {get_user_nfgame(winner)}\nYou lose in this game.",
@@ -392,7 +380,7 @@ async def handle_continue_or_liar(callback_query: types.CallbackQuery):
             if winner != 0:
                 plays = get_all_players_in_game(game_id)
                 for i in plays:
-                    if not i and i != winner and not is_player_dead(game_id, i):
+                    if not i and i != winner:
                         await bot.send_message(
                             chat_id=i,
                             text=f"Game has finished. \nWinner is {get_user_nfgame(winner)}\nYou lose in this game.",
@@ -430,7 +418,7 @@ async def handle_continue_or_liar(callback_query: types.CallbackQuery):
                 if isinstance(bullet, bool) and bullet
                 else f"Now liar shot himself and there was no real bullet in his pistol. He will stay in the game. His next chance to die is {bullet}/6."
             )
-
+            if isinstance(bullet, bool) and bullet:await bot.send_message(chat_id=user_id, text="Your are dead by real bullet, and eliminated from the game 😕")
             await send_message_to_all_players(game_id, msge)
         else:
             bullet = await shoot_self(game_id, user_id)
@@ -445,6 +433,8 @@ async def handle_continue_or_liar(callback_query: types.CallbackQuery):
                 if isinstance(bullet, bool) and bullet
                 else f"Now player {get_user_nfgame(user_id)} shot himself because of blaming others, and it was NOT a real bullet. He will stay in the game. His next chance to die is {bullet}/6."
             )
+            if isinstance(bullet, bool) and bullet:await bot.send_message(chat_id=user_id, text="Your are dead by real bullet, and eliminated from the game 😕")
+            
             await send_message_to_all_players(game_id, msge)
         if is_player_dead(game_id, get_current_turn_user_id(game_id)):
             set_current_turn(
@@ -545,10 +535,7 @@ async def handle_continue_or_liar(callback_query: types.CallbackQuery):
 
 def get_previous_player_id(game_id, current_player_id):
     players = get_all_players_in_game(game_id)
-    creator_id = get_game_creator_id(game_id)
-    if creator_id not in players:
-        players.append(creator_id)
-    alive_players = [player for player in players if not is_player_dead(game_id, player)]
+    alive_players = [player for player in players]
     if not alive_players:
         return None
     current_index = alive_players.index(current_player_id)
@@ -560,9 +547,6 @@ def get_previous_player_id(game_id, current_player_id):
 
 def get_next_player_id(game_id, current_player_id):
     players = get_all_players_in_game(game_id)
-    creator_id = get_game_creator_id(game_id)
-    if creator_id not in players:
-        players.append(creator_id)
     current_index = players.index(current_player_id)
     for i in players:
         if is_player_dead(game_id, i):
@@ -595,10 +579,6 @@ def update_current_turn(game_id):
         current_turn = cursor.fetchone()
         if current_turn is None or len(players) == 0:
             return
-        creator_id = get_game_creator_id(game_id)
-        if creator_id not in players:
-            players.append(creator_id)
-
         next_index = (players.index(current_turn[0]) + 1) % len(players)
         next_turn = players[next_index]
         cursor.execute(
@@ -627,9 +607,6 @@ def get_alive_number(game_id):
 
 async def send_cards_update_to_players(game_id, player_id, num_cards_sent):
     players = get_all_players_in_game(game_id)
-    cre_id = get_game_creator_id(game_id)
-    if not cre_id in players:
-        players.append(cre_id)
     for p_id in players:
         mss = await bot.send_message(
             chat_id=p_id,
