@@ -494,7 +494,7 @@ async def start_tournir_keyborar(message: types.Message, state: FSMContext):
     conn = sqlite3.connect("users_database.db")
     cursor = conn.cursor()
     cursor.execute(
-        "SELECT tournament_id, tournament_start_time FROM tournaments WHERE tournament_id = ?",
+        "SELECT tournament_id, tournament_start_time FROM tournaments_table WHERE tournament_id = ?",
         (tournament_id,)
     )
     tournament = cursor.fetchone()
