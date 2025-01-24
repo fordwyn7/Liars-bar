@@ -586,6 +586,8 @@ async def notify_groups(groups, round_number):
     await asyncio.sleep(3)
     for gn in groups:
         gp = len(gn)
+        for gt in gn:
+            delete_user_from_all_games(gt)
         game_id = str(uuid.uuid4())
         conn = sqlite3.connect("users_database.db")
         cursor = conn.cursor()
@@ -609,7 +611,6 @@ async def notify_groups(groups, round_number):
         players = gn
         # await bot.send_message(chat_id=1155076760, text=f"{get_all_players_in_game(game_id)}")
         for player in players:
-            delete_user_from_all_games(player)
             create_game_record_if_not_exists(game_id, player)
             lent = len(players)
             if lent == 2:
