@@ -244,24 +244,6 @@ async def send_game_statistics(message: types.Message, state: FSMContext):
     )
     await message.answer(game_status, parse_mode="Markdown", reply_markup=get_main_menu(message.from_user.id))
     await state.clear()
-
-@dp.message(F.text == "show")
-async def show_games_handler(message: types.Message):
-    with sqlite3.connect("users_database.db") as conn:
-        cursor = conn.cursor()
-        cursor = conn.execute("SELECT * FROM game_archive")
-        rows = cursor.fetchall()
-        cursor.close()
-    if rows:
-        response = "Game Archive:\n"
-        for row in rows:
-            response += (
-                f"ID: {row[0]}\nUser ID: {row[1]}, \nGame ID: {row[2]}, \n"
-                f"Start Time: {row[3]}, \nEnd Time: {row[4]}, \nWinner: {row[5]}\n"
-            )
-    else:
-        response = "The game archive is empty."
-    await message.answer(response)
     
 @dp.message(F.text == "📱 my cabinet")
 async def my_cabinet(message: types.Message):
@@ -290,7 +272,6 @@ async def my_cabinet(message: types.Message):
 
 @dp.message(F.text == "🤩 tournaments")
 async def tournaments_users_button(message: types.Message):
-    if message.from_user.id in [6807731973, 5219280507]:
-        await message.answer("Choose an option:", reply_markup=user_tournaments_keyboard)
-    else:
-        await message.answer(f"Coming soon ...")
+    # if message.from_user.id in [6807731973, 5219280507]:
+    await message.answer("Choose an option:", reply_markup=user_tournaments_keyboard)
+    
