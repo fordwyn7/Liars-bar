@@ -614,6 +614,9 @@ async def notify_groups(groups, round_number):
                 number = 27
             insert_number_of_cards(game_id, number)
             massiv = get_all_players_nfgame(game_id)
+            for i in massiv:
+                if not i:
+                    massiv.remove(i)
             mark_game_as_started(game_id)
             s = ""
             rang = ["🔴", "🟠", "🟡", "🟢", "⚪️"]
