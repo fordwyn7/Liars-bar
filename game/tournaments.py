@@ -15,6 +15,8 @@ from datetime import datetime, timezone, timedelta
 @dp.message(F.text == "🏆 tournaments")
 @admin_required()
 async def tournaments_admin_panel(message: types.Message):
+    await message.answer(f"{create_groups([1,2,3,4,5,6,7])}")
+    
     await message.answer(
         f"You are in tournaments section. \nPlease choose on of these options 👇",
         reply_markup=tournaments_admin_panel_button,
@@ -290,8 +292,7 @@ def save_tournament_to_db(data, tournamnet_link):
 @dp.message(F.text == "🤩 tournaments")
 @admin_required()
 async def show_tournaments_menu(message: types.Message):
-    # await message.answer(f"")
-    await message.answer(f"Choose an option: {create_groups([1,2,3,4,5,6,7])}", reply_markup=user_tournaments_keyboard)
+    await message.answer("Choose an option:", reply_markup=user_tournaments_keyboard)
 
 @dp.message(F.text == "✏️ edit registration dates")
 @admin_required()
@@ -538,7 +539,6 @@ async def start_tournament(tournament_id):
 
 def create_groups(participants):
     random.shuffle(participants)
-    return 12
     groups = []
     nmb = len(participants)%4 
     nmd = len(participants)//4
@@ -555,7 +555,7 @@ def create_groups(participants):
         for i in range(0, nmd):
             groups.append(participants[:i+4])
             participants = participants[i+4:]
-    return [groups, participants]
+    return groups
 async def notify_participants(participants, num_participants):
     for user_id in participants:
         try:
