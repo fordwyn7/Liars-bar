@@ -554,7 +554,7 @@ def create_groups(participants):
         for i in range(0, nmd):
             groups.append(participants[:i+4])
             participants = participants[i+4:]
-    return groups
+    return [groups, participants]
 async def notify_participants(participants, num_participants):
     for user_id in participants:
         try:
