@@ -290,6 +290,7 @@ def save_tournament_to_db(data, tournamnet_link):
 @dp.message(F.text == "🤩 tournaments")
 @admin_required()
 async def show_tournaments_menu(message: types.Message):
+    await message.answer(f"{create_groups([1,2,3,4,5,6,7,8,9])}")
     await message.answer("Choose an option:", reply_markup=user_tournaments_keyboard)
 
 @dp.message(F.text == "✏️ edit registration dates")
@@ -538,13 +539,21 @@ async def start_tournament(tournament_id):
 def create_groups(participants):
     random.shuffle(participants)
     groups = []
-    num_groups = max(1, len(participants) // 4)
-    group_size = (len(participants) + num_groups - 1) // num_groups
-
-
-    for i in range(0, len(participants), group_size):
-        groups.append(participants[i:i + group_size])
-
+    nmb = len(participants)%4 
+    nmd = len(participants)//4
+    if nmb == 0:
+        for i in range(0, len(participants), 4):
+            groups.append(participants[i:i+4])
+    elif nmb == 1:
+        for i in range(0, nmd-1):
+            groups.append(participants[:i+4])
+            participants = participants[i+4:]
+        groups.append(participants[:2])
+        groups.append(participants[2:])
+    else:
+        for i in range(0, nmd):
+            groups.append(participants[:i+4])
+            participants = participants[i+4:]
     return groups
 async def notify_participants(participants, num_participants):
     for user_id in participants:
