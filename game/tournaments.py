@@ -598,6 +598,8 @@ async def notify_groups(groups, round_number):
         )
         conn.commit()
         conn.close()
+        for us in gn[1:]:
+            insert_invitation(gn[0], us, game_id)
         suits = ["heart ❤️", "diamond ♦️", "spade ♠️", "club ♣️"]
         current_table = random.choice(suits)
         cur_table = set_current_table(game_id, current_table)
