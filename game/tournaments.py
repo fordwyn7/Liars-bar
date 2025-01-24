@@ -583,7 +583,7 @@ async def notify_groups(groups, round_number):
                 )
             except Exception as e:
                 print(f"Failed to notify user {user_id}: {e}")
-    await asyncio.sleep(5)
+    await asyncio.sleep(3)
     for gn in groups:
         gp = len(gn)
         game_id = str(uuid.uuid4())
@@ -598,9 +598,9 @@ async def notify_groups(groups, round_number):
         )
         conn.commit()
         conn.close()
-        mark_game_as_started(game_id)
         for us in gn[1:]:
             insert_invitation(gn[0], us, game_id)
+        mark_game_as_started(game_id)
         suits = ["heart ❤️", "diamond ♦️", "spade ♠️", "club ♣️"]
         current_table = random.choice(suits)
         cur_table = set_current_table(game_id, current_table)
@@ -639,11 +639,10 @@ async def notify_groups(groups, round_number):
                 ),
             )
             set_real_bullet_for_player(game_id, player)
-            set_current_turn(game_id, random.choice(players))
-            save_player_cards(game_id)
-            insert_number_of_cards(game_id, number)
-        for player in players:
-            await send_random_cards_to_players(game_id)
+        set_current_turn(game_id, random.choice(players))
+        save_player_cards(game_id)
+        insert_number_of_cards(game_id, number)
+        await send_random_cards_to_players(game_id)
             
 def get_user_status(user_id):
     conn = sqlite3.connect("users_database.db")
