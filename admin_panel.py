@@ -760,9 +760,6 @@ async def handle_add_unity_coins(message: types.Message, state: FSMContext):
             await message.answer("❌ The amount must be greater than 0.", reply_markup=back_to_admin_panel)
             return
         
-        user_data = await state.get_data()
-        user_id = user_data.get("user_id")
-
         conn = sqlite3.connect("users_database.db")
         cursor = conn.cursor()
         cursor.execute(
@@ -802,6 +799,7 @@ async def handle_subtract_unity_coins(message: types.Message, state: FSMContext)
 
         if subtract_amount <= 0:
             await message.answer("❌ The amount must be greater than 0.", reply_markup=change_users_balance)
+            await state.clear()
             return
 
         conn = sqlite3.connect("users_database.db")
@@ -814,7 +812,7 @@ async def handle_subtract_unity_coins(message: types.Message, state: FSMContext)
         conn.close()
 
         await message.answer(f"✅ {subtract_amount} Unity Coins have been subtracted from the user's balance!", change_users_balance)
-        await state.finish()
+        await state.clear()
     except ValueError:
         await message.answer("❌ Please provide a valid number for Unity coins.", reply_markup=back_to_admin_panel)
 
