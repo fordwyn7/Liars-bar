@@ -134,10 +134,10 @@ CREATE TABLE IF NOT EXISTS tournament_users (
 )
 """
 )
-cursor.execute("""
-        ALTER TABLE tournament_users
-        ADD COLUMN user_status TEXT DEFAULT 'alive'
-    """)
+# cursor.execute("""
+#         ALTER TABLE tournament_users
+#         ADD COLUMN user_status TEXT DEFAULT 'alive'
+#     """)
 conn.commit()
 conn.close()
 
