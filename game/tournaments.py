@@ -290,8 +290,8 @@ def save_tournament_to_db(data, tournamnet_link):
 @dp.message(F.text == "🤩 tournaments")
 @admin_required()
 async def show_tournaments_menu(message: types.Message):
-    await message.answer(f"{create_groups([1,2,3,4,5,6,7])}")
-    await message.answer("Choose an option:", reply_markup=user_tournaments_keyboard)
+    # await message.answer(f"")
+    await message.answer(f"Choose an option: {create_groups([1,2,3,4,5,6,7])}", reply_markup=user_tournaments_keyboard)
 
 @dp.message(F.text == "✏️ edit registration dates")
 @admin_required()
