@@ -572,12 +572,8 @@ async def notify_groups(groups, round_number):
             except Exception as e:
                 print(f"Failed to notify user {user_id}: {e}")
 
-# Helper function to determine winners
 def determine_round_winners(groups):
-    # For demonstration purposes, select one random player from each group
-    import random
-    winners = [random.choice(group) for group in groups]
-    return winners
+    pass
 
 # Helper function to announce the winner
 async def announce_winner(winner, tournament_name):

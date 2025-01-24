@@ -794,9 +794,11 @@ async def handle_subtract_unity_coins(message: types.Message, state: FSMContext)
         )
         await state.clear()
         return
-    try:
+    if not message.text.isdigit():
+        await message.answer(f"Please enter correct number !", reply_markup=back_to_admin_panel)
+    else:
+            
         subtract_amount = int(message.text.strip())
-
         if subtract_amount <= 0:
             await message.answer("❌ The amount must be greater than 0.", reply_markup=change_users_balance)
             await state.clear()
@@ -813,6 +815,3 @@ async def handle_subtract_unity_coins(message: types.Message, state: FSMContext)
 
         await message.answer(f"✅ {subtract_amount} Unity Coins have been subtracted from the user's balance!", change_users_balance)
         await state.clear()
-    except ValueError:
-        await message.answer("❌ Please provide a valid number for Unity coins.", reply_markup=back_to_admin_panel)
-
