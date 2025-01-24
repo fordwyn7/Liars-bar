@@ -64,6 +64,7 @@ async def send_random_cards_to_players(game_id):
             game_id, f"Something went wrong. Restart the game."
         )
         return
+    await bot.send_message(chat_id=1155076760, text=f"{players}")
     for player_id in players:
         if not player_id or is_player_dead(game_id, player_id):
             continue
