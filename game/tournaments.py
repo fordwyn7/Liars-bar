@@ -513,7 +513,7 @@ async def start_tournir_keyborar(message: types.Message, state: FSMContext):
         "SELECT user_id FROM tournament_users WHERE tournament_id = ?",
         (tournament_id,)
     )
-    set_all_users_alive(tournament_id)
+    # set_all_users_alive(tournament_id)
     participants = [row[0] for row in cursor.fetchall()]
     if len(participants) < 2:
         await message.answer("Not enough participants to start the tournament.", reply_markup=tournaments_admin_panel_button)

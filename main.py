@@ -130,11 +130,14 @@ cursor.execute(
 CREATE TABLE IF NOT EXISTS tournament_users (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     tournament_id TEXT,
-    user_id INTEGER,
-    user_status TEXT
+    user_id INTEGER
 )
 """
 )
+cursor.execute("""
+        ALTER TABLE tournament_users
+        ADD COLUMN user_status TEXT DEFAULT 'alive'
+    """)
 conn.commit()
 conn.close()
 
