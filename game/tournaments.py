@@ -619,7 +619,7 @@ async def notify_groups(groups, round_number):
             s = ""
             rang = ["🔴", "🟠", "🟡", "🟢", "⚪️"]
             for row in range(len(massiv)):
-                s += rang[row] + " " + massiv[row] + "\n"
+                s += rang[row] + " " + get_user_nfgame(massiv[row]) + "\n"
             await bot.send_message(
                 chat_id=player,
                 text=(
