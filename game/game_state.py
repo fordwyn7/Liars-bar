@@ -545,7 +545,7 @@ def get_previous_player_id(game_id, current_player_id):
     creator_id = get_game_creator_id(game_id)
     if creator_id not in players:
         players.append(creator_id)
-    alive_players = [player for player in players if not is_player_dead(player)]
+    alive_players = [player for player in players if not is_player_dead(game_id, player)]
     if not alive_players:
         return None
     current_index = alive_players.index(current_player_id)
