@@ -23,7 +23,7 @@ def is_user_in_tournament_and_active(user_id):
         return False
 
     tournament_id, user_status = tournament_data
-    if user_status != "alive":
+    if user_status == "alive":
         conn.close()
         return False
 
