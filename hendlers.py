@@ -290,7 +290,7 @@ async def my_cabinet(message: types.Message):
 
 @dp.message(F.text == "🤩 tournaments")
 async def tournaments_users_button(message: types.Message):
-    if message.from_user.id in [6807731973, 5219280507]:
-        await message.answer("Choose an option:", reply_markup=user_tournaments_keyboard)
-    else:
-        await message.answer(f"Coming soon ...")
+    # if message.from_user.id in [6807731973, 5219280507]:
+    await message.answer("Choose an option:", reply_markup=user_tournaments_keyboard)
+    # else:
+    #     await message.answer(f"Coming soon ...")
