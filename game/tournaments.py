@@ -1,5 +1,6 @@
 import sqlite3
 import uuid
+import asyncio
 from aiogram import types
 from aiogram.filters import Command
 from aiogram.fsm.context import FSMContext
@@ -479,3 +480,111 @@ def update_start_and_end_dates(tournament_id: str, start_date: str, end_date: st
         print(f"❌ Database error: {e}")
     finally:
         conn.close()
+
+
+
+
+
+
+async def start_tournament(tournament_id):
+    conn = sqlite3.connect("users_database.db")
+    cursor = conn.cursor()
+    cursor.execute(
+        "SELECT tournament_id, tournament_start_time FROM tournaments WHERE tournament_id = ?",
+        (tournament_id,)
+    )
+    tournament = cursor.fetchone()
+    if not tournament:
+        print(f"Tournament with ID {tournament_id} not found.")
+        return
+    tournament_name, start_time = tournament
+    uzbekistan_time = datetime.now(timezone.utc) + timedelta(hours=5)
+    start_time = datetime.strptime(start_time, "%Y-%m-%d %H:%M:%S").replace(tzinfo=timezone.utc)
+
+    if uzbekistan_time < start_time:
+        await bot.send_message(chat_id=1155076760, text="Tournament cannot start before the scheduled time.")
+        return
+
+    cursor.execute(
+        "SELECT user_id FROM tournament_users WHERE tournament_id = ?",
+        (tournament_id,)
+    )
+    participants = [row[0] for row in cursor.fetchall()]
+
+    if len(participants) < 2:
+        print("Not enough participants to start the tournament.")
+        return
+    await notify_participants(participants, len(participants))
+    round_number = 1
+    while len(participants) > 1:
+        groups = create_groups(participants)
+
+        # Notify players of their groups
+        await notify_groups(groups, round_number)
+
+        # Wait for the round to complete (simulate 20 minutes)
+        await asyncio.sleep(20 * 60)
+
+        # Determine winners of each group (stub logic for demonstration)
+        participants = determine_round_winners(groups)
+        round_number += 1
+
+    # Announce the winner
+    winner = participants[0]
+    await announce_winner(winner, tournament_name)
+
+    conn.close()
+
+def create_groups(participants):
+    random.shuffle(participants)
+    groups = []
+    num_groups = max(1, len(participants) // 4)
+    group_size = (len(participants) + num_groups - 1) // num_groups
+
+
+    for i in range(0, len(participants), group_size):
+        groups.append(participants[i:i + group_size])
+
+    return groups
+async def notify_participants(participants, num_participants):
+    for user_id in participants:
+        try:
+            await bot.send_message(
+                chat_id=user_id,
+                text=f"🏆 The tournament is starting now❗️\n"
+                     f"👥 Number of participants: {num_participants}\n"
+                     "📋 Get ready for the first round!"
+            )
+        except Exception as e:
+            print(f"Failed to notify user {user_id}: {e}")
+
+async def notify_groups(groups, round_number):
+    for idx, group in enumerate(groups, start=1):
+        group_text = ", ".join(f"Player {user_id}" for user_id in group)
+        for user_id in group:
+            try:
+                await bot.send_message(
+                    chat_id=user_id,
+                    text=f"🏅 Round {round_number} - Group {idx}\n"
+                         f"👥 Players in your group: {group_text}\n"
+                         "🔄 Compete with all players in your group!"
+                )
+            except Exception as e:
+                print(f"Failed to notify user {user_id}: {e}")
+
+# Helper function to determine winners
+def determine_round_winners(groups):
+    # For demonstration purposes, select one random player from each group
+    import random
+    winners = [random.choice(group) for group in groups]
+    return winners
+
+# Helper function to announce the winner
+async def announce_winner(winner, tournament_name):
+    try:
+        await bot.send_message(
+            chat_id=winner,
+            text=f"🎉 Congratulations! You are the winner of the '{tournament_name}' tournament! 🏆"
+        )
+    except Exception as e:
+        print(f"Failed to notify the winner {winner}: {e}")

@@ -717,6 +717,7 @@ async def handle_user_input_for_balance(message: types.Message, state: FSMContex
     user = cursor.fetchone()
     
     if user:
+        global user_id
         user_id, username, unity_coin = user
         await message.answer(
             f"📊 User Information: \n\n"
@@ -726,17 +727,16 @@ async def handle_user_input_for_balance(message: types.Message, state: FSMContex
             "Choose an action below:",
             reply_markup=change_users_balance
         )
-        await state.update_data(user_id=user_id)
+        await state.clear()
+        
     else:
-        await message.answer("❌ User not found.", reply_markup=users_balance_button)
+        await message.answer("❌ User not found. :(", reply_markup=users_balance_button)
         await state.clear()
         return
 
 @dp.message(F.text == "➕ Add Unity Coins")
 @admin_required()
 async def add_unity_coins(message: types.Message, state: FSMContext):
-    user_data = await state.get_data()
-    user_id = user_data.get("user_id")
     if user_id:
         await message.answer(
             "Please provide the amount of Unity coins to add.",
@@ -766,8 +766,8 @@ async def handle_add_unity_coins(message: types.Message, state: FSMContext):
         conn = sqlite3.connect("users_database.db")
         cursor = conn.cursor()
         cursor.execute(
-            "UPDATE users_database SET unity_coin = unity_coin + ? WHERE user_id = ?",
-            (add_amount, user_id)
+            "UPDATE users_database SET unity_coin = unity_coin + ? WHERE user_id = ? or nfgame = ?",
+            (add_amount, user_id, user_id)
         )
         conn.commit()
         conn.close()
@@ -779,10 +779,7 @@ async def handle_add_unity_coins(message: types.Message, state: FSMContext):
 
 @dp.message(F.text == "➖ Subtract Unity Coins")
 @admin_required()
-async def subtract_unity_coins(message: types.Message, state: FSMContext):
-    user_data = await state.get_data()
-    user_id = user_data.get("user_id")
-    
+async def subtract_unity_coins(message: types.Message, state: FSMContext):    
     if user_id:
         await message.answer(
             "Please provide the amount of Unity coins to subtract.",
@@ -812,11 +809,9 @@ async def handle_subtract_unity_coins(message: types.Message, state: FSMContext)
 
         conn = sqlite3.connect("users_database.db")
         cursor = conn.cursor()
-        cursor.execute("SELECT unity_coin FROM users_database WHERE user_id = ?", (user_id,))
-        current_balance = cursor.fetchone()[0]
         cursor.execute(
-            "UPDATE users_database SET unity_coin = unity_coin - ? WHERE user_id = ?",
-            (subtract_amount, user_id)
+            "UPDATE users_database SET unity_coin = unity_coin - ? WHERE user_id = ? or nfgame = ?",
+            (subtract_amount, user_id, user_id)
         )
         conn.commit()
         conn.close()

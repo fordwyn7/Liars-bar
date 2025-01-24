@@ -141,7 +141,6 @@ conn.close()
 @dp.message(Command("start"))
 async def cmd_start(message: types.Message, state: FSMContext):
     await state.clear()
-
     payload = message.text.split(" ", 1)[-1] if " " in message.text else ""
     await state.update_data(payload=payload)
     if "game_" in payload:
@@ -259,7 +258,6 @@ async def cmd_start(message: types.Message, state: FSMContext):
             )
             await state.clear()
             await state.set_state(registration.pref_name)
-
 
 @dp.message(F.text == "start game 🎮")
 async def start_game_handler(message: types.Message, state: FSMContext):

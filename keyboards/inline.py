@@ -66,33 +66,7 @@ async def start_game(callback_query: types.CallbackQuery):
         for player in players:
             if player is None:
                 continue
-
             create_game_record_if_not_exists(game_id, player)
-            # conn = sqlite3.connect("users_database.db")
-            # cursor = conn.cursor()
-            # cursor.execute(
-            #     """
-            # SELECT game_id, game_start_time
-            # FROM game_archive
-            # WHERE user_id = ?
-            # """,
-            #     (player,),
-            # )
-            # result = cursor.fetchone()
-            # conn.close()
-
-            # if result:
-            #     game_id, start_time = result
-            #     message_text = (
-            #         f"🎮 Game Created Successfully!\n"
-            #         f"Game ID: {game_id}\n"
-            #         f"Start Time: {start_time}"
-            #     )
-            #     await bot.send_message(player, message_text)
-            # else:
-            #     await bot.send_message(
-            #         player, "⚠️ No game record found for your user ID."
-            #     )
             tasks.append(send_game_start_messages(player, ms1, ms2, len(players)))
         create_game_record_if_not_exists(game_id, cr_id)
         if callback_query.from_user.id is None:
@@ -550,7 +524,6 @@ async def join_tournament(callback_query: types.CallbackQuery):
     if is_user_in_tournament(tournament_id, user_id):
         await callback_query.answer("❕ You are already registered for this tournament.", show_alert=True)
         return
-
     try:
         add_user_to_tournament(tournament_id, user_id)
         await callback_query.answer("✅ You have successfully joined the tournament!", show_alert=True)

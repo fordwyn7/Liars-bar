@@ -44,10 +44,6 @@ async def send_random_cards_to_players(game_id):
     for i in players:
         if is_player_dead(game_id, i):
             players.remove(i)
-            # await bot.send_message(
-            #     chat_id=i,
-            #     text="You are dead. But you can still watch the game or quit.",
-            # )
 
     current_turn_user_id = None
     if is_game_started(game_id):
