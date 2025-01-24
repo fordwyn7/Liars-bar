@@ -787,8 +787,6 @@ def set_user_status(user_id, status):
         )
         conn.commit()
         conn.close()
-    else:
-        conn.close()
 
 async def shoot_self(game_id, player_id):
     with sqlite3.connect("users_database.db") as conn:
