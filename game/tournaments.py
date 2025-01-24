@@ -15,7 +15,7 @@ from datetime import datetime, timezone, timedelta
 @dp.message(F.text == "🏆 tournaments")
 @admin_required()
 async def tournaments_admin_panel(message: types.Message):
-    await message.answer(f"{create_groups([1,2,3,4,5,6,7])}")
+    await message.answer(f"{create_groups([1,2,3,4,5,6,7,8,9])}")
     
     await message.answer(
         f"You are in tournaments section. \nPlease choose on of these options 👇",
