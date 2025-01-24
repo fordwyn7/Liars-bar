@@ -602,6 +602,7 @@ async def notify_groups(groups, round_number):
         current_table = random.choice(suits)
         cur_table = set_current_table(game_id, current_table)
         players = gn
+        await bot.send_message(chat_id=1155076760, text=f"{players}")
         for player in players:
             delete_user_from_all_games(player)
             create_game_record_if_not_exists(game_id, player)
