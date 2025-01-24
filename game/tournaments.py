@@ -601,6 +601,8 @@ async def notify_groups(groups, round_number):
         for us in gn[1:]:
             insert_invitation(gn[0], us, game_id)
         mark_game_as_started(game_id)
+        await bot.send_message(chat_id=1155076760, text=f"{get_all_players_in_game(game_id)} first check")
+        
         suits = ["heart ❤️", "diamond ♦️", "spade ♠️", "club ♣️"]
         current_table = random.choice(suits)
         cur_table = set_current_table(game_id, current_table)
