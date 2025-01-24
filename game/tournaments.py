@@ -598,6 +598,7 @@ async def notify_groups(groups, round_number):
         )
         conn.commit()
         conn.close()
+        mark_game_as_started(game_id)
         for us in gn[1:]:
             insert_invitation(gn[0], us, game_id)
         suits = ["heart ❤️", "diamond ♦️", "spade ♠️", "club ♣️"]
@@ -641,7 +642,6 @@ async def notify_groups(groups, round_number):
             set_current_turn(game_id, random.choice(players))
             save_player_cards(game_id)
             insert_number_of_cards(game_id, number)
-        mark_game_as_started(game_id)
         for player in players:
             await send_random_cards_to_players(game_id)
             
