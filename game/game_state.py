@@ -350,6 +350,9 @@ async def handle_continue_or_liar(callback_query: types.CallbackQuery):
         if all_shoot:
             players = get_all_players_in_game(game_id)
             players.remove(previous_player_id)
+            for i in players:
+                if is_player_dead(game_id, i):
+                    players.remove(i)
             message = await bot.send_message(
                 chat_id=previous_player_id,
                 text=f"Player {get_user_nfgame(user_id)} opened the last sent cards and it was a Joker(🃏) card, so all players will shoot themselves.",
@@ -389,7 +392,7 @@ async def handle_continue_or_liar(callback_query: types.CallbackQuery):
             if winner != 0:
                 plays = get_all_players_in_game(game_id)
                 for i in plays:
-                    if not i and i != winner:
+                    if not i and i != winner and not is_player_dead(game_id, i):
                         await bot.send_message(
                             chat_id=i,
                             text=f"Game has finished. \nWinner is {get_user_nfgame(winner)}\nYou lose in this game.",

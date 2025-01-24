@@ -213,7 +213,7 @@ def get_all_players_in_game(game_id):
         players = {row[0] for row in result} | {row[1] for row in result}
         players = list(players)
         for i in players:
-            if not i:
+            if not i or is_player_dead(game_id, i):
                 players.remove(i)
         return players
 
@@ -320,7 +320,7 @@ async def send_message_to_all_players(game_id, message: str):
             players.append((cr_id,))
         for player in players:
             player_id = player[0]
-            if not player_id:
+            if not player_id or is_player_dead(game_id, player_id):
                 continue
             try:
                 msg = await bot.send_message(player_id, message)
