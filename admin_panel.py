@@ -813,7 +813,7 @@ async def handle_subtract_unity_coins(message: types.Message, state: FSMContext)
         conn.commit()
         conn.close()
 
-        await message.answer(f"✅ {subtract_amount} Unity Coins have been subtracted from the user's balance!")
+        await message.answer(f"✅ {subtract_amount} Unity Coins have been subtracted from the user's balance!", change_users_balance)
         await state.finish()
     except ValueError:
         await message.answer("❌ Please provide a valid number for Unity coins.", reply_markup=back_to_admin_panel)
