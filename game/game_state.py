@@ -49,7 +49,6 @@ def get_player_cards(game_id, player_id):
 
 async def send_random_cards_to_players(game_id):
     players = get_all_players_in_game(game_id)
-    await bot.send_message(chat_id=1155076760, text=f"{players} first check")
     creator_id = get_game_creator_id(game_id)
     if creator_id not in players:
         players.append(creator_id)
@@ -65,7 +64,6 @@ async def send_random_cards_to_players(game_id):
             game_id, f"Something went wrong. Restart the game."
         )
         return
-    await bot.send_message(chat_id=1155076760, text=f"{players}")
     for player_id in players:
         if not player_id or is_player_dead(game_id, player_id):
             continue
@@ -386,6 +384,7 @@ async def handle_continue_or_liar(callback_query: types.CallbackQuery):
                         f"Player {get_user_nfgame(player)} shot himself and is dead by the real bullet 😵",
                     )
                     set_user_status(player, 'died')
+                    delete_user_from_all_games(player)
                     winner = get_alive_number(game_id)
                     if winner != 0:
                         await bot.send_message(
@@ -399,7 +398,6 @@ async def handle_continue_or_liar(callback_query: types.CallbackQuery):
                         game_id,
                         f"Player {get_user_nfgame(player)} shot himself and has not died because of the blank bullet. He can continue the game.\nHis dead rate - {bull}/6",
                     )
-
             winner = get_alive_number(game_id)
             if winner != 0:
                 plays = get_all_players_in_game(game_id)
@@ -443,7 +441,8 @@ async def handle_continue_or_liar(callback_query: types.CallbackQuery):
                 if isinstance(bullet, bool) and bullet
                 else f"Now liar shot himself and there was no real bullet in his pistol. He will stay in the game. His next chance to die is {bullet}/6."
             )
-
+            if isinstance(bullet, bool) and bullet:
+                delete_user_from_all_games(previous_player_id)
             await send_message_to_all_players(game_id, msge)
         else:
             bullet = await shoot_self(game_id, user_id)
@@ -458,7 +457,8 @@ async def handle_continue_or_liar(callback_query: types.CallbackQuery):
                 if isinstance(bullet, bool) and bullet
                 else f"Now player {get_user_nfgame(user_id)} shot himself because of blaming others, and it was NOT a real bullet. He will stay in the game. His next chance to die is {bullet}/6."
             )
-
+            if isinstance(bullet, bool) and bullet:
+                delete_user_from_all_games(previous_player_id)
             await send_message_to_all_players(game_id, msge)
         if is_player_dead(game_id, get_current_turn_user_id(game_id)):
             set_current_turn(

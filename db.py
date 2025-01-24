@@ -759,7 +759,6 @@ def ensure_life_status_column():
                 """
             )
             conn.commit()
-            print("Added 'life_status' column to 'game_state'.")
 
 
 def is_player_dead(game_id, player_id):

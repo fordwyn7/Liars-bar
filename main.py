@@ -104,7 +104,7 @@ cursor.execute(
             current_table TEXT, 
             real_bullet TEXT,
             blanks_count INTEGER,
-            life_status INTEGER,
+            life_status TEXT,
             UNIQUE(game_id, player_id)
         )
     """
