@@ -538,6 +538,7 @@ async def start_tournament(tournament_id):
 
 def create_groups(participants):
     random.shuffle(participants)
+    return 12
     groups = []
     nmb = len(participants)%4 
     nmd = len(participants)//4
