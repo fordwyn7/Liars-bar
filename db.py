@@ -777,7 +777,18 @@ def is_player_dead(game_id, player_id):
         if result and result[0] == "dead":
             return True
     return False
-
+def set_user_status(user_id, status):
+    if is_user_in_tournament_and_active(user_id):
+        conn = sqlite3.connect("users_database.db")
+        cursor = conn.cursor()
+        cursor.execute(
+            "UPDATE tournament_users SET user_status = ? WHERE user_id = ?",
+            (status, user_id)
+        )
+        conn.commit()
+        conn.close()
+    else:
+        conn.close()
 
 async def shoot_self(game_id, player_id):
     with sqlite3.connect("users_database.db") as conn:
@@ -805,6 +816,7 @@ async def shoot_self(game_id, player_id):
                 (game_id, player_id),
             )
             conn.commit()
+            set_user_status(player_id, 'died')
             return True
         else:
             blanks_count += 1
