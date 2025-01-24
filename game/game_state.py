@@ -18,7 +18,18 @@ def get_current_turn_user_id(game_id):
         result = cursor.fetchone()
         return result[0] if result else None
 
-
+def set_user_status(user_id, status):
+    if is_user_in_tournament_and_active(user_id):
+        conn = sqlite3.connect("users_database.db")
+        cursor = conn.cursor()
+        cursor.execute(
+            "UPDATE tournament_users SET user_status = ? WHERE user_id = ?",
+            (status, user_id)
+        )
+        conn.commit()
+        conn.close()
+    else:
+        conn.close()
 def get_player_cards(game_id, player_id):
     with sqlite3.connect("users_database.db") as conn:
         cursor = conn.cursor()
@@ -372,6 +383,7 @@ async def handle_continue_or_liar(callback_query: types.CallbackQuery):
                         game_id,
                         f"Player {get_user_nfgame(player)} shot himself and is dead by the real bullet 😵",
                     )
+                    set_user_status(player, 'died')
                     winner = get_alive_number(game_id)
                     if winner != 0:
                         await bot.send_message(
@@ -380,8 +392,6 @@ async def handle_continue_or_liar(callback_query: types.CallbackQuery):
                             reply_markup=get_main_menu(player),
                         )
                         update_game_details(game_id, player, get_user_nfgame(winner)+" - "+str(winner))
-                        
-
                 else:
                     await send_message_to_all_players(
                         game_id,
@@ -398,6 +408,7 @@ async def handle_continue_or_liar(callback_query: types.CallbackQuery):
                             text=f"Game has finished. \nWinner is {get_user_nfgame(winner)}\nYou lose in this game.",
                             reply_markup=get_main_menu(i),
                         )
+                        set_user_status(i, 'died')
                         update_game_details(game_id, i, get_user_nfgame(winner)+" - " +str(winner))
                         
                 await bot.send_message(
@@ -461,8 +472,8 @@ async def handle_continue_or_liar(callback_query: types.CallbackQuery):
                         text=f"Game has finished. \nWinner is {get_user_nfgame(winner)}\nYou lose in this game.",
                         reply_markup=get_main_menu(i),
                     )
+                    set_user_status(i, 'died')
                     update_game_details(game_id, i, get_user_nfgame(winner)+" - " + str(winner))
-                    
             await bot.send_message(
                 chat_id=winner,
                 text=f"Game has finished. \nYou are winner. 🥳🥳🥳🥳🥳\nConguratulation on winning in the game. \n🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉",

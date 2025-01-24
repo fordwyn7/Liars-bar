@@ -130,7 +130,8 @@ cursor.execute(
 CREATE TABLE IF NOT EXISTS tournament_users (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     tournament_id TEXT,
-    user_id INTEGER
+    user_id INTEGER,
+    user_status TEXT
 )
 """
 )
@@ -261,7 +262,11 @@ async def cmd_start(message: types.Message, state: FSMContext):
 
 @dp.message(F.text == "start game 🎮")
 async def start_game_handler(message: types.Message, state: FSMContext):
+    if is_user_in_tournament_and_active(message.from_user.id):
+            await message.answer(f"You are participating in a tournament and can't use this button until the tournament ends!")
+            return
     if message.chat.type == "private":
+        
         if has_incomplete_games(message.from_user.id):
             await message.answer(
                 "You have incomplete games. Please finish or stop them before creating a new one.",
@@ -337,6 +342,9 @@ async def get_name(message: types.Message, state: FSMContext):
 
 @dp.message(F.text == "game status 🌟")
 async def start_game_handler(message: types.Message, state: FSMContext):
+    if is_user_in_tournament_and_active(message.from_user.id):
+        await message.answer(f"You are participating in a tournament and can't use this button until the tournament ends!")
+        return
     game_id = get_game_id_by_user(message.from_user.id)
     if not has_incomplete_games(message.from_user.id):
         await message.answer(

@@ -11,12 +11,11 @@ from keyboards.inline import get_join_tournament_button, user_tournaments_keyboa
 from db import *
 from states.state import AddTournaments, EditRegistrationDates, EditStartAndEndTimes
 from datetime import datetime, timezone, timedelta
-
+from game.game_state import send_random_cards_to_players
 @dp.message(F.text == "🏆 tournaments")
 @admin_required()
 async def tournaments_admin_panel(message: types.Message):
-    await message.answer(f"{create_groups([1,2,3,4,5,6,7,8,9])}")
-    
+    # await message.answer(f"{create_groups([1,2,3,4,5,6,7,8,9])}")
     await message.answer(
         f"You are in tournaments section. \nPlease choose on of these options 👇",
         reply_markup=tournaments_admin_panel_button,
@@ -38,7 +37,6 @@ async def back_to_tournaments_section(message: types.Message, state: FSMContext)
 async def ongoing_tournaments_sekshn(message: types.Message):
     ongoing_tournaments = get_ongoing_tournaments()
     if not ongoing_tournaments:
-        # await message.answer(f"{(datetime.now(timezone.utc) + timedelta(hours=5)).strftime('%Y-%m-%d %H:%M:%S')}")
         await message.answer(
             f"There are no ongoing tournaments 🤷‍♂️",
             reply_markup=tournaments_admin_panel_button,
@@ -488,7 +486,11 @@ def update_start_and_end_dates(tournament_id: str, start_date: str, end_date: st
 
 
 
-async def start_tournament(tournament_id):
+@dp.message(F.text == "✅ start the tournament")
+@admin_required()
+async def start_tournir_keyborar(message: types.Message, state: FSMContext):
+    turnir = get_ongoing_tournaments()[0]
+    tournament_id = turnir["name"]
     conn = sqlite3.connect("users_database.db")
     cursor = conn.cursor()
     cursor.execute(
@@ -497,46 +499,36 @@ async def start_tournament(tournament_id):
     )
     tournament = cursor.fetchone()
     if not tournament:
-        print(f"Tournament with ID {tournament_id} not found.")
+        await message.answer(f"Tournament with ID {tournament_id} not found.", reply_markup=tournaments_admin_panel_button)
         return
     tournament_name, start_time = tournament
     uzbekistan_time = datetime.now(timezone.utc) + timedelta(hours=5)
     start_time = datetime.strptime(start_time, "%Y-%m-%d %H:%M:%S").replace(tzinfo=timezone.utc)
 
     if uzbekistan_time < start_time:
-        await bot.send_message(chat_id=1155076760, text="Tournament cannot start before the scheduled time.")
+        await message.answer("Tournament cannot start before the scheduled time.", reply_markup=tournaments_admin_panel_button)
         return
 
     cursor.execute(
         "SELECT user_id FROM tournament_users WHERE tournament_id = ?",
         (tournament_id,)
     )
+    set_all_users_alive(tournament_id)
     participants = [row[0] for row in cursor.fetchall()]
-
     if len(participants) < 2:
-        print("Not enough participants to start the tournament.")
+        await message.answer("Not enough participants to start the tournament.", reply_markup=tournaments_admin_panel_button)
         return
     await notify_participants(participants, len(participants))
     round_number = 1
     while len(participants) > 1:
         groups = create_groups(participants)
-
-        # Notify players of their groups
         await notify_groups(groups, round_number)
-
-        # Wait for the round to complete (simulate 20 minutes)
-        await asyncio.sleep(20 * 60)
-
-        # Determine winners of each group (stub logic for demonstration)
+        await asyncio.sleep(5 * 60)
         participants = determine_round_winners(groups)
         round_number += 1
-
-    # Announce the winner
     winner = participants[0]
     await announce_winner(winner, tournament_name)
-
     conn.close()
-
 def create_groups(participants):
     random.shuffle(participants)
     groups = []
@@ -569,6 +561,15 @@ async def notify_participants(participants, num_participants):
             )
         except Exception as e:
             print(f"Failed to notify user {user_id}: {e}")
+def set_all_users_alive(tournament_id):
+    conn = sqlite3.connect("users_database.db")
+    cursor = conn.cursor()
+    cursor.execute(
+        "UPDATE tournament_users SET user_status = 'alive' WHERE tournament_id = ?",
+        (tournament_id,)
+    )
+    conn.commit()
+    conn.close()
 
 async def notify_groups(groups, round_number):
     for idx, group in enumerate(groups, start=1):
@@ -578,21 +579,96 @@ async def notify_groups(groups, round_number):
                 await bot.send_message(
                     chat_id=user_id,
                     text=f"🏅 Round {round_number} - Group {idx}\n"
-                         f"👥 Players in your group: {group_text}\n"
-                         "🔄 Compete with all players in your group!"
+                         f"👥 Players in this game: {group_text}\n"
                 )
             except Exception as e:
                 print(f"Failed to notify user {user_id}: {e}")
+    asyncio.sleep(5)
+    for gn in groups:
+        gp = len(gn)
+        game_id = str(uuid.uuid4())
+        conn = sqlite3.connect("users_database.db")
+        cursor = conn.cursor()
+        cursor.execute(
+            """
+            INSERT INTO invitations (inviter_id, game_id, needed_players)
+            VALUES (?, ?, ?)
+            """,
+            (gn[0], game_id, gp),
+        )
+        conn.commit()
+        conn.close()
+        suits = ["heart ❤️", "diamond ♦️", "spade ♠️", "club ♣️"]
+        current_table = random.choice(suits)
+        cur_table = set_current_table(game_id, current_table)
+        players = gn
+        for player in players:
+            delete_user_from_all_games(player)
+            create_game_record_if_not_exists(game_id, player)
+            lent = len(players)
+            if lent == 2:
+                number = 19
+            elif lent == 3:
+                number = 23
+            else:
+                number = 27
+            insert_number_of_cards(game_id, number)
+            massiv = get_all_players_nfgame(game_id)
+            mark_game_as_started(game_id)
+            s = ""
+            rang = ["🔴", "🟠", "🟡", "🟢", "⚪️"]
+            for row in range(len(massiv)):
+                s += rang[row] + " " + massiv[row] + "\n"
+            await bot.send_message(
+                chat_id=player,
+                text=(
+                    f"Game has started. 🚀🚀🚀\n"
+                    f"There are {number} cards in the game.\n"
+                    f"{number//4} hearts — ♥️\n"
+                    f"{number//4} diamonds — ♦️\n"
+                    f"{number//4} spades — ♠️\n"
+                    f"{number//4} clubs — ♣️\n"
+                    f"2 universals — 🎴\n"
+                    f"1 Joker — 🃏\n\n"
+                    f"Players in the game: \n{s}\n"
+                    f"Current table for cards: {cur_table}\n\n"
+                ),
+            )
+            set_real_bullet_for_player(game_id, player)
+            set_current_turn(game_id, random.choice(players))
+            save_player_cards(game_id)
+            await send_random_cards_to_players(game_id)
+def get_user_status(user_id):
+    conn = sqlite3.connect("users_database.db")
+    cursor = conn.cursor()
+    cursor.execute(
+        "SELECT user_status FROM tournament_users WHERE user_id = ?",
+        (user_id,)
+    )
+    status = cursor.fetchone()
+    conn.close()
+    if status:
+        return status[0]
+    return None
+
 
 def determine_round_winners(groups):
-    pass
+    winners = []
+    for group in groups:
+        for user_id in group:
+            user_status = get_user_status(user_id)
+            if user_status == 'alive':
+                winners.append(user_id)
+                break
+    return winners
 
-# Helper function to announce the winner
+
 async def announce_winner(winner, tournament_name):
     try:
         await bot.send_message(
             chat_id=winner,
-            text=f"🎉 Congratulations! You are the winner of the '{tournament_name}' tournament! 🏆"
+            text=f"🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉\n\n Congratulations! You are the winner of the tournament! 🏆"
         )
     except Exception as e:
         print(f"Failed to notify the winner {winner}: {e}")
+

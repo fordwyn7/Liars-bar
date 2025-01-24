@@ -209,7 +209,7 @@ ongoing_tournaments_button = ReplyKeyboardMarkup(
     keyboard=[
         [ 
             KeyboardButton(text="👀 watch results"),
-            KeyboardButton(text="✏️ edit data"),
+            KeyboardButton(text="✅ start the tournament"),
         ],
         [
             KeyboardButton(text="back to tournaments panel 🔙"),

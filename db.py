@@ -6,12 +6,43 @@ from config import bot, dp
 from aiogram import types
 from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 from keyboards.keyboard import get_main_menu
-from datetime import datetime
+from datetime import datetime, timezone, timedelta
 
 
 def connect_db():
     return sqlite3.connect("users_database.db")
 
+def is_user_in_tournament_and_active(user_id):
+    conn = sqlite3.connect("users_database.db")
+    cursor = conn.cursor()
+    cursor.execute("SELECT tournament_id, user_status FROM tournament_users WHERE user_id = ?", (user_id,))
+    tournament_data = cursor.fetchone()
+
+    if not tournament_data:
+        conn.close()
+        return False
+
+    tournament_id, user_status = tournament_data
+    if user_status != "alive":
+        conn.close()
+        return False
+    cursor.execute("SELECT tournament_start_time, tournament_end_time FROM tournaments_table WHERE tournament_id = ?", (tournament_id,))
+    tournament = cursor.fetchone()
+
+    if not tournament:
+        conn.close()
+        return False
+    tournament_start, tournament_end = tournament
+    tournament_start = datetime.strptime(tournament_start, "%Y-%m-%d %H:%M:%S")
+    tournament_end = datetime.strptime(tournament_end, "%Y-%m-%d %H:%M:%S")
+    uzbekistan_tz = timezone(timedelta(hours=5))
+    current_time = datetime.now(uzbekistan_tz)
+    if tournament_start <= current_time <= tournament_end:
+        conn.close()
+        return True
+
+    conn.close()
+    return False
 
 def register_user(user_id, username, first_name, last_name, preferred_name):
     try:
