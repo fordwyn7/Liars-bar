@@ -26,23 +26,32 @@ def is_user_in_tournament_and_active(user_id):
     if user_status != "alive":
         conn.close()
         return False
+
     cursor.execute("SELECT tournament_start_time, tournament_end_time FROM tournaments_table WHERE tournament_id = ?", (tournament_id,))
     tournament = cursor.fetchone()
 
     if not tournament:
         conn.close()
         return False
+
     tournament_start, tournament_end = tournament
-    tournament_start = datetime.strptime(tournament_start, "%Y-%m-%d %H:%M:%S")
-    tournament_end = datetime.strptime(tournament_end, "%Y-%m-%d %H:%M:%S")
-    uzbekistan_tz = timezone(timedelta(hours=5))
+    uzbekistan_tz = timezone(timedelta(hours=5))  # Uzbekistan timezone
+
+    # Convert to timezone-aware datetime
+    tournament_start = datetime.strptime(tournament_start, "%Y-%m-%d %H:%M:%S").replace(tzinfo=uzbekistan_tz)
+    tournament_end = datetime.strptime(tournament_end, "%Y-%m-%d %H:%M:%S").replace(tzinfo=uzbekistan_tz)
+
+    # Get current time in Uzbekistan timezone
     current_time = datetime.now(uzbekistan_tz)
+
+    # Compare the timezone-aware datetimes
     if tournament_start <= current_time <= tournament_end:
         conn.close()
         return True
 
     conn.close()
     return False
+
 
 def register_user(user_id, username, first_name, last_name, preferred_name):
     try:
