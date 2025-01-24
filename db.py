@@ -532,8 +532,8 @@ async def periodically_edit_message(
             number = 27
         game_id = get_game_id_by_user(chat_id)
         insert_number_of_cards(game_id, number)
-        massiv = get_all_players_nfgame(game_id)
         mark_game_as_started(game_id)
+        massiv = get_all_players_nfgame(game_id)
         s = ""
         rang = ["🔴", "🟠", "🟡", "🟢", "⚪️"]
         for row in range(len(massiv)):
