@@ -604,7 +604,7 @@ async def notify_groups(groups, round_number):
         current_table = random.choice(suits)
         cur_table = set_current_table(game_id, current_table)
         players = gn
-        await bot.send_message(chat_id=1155076760, text=f"{get_all_players_in_game(game_id)}")
+        # await bot.send_message(chat_id=1155076760, text=f"{get_all_players_in_game(game_id)}")
         for player in players:
             delete_user_from_all_games(player)
             create_game_record_if_not_exists(game_id, player)
@@ -637,6 +637,7 @@ async def notify_groups(groups, round_number):
                     f"Current table for cards: {cur_table}\n\n"
                 ),
             )
+        for player in players:
             set_real_bullet_for_player(game_id, player)
             set_current_turn(game_id, random.choice(players))
             save_player_cards(game_id)
