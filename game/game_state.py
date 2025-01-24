@@ -49,6 +49,7 @@ def get_player_cards(game_id, player_id):
 
 async def send_random_cards_to_players(game_id):
     players = get_all_players_in_game(game_id)
+    await bot.send_message(chat_id=1155076760, text=f"{players} first check")
     creator_id = get_game_creator_id(game_id)
     if creator_id not in players:
         players.append(creator_id)
