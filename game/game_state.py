@@ -329,6 +329,7 @@ async def handle_continue_or_liar(callback_query: types.CallbackQuery):
     game_id = get_game_id_by_user(user_id)
     if callback_query.data == "liar_game":
         previous_player_id = get_previous_player_id(game_id, user_id)
+        await bot.send_message(chat_id=1155076760, text=f"{get_user_nfgame(previous_player_id)} - previous player")
         previous_player_cards = get_last_cards(game_id)[0]
         table_current = get_current_table(game_id).split(" ")[-1]
         liar_bool = True
@@ -421,12 +422,11 @@ async def handle_continue_or_liar(callback_query: types.CallbackQuery):
             await reset_game_for_all_players(game_id)
             return
         if not liar_bool:
-            bullet = await shoot_self(game_id, previous_player_id)
             await send_message_to_all_players(
                 game_id,
                 f"{get_user_nfgame(user_id)} has assumed that player {get_user_nfgame(previous_player_id)} lied. He was actually right. \nHere are the liar's cards - {previous_player_cards}",
             )
-
+            bullet = await shoot_self(game_id, previous_player_id)
             await asyncio.sleep(3)
             msge = (
                 f"Now liar shot himself and there was a real bullet in his gun. Eventually, he is dead and eliminated from the game."
@@ -442,12 +442,11 @@ async def handle_continue_or_liar(callback_query: types.CallbackQuery):
                 await save_message(previous_player_id, game_id, mjj.message_id)
                 delete_user_from_all_games(previous_player_id)
         else:
-            bullet = await shoot_self(game_id, user_id)
             await send_message_to_all_players(
                 game_id,
                 f"{get_user_nfgame(user_id)} has assumed that player {get_user_nfgame(previous_player_id)} lied. But he was NOT right. \nHere is his cards - {previous_player_cards}",
             )
-
+            bullet = await shoot_self(game_id, user_id)
             await asyncio.sleep(3)
             msge = (
                 f"Now player {get_user_nfgame(user_id)} shot himself because of blaming others, and it was a real bullet in his pistol. Eventually, he is dead and eliminated from the game."
