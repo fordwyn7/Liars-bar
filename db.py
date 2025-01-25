@@ -975,7 +975,7 @@ def create_game_record_if_not_exists(game_id: str, user_id: int):
     conn = sqlite3.connect("users_database.db")
     cursor = conn.cursor()
     try:
-        start_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        start_time = (datetime.now() + timedelta(hours=5)).strftime("%Y-%m-%d %H:%M:%S")
         cursor.execute(
             """
             INSERT INTO game_archive (game_id, user_id, game_start_time)
@@ -992,7 +992,7 @@ def create_game_record_if_not_exists(game_id: str, user_id: int):
 
 
 def update_game_details(game_id: str, user_id: int, winner: str):
-    end_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    end_time = (datetime.now() + timedelta(hours=5)).strftime("%Y-%m-%d %H:%M:%S")
     try:
         conn = sqlite3.connect("users_database.db")
         cursor = conn.cursor()

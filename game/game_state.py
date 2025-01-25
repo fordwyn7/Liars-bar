@@ -406,8 +406,9 @@ async def handle_continue_or_liar(callback_query: types.CallbackQuery):
                         )
                         await bot.send_message(
                             chat_id=users,
-                            text=f"Game that you had been died finished.\nWinner is - {get_user_nfgame(winner)}",
+                            text=f"The game in which you died has ended.\nWinner: {get_user_nfgame(winner)} — {winner}",
                         )
+
                 delete_game(game_id)
                 await delete_all_game_messages(game_id)
                 return
@@ -494,8 +495,9 @@ async def handle_continue_or_liar(callback_query: types.CallbackQuery):
                     )
                     await bot.send_message(
                         chat_id=users,
-                        text=f"Game that you had been died finished.\nWinner is - {get_user_nfgame(winner)}",
+                        text=f"The game in which you died has ended.\nWinner: {get_user_nfgame(winner)} — {winner}",
                     )
+
             delete_game(game_id)
             await delete_all_game_messages(game_id)
             return
