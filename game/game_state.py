@@ -349,14 +349,15 @@ async def handle_continue_or_liar(callback_query: types.CallbackQuery):
             await save_message(previous_player_id, game_id, message_id)
             asyncio.sleep(2)
             for player in players:
-                bull = await shoot_self(game_id, player)
                 message = await bot.send_message(
                     chat_id=player,
                     text=f"Player {get_user_nfgame(user_id)} opened the last sent cards and it was a Joker(🃏) card, so you all must shoot yourself.",
                 )
                 message_id = message.message_id
                 await save_message(player, game_id, message_id)
-                await asyncio.sleep(2)
+            await asyncio.sleep(2)
+            for player in players:
+                bull = await shoot_self(game_id, player)
                 if type(bull) == type(True):
                     await send_message_to_all_players(
                         game_id,
@@ -367,18 +368,6 @@ async def handle_continue_or_liar(callback_query: types.CallbackQuery):
                         text="Your are dead by real bullet, and eliminated from game 😕",
                     )
                     await save_message(player, game_id, messa.message_id)
-                    winner = get_alive_number(game_id)
-                    if winner != 0:
-                        await bot.send_message(
-                            chat_id=player,
-                            text=f"Game has finished. \nWinner is {get_user_nfgame(winner)}\nYou lose in this game.",
-                            reply_markup=get_main_menu(player),
-                        )
-                        update_game_details(
-                            game_id,
-                            player,
-                            get_user_nfgame(winner) + " - " + str(winner),
-                        )
                 else:
                     await send_message_to_all_players(
                         game_id,
@@ -392,8 +381,31 @@ async def handle_continue_or_liar(callback_query: types.CallbackQuery):
                     reply_markup=get_main_menu(winner),
                 )
                 update_game_details(
-                    game_id, player, get_user_nfgame(winner) + " - " + str(winner)
+                    game_id, winner, get_user_nfgame(winner) + " - " + str(winner)
                 )
+                conn = sqlite3.connect("users_database.db")
+                cursor = conn.cursor()
+                cursor.execute(
+                    """
+                    SELECT user_id
+                    FROM users_game_states
+                    WHERE game_id_user = ?
+                    """,
+                    (game_id,),
+                )
+                user_ids = cursor.fetchall()
+                user_ids = [row[0] for row in user_ids]
+                for users in user_ids:
+                    if users and is_player_dead(game_id, users):
+                        update_game_details(
+                            game_id,
+                            users,
+                            get_user_nfgame(winner) + " - " + str(winner),
+                        )
+                        await bot.send_message(
+                            chat_id=users,
+                            text=f"Game that you had been died finished.\nWinner is - {get_user_nfgame(winner)}",
+                        )
                 delete_game(game_id)
                 await delete_all_game_messages(game_id)
                 return
@@ -425,16 +437,6 @@ async def handle_continue_or_liar(callback_query: types.CallbackQuery):
                     text="Your are dead by real bullet, and eliminated from the game 😕",
                 )
                 await save_message(previous_player_id, game_id, mjj.message_id)
-                winner = get_alive_number(game_id)
-                if winner != 0:
-                    await bot.send_message(
-                        chat_id=user_id,
-                        text=f"Game has finished. \nWinner is {get_user_nfgame(winner)}\nYou lose in this game.",
-                        reply_markup=get_main_menu(user_id),
-                    )
-                update_game_details(
-                    game_id, user_id, get_user_nfgame(winner) + " - " + str(winner)
-                )
         else:
             bullet = await shoot_self(game_id, user_id)
             await send_message_to_all_players(
@@ -455,17 +457,6 @@ async def handle_continue_or_liar(callback_query: types.CallbackQuery):
                     text="Your are dead by real bullet, and eliminated from the game 😕",
                 )
                 await save_message(user_id, game_id, mjj.message_id)
-                winner = get_alive_number(game_id)
-                if winner != 0:
-                    await bot.send_message(
-                        chat_id=user_id,
-                        text=f"Game has finished. \nWinner is {get_user_nfgame(winner)}\nYou lose in this game.",
-                        reply_markup=get_main_menu(user_id),
-                    )
-                    update_game_details(
-                        game_id, user_id, get_user_nfgame(winner) + " - " + str(winner)
-                    )
-
         while is_player_dead(game_id, get_current_turn_user_id(game_id)):
             set_current_turn(
                 game_id, get_next_player_id(game_id, get_current_turn_user_id(game_id))
@@ -480,6 +471,27 @@ async def handle_continue_or_liar(callback_query: types.CallbackQuery):
             update_game_details(
                 game_id, winner, get_user_nfgame(winner) + " - " + str(winner)
             )
+            conn = sqlite3.connect("users_database.db")
+            cursor = conn.cursor()
+            cursor.execute(
+                """
+                SELECT user_id
+                FROM users_game_states
+                WHERE game_id_user = ?
+                """,
+                (game_id,),
+            )
+            user_ids = cursor.fetchall()
+            user_ids = [row[0] for row in user_ids]
+            for users in user_ids:
+                if users and is_player_dead(game_id, users):
+                    update_game_details(
+                        game_id, users, get_user_nfgame(winner) + " - " + str(winner)
+                    )
+                    await bot.send_message(
+                        chat_id=users,
+                        text=f"Game that you had been died finished.\nWinner is - {get_user_nfgame(winner)}",
+                    )
             delete_game(game_id)
             await delete_all_game_messages(game_id)
             return
