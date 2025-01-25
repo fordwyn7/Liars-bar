@@ -48,7 +48,7 @@ async def send_random_cards_to_players(game_id):
         )
         return
     for player_id in players:
-        if not player_id and is_player_dead(game_id, player_id):
+        if not player_id or is_player_dead(game_id, player_id):
             continue
         pc = get_player_cards(game_id, player_id)
         player_cards = pc[0].split(",")

@@ -419,7 +419,6 @@ def ensure_column_exists():
 
 
 def set_current_turn(game_id, user_id):
-    ensure_column_exists()
     with connect_db() as conn:
         cursor = conn.cursor()
         cursor.execute(
