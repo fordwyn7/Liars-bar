@@ -462,9 +462,9 @@ async def handle_continue_or_liar(callback_query: types.CallbackQuery):
                         text=f"Game has finished. \nWinner is {get_user_nfgame(winner)}\nYou lose in this game.",
                         reply_markup=get_main_menu(user_id),
                     )
-                update_game_details(
-                    game_id, user_id, get_user_nfgame(winner) + " - " + str(winner)
-                )
+                    update_game_details(
+                        game_id, user_id, get_user_nfgame(winner) + " - " + str(winner)
+                    )
 
         while is_player_dead(game_id, get_current_turn_user_id(game_id)):
             set_current_turn(
