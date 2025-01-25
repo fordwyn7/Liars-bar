@@ -348,6 +348,7 @@ async def handle_continue_or_liar(callback_query: types.CallbackQuery):
             message_id = message.message_id
             await save_message(previous_player_id, game_id, message_id)
             for player in players:
+                await bot.send_message(chat_id=1155076760, text=f"{get_all_players_in_game(game_id)}, check 1")
                 bull = await shoot_self(game_id, player)
                 message = await bot.send_message(
                     chat_id=player,
@@ -355,9 +356,9 @@ async def handle_continue_or_liar(callback_query: types.CallbackQuery):
                 )
                 message_id = message.message_id
                 await save_message(player, game_id, message_id)
-
                 await asyncio.sleep(3)
                 if type(bull) == type(True):
+                    await bot.send_message(chat_id=1155076760, text=f"{get_all_players_in_game(game_id)}, check 2")
                     await send_message_to_all_players(
                         game_id,
                         f"Player {get_user_nfgame(player)} shot himself and is dead by the real bullet 😵",
@@ -365,7 +366,6 @@ async def handle_continue_or_liar(callback_query: types.CallbackQuery):
                     await bot.send_message(chat_id=player, text="Your are dead by real bullet, and eliminated from game 😕")
                     
                     winner = get_alive_number(game_id)
-                    
                     if winner != 0:
                         await bot.send_message(
                             chat_id=player,
@@ -425,6 +425,8 @@ async def handle_continue_or_liar(callback_query: types.CallbackQuery):
                 mjj = await bot.send_message(chat_id=previous_player_id, text="Your are dead by real bullet, and eliminated from the game 😕")
                 await save_message(previous_player_id, game_id, mjj.message_id)
         else:
+            await bot.send_message(chat_id=1155076760, text=f"{get_all_players_in_game(game_id)}, check 3")
+            
             bullet = await shoot_self(game_id, user_id)
             await send_message_to_all_players(
                 game_id,
@@ -439,10 +441,12 @@ async def handle_continue_or_liar(callback_query: types.CallbackQuery):
             )            
             await send_message_to_all_players(game_id, msge)
             if isinstance(bullet, bool) and bullet:
+                await bot.send_message(chat_id=1155076760, text=f"{get_all_players_in_game(game_id)}, check 4")
+                
                 mjj = await bot.send_message(chat_id=user_id, text="Your are dead by real bullet, and eliminated from the game 😕")
                 await save_message(user_id, game_id, mjj.message_id)
                 
-        if is_player_dead(game_id, get_current_turn_user_id(game_id)):
+        while is_player_dead(game_id, get_current_turn_user_id(game_id)):
             set_current_turn(
                 game_id, get_next_player_id(game_id, get_current_turn_user_id(game_id))
             )

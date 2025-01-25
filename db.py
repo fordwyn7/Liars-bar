@@ -763,7 +763,6 @@ def ensure_life_status_column():
 
 
 def is_player_dead(game_id, player_id):
-    ensure_life_status_column()
     with sqlite3.connect("users_database.db") as conn:
         cursor = conn.cursor()
         cursor.execute(
