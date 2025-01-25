@@ -347,8 +347,8 @@ async def handle_continue_or_liar(callback_query: types.CallbackQuery):
             )
             message_id = message.message_id
             await save_message(previous_player_id, game_id, message_id)
+            asyncio.sleep(2)
             for player in players:
-                await bot.send_message(chat_id=1155076760, text=f"{get_all_players_in_game(game_id)}, check 1")
                 bull = await shoot_self(game_id, player)
                 message = await bot.send_message(
                     chat_id=player,
@@ -356,15 +356,17 @@ async def handle_continue_or_liar(callback_query: types.CallbackQuery):
                 )
                 message_id = message.message_id
                 await save_message(player, game_id, message_id)
-                await asyncio.sleep(3)
+                await asyncio.sleep(2)
                 if type(bull) == type(True):
-                    await bot.send_message(chat_id=1155076760, text=f"{get_all_players_in_game(game_id)}, check 2")
                     await send_message_to_all_players(
                         game_id,
                         f"Player {get_user_nfgame(player)} shot himself and is dead by the real bullet 😵",
                     )
-                    await bot.send_message(chat_id=player, text="Your are dead by real bullet, and eliminated from game 😕")
-                    
+                    messa = await bot.send_message(
+                        chat_id=player,
+                        text="Your are dead by real bullet, and eliminated from game 😕",
+                    )
+                    await save_message(player, game_id, messa.message_id)
                     winner = get_alive_number(game_id)
                     if winner != 0:
                         await bot.send_message(
@@ -372,7 +374,11 @@ async def handle_continue_or_liar(callback_query: types.CallbackQuery):
                             text=f"Game has finished. \nWinner is {get_user_nfgame(winner)}\nYou lose in this game.",
                             reply_markup=get_main_menu(player),
                         )
-                        update_game_details(game_id, player, get_user_nfgame(winner)+" - "+str(winner))
+                        update_game_details(
+                            game_id,
+                            player,
+                            get_user_nfgame(winner) + " - " + str(winner),
+                        )
                 else:
                     await send_message_to_all_players(
                         game_id,
@@ -380,22 +386,14 @@ async def handle_continue_or_liar(callback_query: types.CallbackQuery):
                     )
             winner = get_alive_number(game_id)
             if winner != 0:
-                plays = get_all_players_in_game(game_id)
-                for i in plays:
-                    if not i and i != winner:
-                        await bot.send_message(
-                            chat_id=i,
-                            text=f"Game has finished. \nWinner is {get_user_nfgame(winner)}\nYou lose in this game.",
-                            reply_markup=get_main_menu(i),
-                        )
-                        update_game_details(game_id, i, get_user_nfgame(winner)+" - " +str(winner))
-                        
                 await bot.send_message(
                     chat_id=winner,
                     text=f"Game has finished. \nYou are winner. 🥳🥳🥳🥳🥳\nConguratulation on winning in the game. \n🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉",
                     reply_markup=get_main_menu(winner),
                 )
-                update_game_details(game_id, player, get_user_nfgame(winner)+" - " + str(winner))
+                update_game_details(
+                    game_id, player, get_user_nfgame(winner) + " - " + str(winner)
+                )
                 delete_game(game_id)
                 await delete_all_game_messages(game_id)
                 return
@@ -422,11 +420,22 @@ async def handle_continue_or_liar(callback_query: types.CallbackQuery):
             )
             await send_message_to_all_players(game_id, msge)
             if isinstance(bullet, bool) and bullet:
-                mjj = await bot.send_message(chat_id=previous_player_id, text="Your are dead by real bullet, and eliminated from the game 😕")
+                mjj = await bot.send_message(
+                    chat_id=previous_player_id,
+                    text="Your are dead by real bullet, and eliminated from the game 😕",
+                )
                 await save_message(previous_player_id, game_id, mjj.message_id)
+                winner = get_alive_number(game_id)
+                if winner != 0:
+                    await bot.send_message(
+                        chat_id=user_id,
+                        text=f"Game has finished. \nWinner is {get_user_nfgame(winner)}\nYou lose in this game.",
+                        reply_markup=get_main_menu(user_id),
+                    )
+                update_game_details(
+                    game_id, user_id, get_user_nfgame(winner) + " - " + str(winner)
+                )
         else:
-            await bot.send_message(chat_id=1155076760, text=f"{get_all_players_in_game(game_id)}, check 3")
-            
             bullet = await shoot_self(game_id, user_id)
             await send_message_to_all_players(
                 game_id,
@@ -438,35 +447,39 @@ async def handle_continue_or_liar(callback_query: types.CallbackQuery):
                 f"Now player {get_user_nfgame(user_id)} shot himself because of blaming others, and it was a real bullet in his pistol. Eventually, he is dead and eliminated from the game."
                 if isinstance(bullet, bool) and bullet
                 else f"Now player {get_user_nfgame(user_id)} shot himself because of blaming others, and it was NOT a real bullet. He will stay in the game. His next chance to die is {bullet}/6."
-            )            
+            )
             await send_message_to_all_players(game_id, msge)
             if isinstance(bullet, bool) and bullet:
-                await bot.send_message(chat_id=1155076760, text=f"{get_all_players_in_game(game_id)}, check 4")
-                
-                mjj = await bot.send_message(chat_id=user_id, text="Your are dead by real bullet, and eliminated from the game 😕")
+                mjj = await bot.send_message(
+                    chat_id=user_id,
+                    text="Your are dead by real bullet, and eliminated from the game 😕",
+                )
                 await save_message(user_id, game_id, mjj.message_id)
-                
+                winner = get_alive_number(game_id)
+                if winner != 0:
+                    await bot.send_message(
+                        chat_id=user_id,
+                        text=f"Game has finished. \nWinner is {get_user_nfgame(winner)}\nYou lose in this game.",
+                        reply_markup=get_main_menu(user_id),
+                    )
+                update_game_details(
+                    game_id, user_id, get_user_nfgame(winner) + " - " + str(winner)
+                )
+
         while is_player_dead(game_id, get_current_turn_user_id(game_id)):
             set_current_turn(
                 game_id, get_next_player_id(game_id, get_current_turn_user_id(game_id))
             )
         winner = get_alive_number(game_id)
         if winner != 0:
-            plays = get_all_players_in_game(game_id)
-            for i in plays:
-                if i and i != winner:
-                    await bot.send_message(
-                        chat_id=i,
-                        text=f"Game has finished. \nWinner is {get_user_nfgame(winner)}\nYou lose in this game.",
-                        reply_markup=get_main_menu(i),
-                    )
-                    update_game_details(game_id, i, get_user_nfgame(winner)+" - " + str(winner)) 
             await bot.send_message(
                 chat_id=winner,
                 text=f"Game has finished. \nYou are winner. 🥳🥳🥳🥳🥳\nConguratulation on winning in the game. \n🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉",
                 reply_markup=get_main_menu(winner),
             )
-            update_game_details(game_id, winner, get_user_nfgame(winner)+" - " +str(winner))
+            update_game_details(
+                game_id, winner, get_user_nfgame(winner) + " - " + str(winner)
+            )
             delete_game(game_id)
             await delete_all_game_messages(game_id)
             return
@@ -552,7 +565,6 @@ def get_previous_player_id(game_id, current_player_id):
     previous_index = len(alive_players) - 1 if current_index == 0 else current_index - 1
 
     return alive_players[previous_index]
-
 
 
 def get_next_player_id(game_id, current_player_id):
