@@ -586,7 +586,7 @@ def get_previous_player_id(game_id, current_player_id):
 
 def get_next_player_id(game_id, current_player_id):
     players = get_all_players_in_game(game_id)
-    current_index = players.index(current_player_id)
+    current_index = players.index(get_current_turn_user_id(game_id))
     for i in players:
         if is_player_dead(game_id, i):
             players.remove(i)
