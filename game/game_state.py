@@ -365,8 +365,8 @@ async def handle_continue_or_liar(callback_query: types.CallbackQuery):
                     await bot.send_message(chat_id=player, text="Your are dead by real bullet, and eliminated from game 😕")
                     
                     winner = get_alive_number(game_id)
-                    if winner == 0:await bot.send_message(chat_id=player, text="Your are dead by real bullet, and eliminated from game 😕")
-                    elif winner != 0:
+                    
+                    if winner != 0:
                         await bot.send_message(
                             chat_id=player,
                             text=f"Game has finished. \nWinner is {get_user_nfgame(winner)}\nYou lose in this game.",
@@ -420,8 +420,10 @@ async def handle_continue_or_liar(callback_query: types.CallbackQuery):
                 if isinstance(bullet, bool) and bullet
                 else f"Now liar shot himself and there was no real bullet in his pistol. He will stay in the game. His next chance to die is {bullet}/6."
             )
-            if isinstance(bullet, bool) and bullet:await bot.send_message(chat_id=user_id, text="Your are dead by real bullet, and eliminated from the game 😕")
             await send_message_to_all_players(game_id, msge)
+            if isinstance(bullet, bool) and bullet:
+                mjj = await bot.send_message(chat_id=previous_player_id, text="Your are dead by real bullet, and eliminated from the game 😕")
+                await save_message(previous_player_id, game_id, mjj.message_id)
         else:
             bullet = await shoot_self(game_id, user_id)
             await send_message_to_all_players(
@@ -434,10 +436,12 @@ async def handle_continue_or_liar(callback_query: types.CallbackQuery):
                 f"Now player {get_user_nfgame(user_id)} shot himself because of blaming others, and it was a real bullet in his pistol. Eventually, he is dead and eliminated from the game."
                 if isinstance(bullet, bool) and bullet
                 else f"Now player {get_user_nfgame(user_id)} shot himself because of blaming others, and it was NOT a real bullet. He will stay in the game. His next chance to die is {bullet}/6."
-            )
-            if isinstance(bullet, bool) and bullet:await bot.send_message(chat_id=user_id, text="Your are dead by real bullet, and eliminated from the game 😕")
-            
+            )            
             await send_message_to_all_players(game_id, msge)
+            if isinstance(bullet, bool) and bullet:
+                mjj = await bot.send_message(chat_id=user_id, text="Your are dead by real bullet, and eliminated from the game 😕")
+                await save_message(user_id, game_id, mjj.message_id)
+                
         if is_player_dead(game_id, get_current_turn_user_id(game_id)):
             set_current_turn(
                 game_id, get_next_player_id(game_id, get_current_turn_user_id(game_id))
