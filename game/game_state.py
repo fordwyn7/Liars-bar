@@ -584,10 +584,10 @@ def get_previous_player_id(game_id, current_player_id):
 
 def get_next_player_id(game_id, current_player_id):
     players = get_all_players_in_game(game_id)
-    current_index = players.index(get_current_turn_user_id(game_id))
     for i in players:
-        if is_player_dead(game_id, i):
+        if is_player_dead(game_id, i) or not i:
             players.remove(i)
+    current_index = players.index(get_current_turn_user_id(game_id))
     ind = current_index + 1
     if ind > len(players):
         return players[0]
@@ -614,7 +614,8 @@ def update_current_turn(game_id):
             "SELECT current_turn_user_id FROM invitations WHERE game_id = ?", (game_id,)
         )
         current_turn = cursor.fetchone()
-        if current_turn is None or len(players) == 0:
+        if not current_turn or len(players) == 0:
+            print("erooooooooooooooooooooooooooooooooooooooooooooor")
             return
         next_index = (players.index(current_turn[0]) + 1) % len(players)
         next_turn = players[next_index]
@@ -645,6 +646,8 @@ def get_alive_number(game_id):
 async def send_cards_update_to_players(game_id, player_id, num_cards_sent):
     players = get_all_players_in_game(game_id)
     for p_id in players:
+        if not p_id:
+            continue
         mss = await bot.send_message(
             chat_id=p_id,
             text=(
