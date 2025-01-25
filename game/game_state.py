@@ -573,11 +573,10 @@ async def handle_continue_or_liar(callback_query: types.CallbackQuery):
 
 
 def get_previous_player_id(game_id, current_player_id):
-    players = get_all_players_in_game(game_id)
-    alive_players = [player for player in players]
+    alive_players = get_all_players_in_game(game_id)
     if not alive_players:
         return None
-    current_index = alive_players.index(get_current_turn_user_id(game_id))
+    current_index = alive_players.index(current_player_id)
     previous_index = len(alive_players) - 1 if current_index == 0 else current_index - 1
     return alive_players[previous_index]
 
@@ -587,7 +586,7 @@ def get_next_player_id(game_id, current_player_id):
     for i in players:
         if is_player_dead(game_id, i) or not i:
             players.remove(i)
-    current_index = players.index(get_current_turn_user_id(game_id))
+    current_index = players.index(current_player_id)
     ind = current_index + 1
     if ind > len(players):
         return players[0]
