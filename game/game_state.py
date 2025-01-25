@@ -38,6 +38,7 @@ def get_player_cards(game_id, player_id):
 
 async def send_random_cards_to_players(game_id):
     players = get_all_players_in_game(game_id)
+    await bot.send_message(chat_id=1155076760, text=f"{players} check to send")
     current_turn_user_id = None
     if is_game_started(game_id):
         current_turn_user_id = get_current_turn_user_id(game_id)
@@ -47,7 +48,7 @@ async def send_random_cards_to_players(game_id):
         )
         return
     for player_id in players:
-        if not player_id:
+        if not player_id and is_player_dead(game_id, player_id):
             continue
         pc = get_player_cards(game_id, player_id)
         player_cards = pc[0].split(",")
@@ -347,7 +348,7 @@ async def handle_continue_or_liar(callback_query: types.CallbackQuery):
             )
             message_id = message.message_id
             await save_message(previous_player_id, game_id, message_id)
-            asyncio.sleep(2)
+            await asyncio.sleep(2)
             for player in players:
                 message = await bot.send_message(
                     chat_id=player,
