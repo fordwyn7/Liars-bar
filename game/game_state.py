@@ -459,7 +459,7 @@ async def handle_continue_or_liar(callback_query: types.CallbackQuery):
                     chat_id=user_id,
                     text="Your are dead by real bullet, and eliminated from the game 😕",
                 )
-                delete_user_from_all_games(previous_player_id)
+                delete_user_from_all_games(user_id)
                 await save_message(user_id, game_id, mjj.message_id)
         while is_player_dead(game_id, get_current_turn_user_id(game_id)):
             set_current_turn(
@@ -507,7 +507,6 @@ async def handle_continue_or_liar(callback_query: types.CallbackQuery):
                 await save_message(play, game_id, mss.message_id)
         await reset_game_for_all_players(game_id)
     elif callback_query.data == "continue_game":
-
         rm = get_player_cards(game_id, user_id)
         cnt = 0
         array = get_all_players_in_game(game_id)
