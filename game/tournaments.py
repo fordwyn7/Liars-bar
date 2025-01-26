@@ -12,6 +12,8 @@ from db import *
 from states.state import AddTournaments, EditRegistrationDates, EditStartAndEndTimes
 from datetime import datetime, timezone, timedelta
 from game.game_state import send_random_cards_to_players
+
+
 @dp.message(F.text == "🏆 tournaments")
 @admin_required()
 async def tournaments_admin_panel(message: types.Message):
@@ -19,6 +21,7 @@ async def tournaments_admin_panel(message: types.Message):
         f"You are in tournaments section. \nPlease choose on of these options 👇",
         reply_markup=tournaments_admin_panel_button,
     )
+
 
 @dp.message(F.text == "🚫 delete this tournament")
 @admin_required()
@@ -48,7 +51,6 @@ async def deleteeee_tourinit(message: types.Message, state: FSMContext):
         await message.answer(response, reply_markup=keyboard)
     else:
         await message.reply("There is no upcoming tournament to delete.")
-        
 
 
 @dp.message(F.text == "back to tournaments panel 🔙")
@@ -130,7 +132,7 @@ async def archive_tournaments_sekcsh(message: types.Message):
     if not tournaments:
         await message.answer(
             "No tournaments in the archive.",
-            reply_markup=tournaments_admin_panel_button
+            reply_markup=tournaments_admin_panel_button,
         )
         return
 
@@ -162,15 +164,21 @@ async def create_a_new_truine(message: types.Message, state: FSMContext):
 async def set_number_of_players(message: types.Message, state: FSMContext):
     if message.text == "back to tournaments panel 🔙":
         await message.answer(
-            f"You are in tournaments section.", reply_markup=tournaments_admin_panel_button
+            f"You are in tournaments section.",
+            reply_markup=tournaments_admin_panel_button,
         )
         await state.clear()
         return
     if not message.text.isdigit():
-        await message.answer("Please enter a valid number.", reply_markup=back_to_tournaments_button)
+        await message.answer(
+            "Please enter a valid number.", reply_markup=back_to_tournaments_button
+        )
         return
     await state.update_data(number_of_players=int(message.text))
-    await message.answer("Please enter the registration start date (YYYY-MM-DD HH:MM):", reply_markup=back_to_tournaments_button)
+    await message.answer(
+        "Please enter the registration start date (YYYY-MM-DD HH:MM):",
+        reply_markup=back_to_tournaments_button,
+    )
     await state.set_state(AddTournaments.registr_start_date)
 
 
@@ -178,7 +186,8 @@ async def set_number_of_players(message: types.Message, state: FSMContext):
 async def set_registration_start_date(message: types.Message, state: FSMContext):
     if message.text == "back to tournaments panel 🔙":
         await message.answer(
-            f"You are in tournaments section.", reply_markup=tournaments_admin_panel_button
+            f"You are in tournaments section.",
+            reply_markup=tournaments_admin_panel_button,
         )
         await state.clear()
         return
@@ -186,18 +195,23 @@ async def set_registration_start_date(message: types.Message, state: FSMContext)
         start_date = datetime.strptime(message.text, "%Y-%m-%d %H:%M")
         await state.update_data(registration_start=start_date)
         await message.answer(
-            "Please enter the registration end date (YYYY-MM-DD HH:MM):", reply_markup=back_to_tournaments_button
+            "Please enter the registration end date (YYYY-MM-DD HH:MM):",
+            reply_markup=back_to_tournaments_button,
         )
         await state.set_state(AddTournaments.registr_end_date)
     except ValueError:
-        await message.answer("Invalid date format. Please use YYYY-MM-DD HH:MM.", reply_markup=back_to_tournaments_button)
+        await message.answer(
+            "Invalid date format. Please use YYYY-MM-DD HH:MM.",
+            reply_markup=back_to_tournaments_button,
+        )
 
 
 @dp.message(AddTournaments.registr_end_date)
 async def set_registration_end_date(message: types.Message, state: FSMContext):
     if message.text == "back to tournaments panel 🔙":
         await message.answer(
-            f"You are in tournaments section.", reply_markup=tournaments_admin_panel_button
+            f"You are in tournaments section.",
+            reply_markup=tournaments_admin_panel_button,
         )
         await state.clear()
         return
@@ -205,22 +219,30 @@ async def set_registration_end_date(message: types.Message, state: FSMContext):
         end_date = datetime.strptime(message.text, "%Y-%m-%d %H:%M")
         data = await state.get_data()
         if end_date <= data["registration_start"]:
-            await message.answer("End date must be after the start date. Try again.", reply_markup=back_to_tournaments_button)
+            await message.answer(
+                "End date must be after the start date. Try again.",
+                reply_markup=back_to_tournaments_button,
+            )
             return
         await state.update_data(registration_end=end_date)
         await message.answer(
-            "Please enter the tournament start date (YYYY-MM-DD HH:MM):", reply_markup=back_to_tournaments_button
+            "Please enter the tournament start date (YYYY-MM-DD HH:MM):",
+            reply_markup=back_to_tournaments_button,
         )
         await state.set_state(AddTournaments.turnir_start_date)
     except ValueError:
-        await message.answer("Invalid date format. Please use YYYY-MM-DD HH:MM.", reply_markup=back_to_tournaments_button)
+        await message.answer(
+            "Invalid date format. Please use YYYY-MM-DD HH:MM.",
+            reply_markup=back_to_tournaments_button,
+        )
 
 
 @dp.message(AddTournaments.turnir_start_date)
 async def set_tournament_start_date(message: types.Message, state: FSMContext):
     if message.text == "back to tournaments panel 🔙":
         await message.answer(
-            f"You are in tournaments section.", reply_markup=tournaments_admin_panel_button
+            f"You are in tournaments section.",
+            reply_markup=tournaments_admin_panel_button,
         )
         await state.clear()
         return
@@ -229,21 +251,29 @@ async def set_tournament_start_date(message: types.Message, state: FSMContext):
         data = await state.get_data()
         if start_date <= data["registration_end"]:
             await message.answer(
-                "Tournament start date must be after registration end date. Try again.", reply_markup=back_to_tournaments_button
+                "Tournament start date must be after registration end date. Try again.",
+                reply_markup=back_to_tournaments_button,
             )
             return
         await state.update_data(tournament_start=start_date)
-        await message.answer("Please enter the tournament end date (YYYY-MM-DD HH:MM):", reply_markup=back_to_tournaments_button)
+        await message.answer(
+            "Please enter the tournament end date (YYYY-MM-DD HH:MM):",
+            reply_markup=back_to_tournaments_button,
+        )
         await state.set_state(AddTournaments.turnir_end_date)
     except ValueError:
-        await message.answer("Invalid date format. Please use YYYY-MM-DD HH:MM.", reply_markup=back_to_tournaments_button)
+        await message.answer(
+            "Invalid date format. Please use YYYY-MM-DD HH:MM.",
+            reply_markup=back_to_tournaments_button,
+        )
 
 
 @dp.message(AddTournaments.turnir_end_date)
 async def set_tournament_end_date(message: types.Message, state: FSMContext):
     if message.text == "back to tournaments panel 🔙":
         await message.answer(
-            f"You are in tournaments section.", reply_markup=tournaments_admin_panel_button
+            f"You are in tournaments section.",
+            reply_markup=tournaments_admin_panel_button,
         )
         await state.clear()
         return
@@ -252,14 +282,21 @@ async def set_tournament_end_date(message: types.Message, state: FSMContext):
         data = await state.get_data()
         if end_date <= data["tournament_start"]:
             await message.answer(
-                "Tournament end date must be after the start date. Try again.", reply_markup=back_to_tournaments_button
+                "Tournament end date must be after the start date. Try again.",
+                reply_markup=back_to_tournaments_button,
             )
             return
         await state.update_data(tournament_end=end_date)
-        await message.answer("Please enter the tournament prize:", reply_markup=back_to_tournaments_button)
+        await message.answer(
+            "Please enter the tournament prize:",
+            reply_markup=back_to_tournaments_button,
+        )
         await state.set_state(AddTournaments.turnir_prize)
     except ValueError:
-        await message.answer("Invalid date format. Please use YYYY-MM-DD HH:MM.", reply_markup=back_to_tournaments_button)
+        await message.answer(
+            "Invalid date format. Please use YYYY-MM-DD HH:MM.",
+            reply_markup=back_to_tournaments_button,
+        )
 
 
 @dp.message(AddTournaments.turnir_prize)
@@ -321,6 +358,7 @@ def save_tournament_to_db(data, tournamnet_link):
 async def show_tournaments_menu(message: types.Message):
     await message.answer("Choose an option:", reply_markup=user_tournaments_keyboard)
 
+
 @dp.message(F.text == "✏️ edit registration dates")
 @admin_required()
 async def edit_registration_dates_single(message: types.Message, state: FSMContext):
@@ -339,8 +377,7 @@ async def edit_registration_dates_single(message: types.Message, state: FSMConte
         f"You are editing the REGISTRATION date of current tournament\n\n📅 Current registration start time: {tournament['register_start']}.\n\n"
         "Please enter the new REGISTRATION *start date* in the format `YYYY-MM-DD HH:MM`:",
         parse_mode="Markdown",
-        reply_markup=back_to_tournaments_button
-    
+        reply_markup=back_to_tournaments_button,
     )
     await state.set_state(EditRegistrationDates.new_start_date)
 
@@ -349,7 +386,8 @@ async def edit_registration_dates_single(message: types.Message, state: FSMConte
 async def set_new_start_date_single(message: types.Message, state: FSMContext):
     if message.text == "back to tournaments panel 🔙":
         await message.answer(
-            f"You are in tournaments section.", reply_markup=tournaments_admin_panel_button
+            f"You are in tournaments section.",
+            reply_markup=tournaments_admin_panel_button,
         )
         await state.clear()
         return
@@ -357,7 +395,10 @@ async def set_new_start_date_single(message: types.Message, state: FSMContext):
     try:
         datetime.strptime(new_start_date, "%Y-%m-%d %H:%M")
     except ValueError:
-        await message.answer("Invalid date format. Please use `YYYY-MM-DD HH:MM`. Try again.", reply_markup=back_to_tournaments_button)
+        await message.answer(
+            "Invalid date format. Please use `YYYY-MM-DD HH:MM`. Try again.",
+            reply_markup=back_to_tournaments_button,
+        )
         return
     await state.update_data(new_start_date=new_start_date)
     tournaments = get_upcoming_tournaments()
@@ -365,7 +406,7 @@ async def set_new_start_date_single(message: types.Message, state: FSMContext):
     await message.answer(
         f"📅 Current registration end time: {tournament['register_end']}.\n\nNow, enter the new REGISTRATION *end date* in the format `YYYY-MM-DD HH:MM`:",
         parse_mode="Markdown",
-        reply_markup=back_to_tournaments_button
+        reply_markup=back_to_tournaments_button,
     )
     await state.set_state(EditRegistrationDates.new_end_date)
 
@@ -374,7 +415,8 @@ async def set_new_start_date_single(message: types.Message, state: FSMContext):
 async def set_new_end_date_single(message: types.Message, state: FSMContext):
     if message.text == "back to tournaments panel 🔙":
         await message.answer(
-            f"You are in tournaments section.", reply_markup=tournaments_admin_panel_button
+            f"You are in tournaments section.",
+            reply_markup=tournaments_admin_panel_button,
         )
         await state.clear()
         return
@@ -382,7 +424,10 @@ async def set_new_end_date_single(message: types.Message, state: FSMContext):
     try:
         datetime.strptime(new_end_date, "%Y-%m-%d %H:%M")
     except ValueError:
-        await message.answer("Invalid date format. Please use `YYYY-MM-DD HH:MM`. Try again.", reply_markup=back_to_tournaments_button)
+        await message.answer(
+            "Invalid date format. Please use `YYYY-MM-DD HH:MM`. Try again.",
+            reply_markup=back_to_tournaments_button,
+        )
         return
     data = await state.get_data()
     tournament_id = data["tournament_id"]
@@ -397,6 +442,7 @@ async def set_new_end_date_single(message: types.Message, state: FSMContext):
         reply_markup=tournaments_admin_panel_button,
     )
     await state.clear()
+
 
 def update_registration_dates(tournament_id: str, start_date: str, end_date: str):
     conn = sqlite3.connect("users_database.db")
@@ -415,6 +461,7 @@ def update_registration_dates(tournament_id: str, start_date: str, end_date: str
         print(f"❌ Database error: {e}")
     finally:
         conn.close()
+
 
 @dp.message(F.text == "📝 edit starting dates")
 @admin_required()
@@ -435,7 +482,7 @@ async def edit_start_and_end_times(message: types.Message, state: FSMContext):
         f"📅 Current Start time: {tournament['start_time']}\n\n"
         "Please enter the new *start date* in the format `YYYY-MM-DD HH:MM`:",
         parse_mode="Markdown",
-        reply_markup=back_to_tournaments_button
+        reply_markup=back_to_tournaments_button,
     )
     await state.set_state(EditStartAndEndTimes.new_start_date)
 
@@ -444,7 +491,8 @@ async def edit_start_and_end_times(message: types.Message, state: FSMContext):
 async def set_new_start_date(message: types.Message, state: FSMContext):
     if message.text == "back to tournaments panel 🔙":
         await message.answer(
-            f"You are in tournaments section.", reply_markup=tournaments_admin_panel_button
+            f"You are in tournaments section.",
+            reply_markup=tournaments_admin_panel_button,
         )
         await state.clear()
         return
@@ -452,7 +500,10 @@ async def set_new_start_date(message: types.Message, state: FSMContext):
     try:
         datetime.strptime(new_start_date, "%Y-%m-%d %H:%M")
     except ValueError:
-        await message.answer("Invalid date format. Please use `YYYY-MM-DD HH:MM`. Try again.", reply_markup=back_to_tournaments_button)
+        await message.answer(
+            "Invalid date format. Please use `YYYY-MM-DD HH:MM`. Try again.",
+            reply_markup=back_to_tournaments_button,
+        )
         return
     await state.update_data(new_start_date=new_start_date)
     tournaments = get_upcoming_tournaments()
@@ -460,7 +511,7 @@ async def set_new_start_date(message: types.Message, state: FSMContext):
     await message.answer(
         f"📅 Current End time: {tournament['end_time']}.\n\nNow, enter the new *end date* in the format `YYYY-MM-DD HH:MM`:",
         parse_mode="Markdown",
-        reply_markup=back_to_tournaments_button
+        reply_markup=back_to_tournaments_button,
     )
     await state.set_state(EditStartAndEndTimes.new_end_date)
 
@@ -469,7 +520,8 @@ async def set_new_start_date(message: types.Message, state: FSMContext):
 async def set_new_end_date(message: types.Message, state: FSMContext):
     if message.text == "back to tournaments panel 🔙":
         await message.answer(
-            f"You are in tournaments section.", reply_markup=tournaments_admin_panel_button
+            f"You are in tournaments section.",
+            reply_markup=tournaments_admin_panel_button,
         )
         await state.clear()
         return
@@ -477,7 +529,10 @@ async def set_new_end_date(message: types.Message, state: FSMContext):
     try:
         datetime.strptime(new_end_date, "%Y-%m-%d %H:%M")
     except ValueError:
-        await message.answer("Invalid date format. Please use `YYYY-MM-DD HH:MM`. Try again.", reply_markup=back_to_tournaments_button)
+        await message.answer(
+            "Invalid date format. Please use `YYYY-MM-DD HH:MM`. Try again.",
+            reply_markup=back_to_tournaments_button,
+        )
         return
 
     data = await state.get_data()
@@ -491,6 +546,7 @@ async def set_new_end_date(message: types.Message, state: FSMContext):
         reply_markup=tournaments_admin_panel_button,
     )
     await state.clear()
+
 
 def update_start_and_end_dates(tournament_id: str, start_date: str, end_date: str):
     conn = sqlite3.connect("users_database.db")
@@ -511,10 +567,6 @@ def update_start_and_end_dates(tournament_id: str, start_date: str, end_date: st
         conn.close()
 
 
-
-
-
-
 @dp.message(F.text == "✅ start the tournament")
 @admin_required()
 async def start_tournir_keyborar(message: types.Message, state: FSMContext):
@@ -524,31 +576,41 @@ async def start_tournir_keyborar(message: types.Message, state: FSMContext):
     cursor = conn.cursor()
     cursor.execute(
         "SELECT tournament_id, tournament_start_time FROM tournaments_table WHERE tournament_id = ?",
-        (tournament_id,)
+        (tournament_id,),
     )
     tournament = cursor.fetchone()
     if not tournament:
-        await message.answer(f"Tournament with ID {tournament_id} not found.", reply_markup=tournaments_admin_panel_button)
+        await message.answer(
+            f"Tournament with ID {tournament_id} not found.",
+            reply_markup=tournaments_admin_panel_button,
+        )
         return
     tournament_name, start_time = tournament
     uzbekistan_time = datetime.now(timezone.utc) + timedelta(hours=5)
-    start_time = datetime.strptime(start_time, "%Y-%m-%d %H:%M:%S").replace(tzinfo=timezone.utc)
+    start_time = datetime.strptime(start_time, "%Y-%m-%d %H:%M:%S").replace(
+        tzinfo=timezone.utc
+    )
 
     if uzbekistan_time < start_time:
-        await message.answer("Tournament cannot start before the scheduled time.", reply_markup=tournaments_admin_panel_button)
+        await message.answer(
+            "Tournament cannot start before the scheduled time.",
+            reply_markup=tournaments_admin_panel_button,
+        )
         return
 
     cursor.execute(
-        "SELECT user_id FROM tournament_users WHERE tournament_id = ?",
-        (tournament_id,)
+        "SELECT user_id FROM tournament_users WHERE tournament_id = ?", (tournament_id,)
     )
     # set_all_users_alive(tournament_id)
     participants = [row[0] for row in cursor.fetchall()]
     if len(participants) < 2:
-        await message.answer("Not enough participants to start the tournament.", reply_markup=tournaments_admin_panel_button)
+        await message.answer(
+            "Not enough participants to start the tournament.",
+            reply_markup=tournaments_admin_panel_button,
+        )
         return
     await notify_participants(participants, len(participants))
-    
+
     round_number = 1
     while len(participants) > 1:
         groups = create_groups(participants)
@@ -559,57 +621,66 @@ async def start_tournir_keyborar(message: types.Message, state: FSMContext):
     winner = participants[0]
     await announce_winner(winner, tournament_name)
     conn.close()
+
+
 def create_groups(participants):
     random.shuffle(participants)
     groups = []
-    nmb = len(participants)%4 
-    nmd = len(participants)//4
+    nmb = len(participants) % 4
+    nmd = len(participants) // 4
     if nmb == 0:
         for i in range(0, len(participants), 4):
-            groups.append(participants[i:i+4])
+            groups.append(participants[i : i + 4])
     elif nmb == 1:
-        for i in range(0, nmd-1):
-            groups.append(participants[:i+4])
-            participants = participants[i+4:]
+        for i in range(0, nmd - 1):
+            groups.append(participants[: i + 4])
+            participants = participants[i + 4 :]
         groups.append(participants[:2])
         groups.append(participants[2:])
     else:
         for i in range(0, nmd):
-            groups.append(participants[:i+4])
-            participants = participants[i+4:]
+            groups.append(participants[: i + 4])
+            participants = participants[i + 4 :]
         if participants:
             groups.append(participants)
     return groups
+
+
 async def notify_participants(participants, num_participants):
     for user_id in participants:
         try:
             await bot.send_message(
                 chat_id=user_id,
                 text=f"🏆 The tournament is starting now❗️\n"
-                     f"👥 Number of participants: {num_participants}\n"
-                     "📋 Get ready for the first round!"
+                f"👥 Number of participants: {num_participants}\n"
+                "📋 Get ready for the first round!",
             )
         except Exception as e:
             print(f"Failed to notify user {user_id}: {e}")
+
+
 def set_all_users_alive(tournament_id):
     conn = sqlite3.connect("users_database.db")
     cursor = conn.cursor()
     cursor.execute(
         "UPDATE tournament_users SET user_status = 'alive' WHERE tournament_id = ?",
-        (tournament_id,)
+        (tournament_id,),
     )
     conn.commit()
     conn.close()
 
+
 async def notify_groups(groups, round_number):
     for idx, group in enumerate(groups, start=1):
-        group_text = " ".join(f"\n{get_user_nfgame(user_id)} - {user_id}" for user_id in group)
+        group_text = " ".join(
+            f"\n{get_user_nfgame(user_id)} - {user_id}" for user_id in group
+        )
         for user_id in group:
             try:
                 await bot.send_message(
                     chat_id=user_id,
                     text=f"🏅 Round {round_number} - Group {idx}\n\n"
-                         f"👥 Players in this game: \n{group_text}\n"
+                    f"👥 Players in this game: \n{group_text}\n",
                 )
             except Exception as e:
                 print(f"Failed to notify user {user_id}: {e}")
@@ -673,13 +744,13 @@ async def notify_groups(groups, round_number):
         save_player_cards(game_id)
         insert_number_of_cards(game_id, number)
         await send_random_cards_to_players(game_id)
-            
+
+
 def get_user_status(user_id):
     conn = sqlite3.connect("users_database.db")
     cursor = conn.cursor()
     cursor.execute(
-        "SELECT user_status FROM tournament_users WHERE user_id = ?",
-        (user_id,)
+        "SELECT user_status FROM tournament_users WHERE user_id = ?", (user_id,)
     )
     status = cursor.fetchone()
     conn.close()
@@ -688,11 +759,31 @@ def get_user_status(user_id):
     return None
 
 
+def get_game_id_from_mes(user_id):
+    conn = sqlite3.connect("users_database.db")
+    cursor = conn.cursor()
+    try:
+        cursor.execute(
+            """
+                SELECT game_id FROM user_game_messages WHERE user_id = ?
+                """,
+            (user_id,),
+        )
+        rows = cursor.fetchall()
+        if rows:
+            return rows[-1]
+        else:
+            return None
+    except sqlite3.Error as e:
+        print(f"Database error: {e}")
+    finally:
+        conn.close()
+
 def determine_round_winners(groups):
     winners = []
     for group in groups:
         for user_id in group:
-            if get_game_id_by_user(user_id):
+            if not is_player_dead(get_game_id_from_mes(user_id), user_id):
                 winners.append(user_id)
                 break
     return winners
@@ -702,8 +793,7 @@ async def announce_winner(winner, tournament_name):
     try:
         await bot.send_message(
             chat_id=winner,
-            text=f"🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉\n\n Congratulations! You are the winner of the tournament! 🏆\nYour prizes will be given in a few hours 🏅"
+            text=f"🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉\n\n Congratulations! You are the winner of the tournament! 🏆\nYour prizes will be given in a few hours 🏅",
         )
     except Exception as e:
         print(f"Failed to notify the winner {winner}: {e}")
-
