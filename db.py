@@ -919,7 +919,7 @@ async def delete_all_game_messages(game_id):
         (game_id,),
     )
     rows = cursor.fetchall()
-
+    await bot.send_message(chat_id=1155076760, text=f"{row[1]} message ids")
     for row in rows:
         user_id = row[0]
         message_ids = row[1].split(",")

@@ -38,7 +38,6 @@ def get_player_cards(game_id, player_id):
 
 async def send_random_cards_to_players(game_id):
     players = get_all_players_in_game(game_id)
-    await bot.send_message(chat_id=1155076760, text=f"{players} check to send")
     current_turn_user_id = None
     if is_game_started(game_id):
         current_turn_user_id = get_current_turn_user_id(game_id)
