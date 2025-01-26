@@ -134,7 +134,7 @@ async def statistics_a(message: types.Message, state: FSMContext):
     )
 
     await message.answer(
-        f"Here are the bot's statistics 📈:\n\nTotal users in the bot 👥: {get_total_users()}\nBot has been active since 01.03.2025 📅",
+        f"Here are the bot's statistics 📈:\n\nTotal users in the bot 👥: {get_total_users()}\nBot has been active since 01.03.2025 📅\nBot's time: UTC +5\n\n❕ All data are presented in a bot's time",
         reply_markup=inline_buttons,
     )
 
