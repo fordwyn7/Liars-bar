@@ -804,6 +804,8 @@ async def shoot_self(game_id, player_id):
 
         real_bullet_position, blanks_count = result
         if int(blanks_count) == int(real_bullet_position):
+            if is_user_turn(player_id, game_id):
+                update_current_turn(game_id)
             cursor.execute(
                 """
                 UPDATE game_state
@@ -829,7 +831,34 @@ async def shoot_self(game_id, player_id):
             elimination_chance = blanks_count
             return elimination_chance
 
+def is_user_turn(user_id, game_id):
+    with sqlite3.connect("users_database.db") as conn:
+        cursor = conn.cursor()
+        cursor.execute(
+            "SELECT current_turn_user_id FROM invitations WHERE game_id = ?",
+            (game_id,),
+        )
+        result = cursor.fetchone()
+        return result[0] == user_id if result else False
 
+def update_current_turn(game_id):
+    with sqlite3.connect("users_database.db") as conn:
+        cursor = conn.cursor()
+        players = get_all_players_in_game(game_id)
+        cursor.execute(
+            "SELECT current_turn_user_id FROM invitations WHERE game_id = ?", (game_id,)
+        )
+        current_turn = cursor.fetchone()
+        if not current_turn or len(players) == 0:
+            print("erooooooooooooooooooooooooooooooooooooooooooooor")
+            return
+        next_index = (players.index(current_turn[0]) + 1) % len(players)
+        next_turn = players[next_index]
+        cursor.execute(
+            "UPDATE invitations SET current_turn_user_id = ? WHERE game_id = ?",
+            (next_turn, game_id),
+        )
+        conn.commit()
 def get_player_status(game_id, player_id):
     with sqlite3.connect("users_database.db") as conn:
         cursor = conn.cursor()

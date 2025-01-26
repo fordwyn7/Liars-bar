@@ -599,35 +599,9 @@ def get_next_player_id(game_id, current_player_id):
         return players[ind % len(players)]
 
 
-def is_user_turn(user_id, game_id):
-    with sqlite3.connect("users_database.db") as conn:
-        cursor = conn.cursor()
-        cursor.execute(
-            "SELECT current_turn_user_id FROM invitations WHERE game_id = ?",
-            (game_id,),
-        )
-        result = cursor.fetchone()
-        return result[0] == user_id if result else False
 
 
-def update_current_turn(game_id):
-    with sqlite3.connect("users_database.db") as conn:
-        cursor = conn.cursor()
-        players = get_all_players_in_game(game_id)
-        cursor.execute(
-            "SELECT current_turn_user_id FROM invitations WHERE game_id = ?", (game_id,)
-        )
-        current_turn = cursor.fetchone()
-        if not current_turn or len(players) == 0:
-            print("erooooooooooooooooooooooooooooooooooooooooooooor")
-            return
-        next_index = (players.index(current_turn[0]) + 1) % len(players)
-        next_turn = players[next_index]
-        cursor.execute(
-            "UPDATE invitations SET current_turn_user_id = ? WHERE game_id = ?",
-            (next_turn, game_id),
-        )
-        conn.commit()
+
 
 
 async def reset_game_for_all_players(game_id):
