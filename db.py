@@ -912,22 +912,30 @@ async def save_message(user_id, game_id, message_id):
     cursor = conn.cursor()
     try:
         cursor.execute(
+            "SELECT messages_ingame FROM users_game_states WHERE user_id = ?",
+            (user_id,),
+        )
+        result = cursor.fetchone()
+        existing_message_ids = set(result[0].split(",")) if result and result[0] else set()
+        existing_message_ids.add(str(message_id))
+        updated_message_ids = ",".join(existing_message_ids)
+        cursor.execute(
             """
             INSERT INTO users_game_states (user_id, game_id_user, messages_ingame)
             VALUES (?, ?, ?)
             ON CONFLICT(user_id)
             DO UPDATE SET
                 game_id_user = excluded.game_id_user,
-                messages_ingame = COALESCE(
-                    (SELECT messages_ingame FROM users_game_states WHERE user_id = excluded.user_id) || ',' || excluded.messages_ingame,
-                    excluded.messages_ingame
-                )
+                messages_ingame = ?
             """,
-            (user_id, game_id, message_id),
+            (user_id, game_id, updated_message_ids, updated_message_ids),
         )
         conn.commit()
     except sqlite3.Error as e:
         print(f"Database error: {e}")
+    finally:
+        conn.close()
+
 
 
 async def delete_all_game_messages(game_id):
