@@ -12,10 +12,14 @@ from datetime import datetime, timezone, timedelta
 def connect_db():
     return sqlite3.connect("users_database.db")
 
+
 def is_user_in_tournament_and_active(user_id):
     conn = sqlite3.connect("users_database.db")
     cursor = conn.cursor()
-    cursor.execute("SELECT tournament_id, user_status FROM tournament_users WHERE user_id = ?", (user_id,))
+    cursor.execute(
+        "SELECT tournament_id, user_status FROM tournament_users WHERE user_id = ?",
+        (user_id,),
+    )
     tournament_data = cursor.fetchone()
 
     if not tournament_data:
@@ -27,7 +31,10 @@ def is_user_in_tournament_and_active(user_id):
         conn.close()
         return False
 
-    cursor.execute("SELECT tournament_start_time, tournament_end_time FROM tournaments_table WHERE tournament_id = ?", (tournament_id,))
+    cursor.execute(
+        "SELECT tournament_start_time, tournament_end_time FROM tournaments_table WHERE tournament_id = ?",
+        (tournament_id,),
+    )
     tournament = cursor.fetchone()
 
     if not tournament:
@@ -35,11 +42,14 @@ def is_user_in_tournament_and_active(user_id):
         return False
 
     tournament_start, tournament_end = tournament
-    uzbekistan_tz = timezone(timedelta(hours=5)) 
+    uzbekistan_tz = timezone(timedelta(hours=5))
 
-    tournament_start = datetime.strptime(tournament_start, "%Y-%m-%d %H:%M:%S").replace(tzinfo=uzbekistan_tz)
-    tournament_end = datetime.strptime(tournament_end, "%Y-%m-%d %H:%M:%S").replace(tzinfo=uzbekistan_tz)
-
+    tournament_start = datetime.strptime(tournament_start, "%Y-%m-%d %H:%M:%S").replace(
+        tzinfo=uzbekistan_tz
+    )
+    tournament_end = datetime.strptime(tournament_end, "%Y-%m-%d %H:%M:%S").replace(
+        tzinfo=uzbekistan_tz
+    )
 
     current_time = datetime.now(uzbekistan_tz)
 
@@ -196,6 +206,7 @@ def delete_user_from_all_games(user_id):
     except sqlite3.Error as e:
         print(f"Error deleting user from games: {e}")
 
+
 def delete_invitation(invitee_id, game_id):
     try:
         with connect_db() as conn:
@@ -210,6 +221,7 @@ def delete_invitation(invitee_id, game_id):
             conn.commit()
     except sqlite3.Error as e:
         print(f"Error deleting invitation: {e}")
+
 
 def get_all_players_in_game(game_id):
     with sqlite3.connect("users_database.db") as conn:
@@ -776,16 +788,19 @@ def is_player_dead(game_id, player_id):
         if result and result[0] == "dead":
             return True
     return False
+
+
 def set_user_status(user_id, status):
     if is_user_in_tournament_and_active(user_id):
         conn = sqlite3.connect("users_database.db")
         cursor = conn.cursor()
         cursor.execute(
             "UPDATE tournament_users SET user_status = ? WHERE user_id = ?",
-            (status, user_id)
+            (status, user_id),
         )
         conn.commit()
         conn.close()
+
 
 async def shoot_self(game_id, player_id):
     with sqlite3.connect("users_database.db") as conn:
@@ -815,7 +830,7 @@ async def shoot_self(game_id, player_id):
                 (game_id, player_id),
             )
             conn.commit()
-            set_user_status(player_id, 'died')
+            set_user_status(player_id, "died")
             return True
         else:
             blanks_count += 1
@@ -831,6 +846,7 @@ async def shoot_self(game_id, player_id):
             elimination_chance = blanks_count
             return elimination_chance
 
+
 def is_user_turn(user_id, game_id):
     with sqlite3.connect("users_database.db") as conn:
         cursor = conn.cursor()
@@ -840,6 +856,7 @@ def is_user_turn(user_id, game_id):
         )
         result = cursor.fetchone()
         return result[0] == user_id if result else False
+
 
 def update_current_turn(game_id):
     with sqlite3.connect("users_database.db") as conn:
@@ -859,6 +876,8 @@ def update_current_turn(game_id):
             (next_turn, game_id),
         )
         conn.commit()
+
+
 def get_player_status(game_id, player_id):
     with sqlite3.connect("users_database.db") as conn:
         cursor = conn.cursor()
@@ -920,14 +939,20 @@ async def delete_all_game_messages(game_id):
     )
     rows = cursor.fetchall()
     for row in rows:
-        await bot.send_message(chat_id=1155076760, text=f"{row} message ids")
         user_id = row[0]
-        message_ids = row[1].split(",")
+        message_ids = [
+            msg_id for msg_id in row[1].split(",") if msg_id.strip().isdigit()
+        ]
         for message_id in message_ids:
             try:
                 await bot.delete_message(chat_id=user_id, message_id=int(message_id))
             except Exception as e:
                 print(f"Error deleting message {message_id} for user {user_id}: {e}")
+    cursor.execute(
+        "UPDATE users_game_states SET messages_ingame = NULL WHERE game_id_user = ?",
+        (game_id,),
+    )
+
     conn.commit()
 
 
@@ -1071,7 +1096,7 @@ def get_upcoming_tournaments():
                 "maximum_players": row[4],
                 "end_time": row[5],
                 "register_start": row[6],
-                "register_end": row[7]
+                "register_end": row[7],
             }
             for row in cursor.fetchall()
         ]
@@ -1081,7 +1106,6 @@ def get_upcoming_tournaments():
         return []
     finally:
         conn.close()
-
 
 
 def get_tournament_archive():
@@ -1096,7 +1120,13 @@ def get_tournament_archive():
             """
         )
         tournaments = [
-            {"id": row[0], "prize": row[1], "winner": row[2], "start_time": row[3], "end_time":row[4]}
+            {
+                "id": row[0],
+                "prize": row[1],
+                "winner": row[2],
+                "start_time": row[3],
+                "end_time": row[4],
+            }
             for row in cursor.fetchall()
         ]
         return tournaments
@@ -1105,6 +1135,7 @@ def get_tournament_archive():
         return []
     finally:
         conn.close()
+
 
 def is_user_in_tournament(tournament_id: str, user_id: int) -> bool:
     conn = sqlite3.connect("users_database.db")
@@ -1125,6 +1156,7 @@ def is_user_in_tournament(tournament_id: str, user_id: int) -> bool:
     finally:
         conn.close()
 
+
 def add_user_to_tournament(tournament_id: str, user_id: int):
     conn = sqlite3.connect("users_database.db")
     cursor = conn.cursor()
@@ -1142,6 +1174,7 @@ def add_user_to_tournament(tournament_id: str, user_id: int):
         raise
     finally:
         conn.close()
+
 
 def get_current_players(tournament_id: str) -> int:
     conn = sqlite3.connect("users_database.db")
@@ -1163,13 +1196,19 @@ def get_current_players(tournament_id: str) -> int:
     finally:
         conn.close()
 
+
 def delete_tournament(tournament_id: str):
-    conn = sqlite3.connect('users_database.db')
+    conn = sqlite3.connect("users_database.db")
     cursor = conn.cursor()
-    cursor.execute("DELETE FROM tournament_users WHERE tournament_id = ?", (tournament_id,))
-    cursor.execute("DELETE FROM tournaments_table WHERE tournament_id = ?", (tournament_id,))
+    cursor.execute(
+        "DELETE FROM tournament_users WHERE tournament_id = ?", (tournament_id,)
+    )
+    cursor.execute(
+        "DELETE FROM tournaments_table WHERE tournament_id = ?", (tournament_id,)
+    )
     conn.commit()
     conn.close()
+
 
 def get_ongoing_tournaments():
     conn = sqlite3.connect("users_database.db")
