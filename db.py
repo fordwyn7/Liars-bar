@@ -814,7 +814,6 @@ async def shoot_self(game_id, player_id):
             )
             conn.commit()
             set_user_status(player_id, 'died')
-            
             return True
         else:
             blanks_count += 1

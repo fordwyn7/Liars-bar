@@ -278,7 +278,6 @@ async def send_cards(callback_query: types.CallbackQuery):
         return
 
     players = get_all_players_in_game(game_id)
-    cre_id = get_game_creator_id(game_id)
     for p_id in players:
         if not p_id:
             continue
@@ -329,7 +328,7 @@ async def handle_continue_or_liar(callback_query: types.CallbackQuery):
     game_id = get_game_id_by_user(user_id)
     if callback_query.data == "liar_game":
         previous_player_id = get_previous_player_id(game_id, user_id)
-        await bot.send_message(chat_id=1155076760, text=f"{get_user_nfgame(previous_player_id)} - previous player")
+        # await bot.send_message(chat_id=1155076760, text=f"{get_user_nfgame(previous_player_id)} - previous player")
         previous_player_cards = get_last_cards(game_id)[0]
         table_current = get_current_table(game_id).split(" ")[-1]
         liar_bool = True
@@ -365,6 +364,8 @@ async def handle_continue_or_liar(callback_query: types.CallbackQuery):
                         game_id,
                         f"Player {get_user_nfgame(player)} shot himself and is dead by the real bullet 😵",
                     )
+                    if is_user_turn(player, game_id):
+                        update_current_turn(game_id)
                     messa = await bot.send_message(
                         chat_id=player,
                         text="Your are dead by real bullet, and eliminated from game 😕",
@@ -439,6 +440,8 @@ async def handle_continue_or_liar(callback_query: types.CallbackQuery):
                     chat_id=previous_player_id,
                     text="Your are dead by real bullet, and eliminated from the game 😕",
                 )
+                if is_user_turn(previous_player_id, game_id):
+                    update_current_turn(game_id)
                 await save_message(previous_player_id, game_id, mjj.message_id)
                 delete_user_from_all_games(previous_player_id)
         else:
@@ -459,6 +462,8 @@ async def handle_continue_or_liar(callback_query: types.CallbackQuery):
                     chat_id=user_id,
                     text="Your are dead by real bullet, and eliminated from the game 😕",
                 )
+                if is_user_turn(user_id, game_id):
+                    update_current_turn(game_id)
                 delete_user_from_all_games(user_id)
                 await save_message(user_id, game_id, mjj.message_id)
         while is_player_dead(game_id, get_current_turn_user_id(game_id)):
