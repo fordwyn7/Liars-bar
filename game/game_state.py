@@ -397,6 +397,7 @@ async def handle_continue_or_liar(callback_query: types.CallbackQuery):
                 )
                 user_ids = cursor.fetchall()
                 for users in user_ids:
+                    users = users[0]
                     if users and is_player_dead(game_id, users):
                         update_game_details(
                             game_id,
@@ -438,7 +439,7 @@ async def handle_continue_or_liar(callback_query: types.CallbackQuery):
             if isinstance(bullet, bool) and bullet:
                 mjj = await bot.send_message(
                     chat_id=previous_player_id,
-                    text="Your are dead by real bullet, and eliminated from the game 😕",
+                    text="Now you shot yourself and dead by real bullet😵\nYou are eliminated from the game 😕",
                 )
                 if is_user_turn(previous_player_id, game_id):
                     update_current_turn(game_id)
@@ -492,6 +493,7 @@ async def handle_continue_or_liar(callback_query: types.CallbackQuery):
             )
             user_ids = cursor.fetchall()
             for users in user_ids:
+                users = users[0]
                 if users and is_player_dead(game_id, users):
                     update_game_details(
                         game_id, users, get_user_nfgame(winner) + " - " + str(winner)

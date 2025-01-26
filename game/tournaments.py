@@ -771,7 +771,7 @@ def get_game_id_from_mes(user_id):
         )
         rows = cursor.fetchall()
         if rows:
-            return rows[-1]
+            return rows[-1][0]
         else:
             return None
     except sqlite3.Error as e:
