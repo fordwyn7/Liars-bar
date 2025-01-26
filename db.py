@@ -961,13 +961,12 @@ async def delete_user_messages(game_id, user_id):
     conn = sqlite3.connect("users_database.db")
     cursor = conn.cursor()
     cursor.execute(
-        "SELECT messages_ingame FROM users_game_states WHERE game_id_user = ? AND user_id = ?",
+        "SELECT message_id FROM user_game_messages WHERE game_id = ? AND user_id = ?",
         (game_id, user_id),
     )
     row = cursor.fetchone()
     if row:
-        message_ids = row[0].split(",")
-        for message_id in message_ids:
+        for message_id in row:
             try:
                 await bot.delete_message(chat_id=user_id, message_id=int(message_id))
             except Exception as e:

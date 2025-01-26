@@ -390,13 +390,12 @@ async def handle_continue_or_liar(callback_query: types.CallbackQuery):
                 cursor.execute(
                     """
                     SELECT user_id
-                    FROM users_game_states
-                    WHERE game_id_user = ?
+                    FROM user_game_messages
+                    WHERE game_id = ?
                     """,
                     (game_id,),
                 )
                 user_ids = cursor.fetchall()
-                user_ids = [row[0] for row in user_ids]
                 for users in user_ids:
                     if users and is_player_dead(game_id, users):
                         update_game_details(
@@ -486,13 +485,12 @@ async def handle_continue_or_liar(callback_query: types.CallbackQuery):
             cursor.execute(
                 """
                 SELECT user_id
-                FROM users_game_states
-                WHERE game_id_user = ?
+                FROM user_game_messages
+                WHERE game_id = ?
                 """,
                 (game_id,),
             )
             user_ids = cursor.fetchall()
-            user_ids = [row[0] for row in user_ids]
             for users in user_ids:
                 if users and is_player_dead(game_id, users):
                     update_game_details(

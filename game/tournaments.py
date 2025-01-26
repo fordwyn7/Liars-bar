@@ -603,12 +603,12 @@ def set_all_users_alive(tournament_id):
 
 async def notify_groups(groups, round_number):
     for idx, group in enumerate(groups, start=1):
-        group_text = ", ".join(f"\n{get_user_nfgame(user_id)} - {user_id}" for user_id in group)
+        group_text = " ".join(f"\n{get_user_nfgame(user_id)} - {user_id}" for user_id in group)
         for user_id in group:
             try:
                 await bot.send_message(
                     chat_id=user_id,
-                    text=f"🏅 Round {round_number} - Group {idx}\n"
+                    text=f"🏅 Round {round_number} - Group {idx}\n\n"
                          f"👥 Players in this game: \n{group_text}\n"
                 )
             except Exception as e:

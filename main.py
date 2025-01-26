@@ -44,17 +44,6 @@ if 'unity_coin' not in column_names:
         ADD COLUMN unity_coin INTEGER DEFAULT 0
         """
     )
-
-cursor.execute(
-    """
-CREATE TABLE IF NOT EXISTS users_game_states (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    user_id INTEGER UNIQUE NOT NULL,
-    game_id_user TEXT,
-    messages_ingame TEXT
-)
-"""
-)
 cursor.execute(
     """
 CREATE TABLE IF NOT EXISTS user_game_messages (
