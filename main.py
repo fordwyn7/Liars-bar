@@ -55,6 +55,16 @@ CREATE TABLE IF NOT EXISTS users_game_states (
 )
 """
 )
+cursor.execute(
+    """
+CREATE TABLE IF NOT EXISTS user_game_messages (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id INTEGER NOT NULL,
+    game_id TEXT NOT NULL,
+    message_id INTEGER NOT NULL
+);
+"""
+)
 
 cursor.execute(
     """

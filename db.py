@@ -912,23 +912,11 @@ async def save_message(user_id, game_id, message_id):
     cursor = conn.cursor()
     try:
         cursor.execute(
-            "SELECT messages_ingame FROM users_game_states WHERE user_id = ?",
-            (user_id,),
-        )
-        result = cursor.fetchone()
-        existing_message_ids = set(result[0].split(",")) if result and result[0] else set()
-        existing_message_ids.add(str(message_id))
-        updated_message_ids = ",".join(existing_message_ids)
-        cursor.execute(
             """
-            INSERT INTO users_game_states (user_id, game_id_user, messages_ingame)
+            INSERT INTO user_game_messages (user_id, game_id, message_id)
             VALUES (?, ?, ?)
-            ON CONFLICT(user_id)
-            DO UPDATE SET
-                game_id_user = excluded.game_id_user,
-                messages_ingame = ?
             """,
-            (user_id, game_id, updated_message_ids, updated_message_ids),
+            (user_id, game_id, message_id),
         )
         conn.commit()
     except sqlite3.Error as e:
@@ -941,27 +929,37 @@ async def save_message(user_id, game_id, message_id):
 async def delete_all_game_messages(game_id):
     conn = sqlite3.connect("users_database.db")
     cursor = conn.cursor()
-    cursor.execute(
-        "SELECT user_id, messages_ingame FROM users_game_states WHERE game_id_user = ?",
-        (game_id,),
-    )
-    rows = cursor.fetchall()
-    for row in rows:
-        user_id = row[0]
-        message_ids = [
-            msg_id for msg_id in row[1].split(",") if msg_id.strip().isdigit()
-        ]
-        for message_id in message_ids:
+    try:
+        # Fetch all messages for the given game
+        cursor.execute(
+            """
+            SELECT user_id, message_id FROM user_game_messages WHERE game_id = ?
+            """,
+            (game_id,),
+        )
+        rows = cursor.fetchall()
+
+        # Delete messages from Telegram
+        for row in rows:
+            user_id, message_id = row
             try:
-                await bot.delete_message(chat_id=user_id, message_id=int(message_id))
+                await bot.delete_message(chat_id=user_id, message_id=message_id)
             except Exception as e:
                 print(f"Error deleting message {message_id} for user {user_id}: {e}")
-    cursor.execute(
-        "UPDATE users_game_states SET messages_ingame = NULL WHERE game_id_user = ?",
-        (game_id,),
-    )
 
-    conn.commit()
+        # Delete messages from the database
+        cursor.execute(
+            """
+            DELETE FROM user_game_messages WHERE game_id = ?
+            """,
+            (game_id,),
+        )
+        conn.commit()
+
+    except sqlite3.Error as e:
+        print(f"Database error: {e}")
+    finally:
+        conn.close()
 
 
 async def delete_user_messages(game_id, user_id):
