@@ -32,8 +32,6 @@ async def deleteeee_tourinit(message: types.Message, state: FSMContext):
             f"🌟 Tournament ID: {tournament['id']}\n\n"
             f"🗓 Started: {tournament['start_time']}\n"
             f"🏁 Ends: {tournament['end_time']}\n\n"
-            f"🗓 Registration started: {tournament['register_start']}\n"
-            f"🏁 Registration ended: {tournament['register_end']}\n\n"
             f"👥 Registered Players: {nop}/{tournament['maximum_players']}\n"
             f"🏆 Prize: \n\n{tournament['prize']}\n\n"
         )
