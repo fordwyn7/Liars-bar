@@ -550,6 +550,7 @@ async def start_tournir_keyborar(message: types.Message, state: FSMContext):
         await message.answer("Not enough participants to start the tournament.", reply_markup=tournaments_admin_panel_button)
         return
     await notify_participants(participants, len(participants))
+    
     round_number = 1
     while len(participants) > 1:
         groups = create_groups(participants)
@@ -604,13 +605,13 @@ def set_all_users_alive(tournament_id):
 
 async def notify_groups(groups, round_number):
     for idx, group in enumerate(groups, start=1):
-        group_text = ", ".join(f"Player {user_id}\n" for user_id in group)
+        group_text = ", ".join(f"\n{get_user_nfgame(user_id)} - {user_id}" for user_id in group)
         for user_id in group:
             try:
                 await bot.send_message(
                     chat_id=user_id,
                     text=f"🏅 Round {round_number} - Group {idx}\n"
-                         f"👥 Players in this game: {group_text}\n"
+                         f"👥 Players in this game: \n{group_text}\n"
                 )
             except Exception as e:
                 print(f"Failed to notify user {user_id}: {e}")
@@ -693,8 +694,7 @@ def determine_round_winners(groups):
     winners = []
     for group in groups:
         for user_id in group:
-            user_status = get_user_status(user_id)
-            if user_status == 'alive':
+            if get_game_id_by_user(user_id):
                 winners.append(user_id)
                 break
     return winners
@@ -704,7 +704,7 @@ async def announce_winner(winner, tournament_name):
     try:
         await bot.send_message(
             chat_id=winner,
-            text=f"🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉\n\n Congratulations! You are the winner of the tournament! 🏆"
+            text=f"🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉\n\n Congratulations! You are the winner of the tournament! 🏆\nYour prizes will be given in a few hours 🏅"
         )
     except Exception as e:
         print(f"Failed to notify the winner {winner}: {e}")
