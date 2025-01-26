@@ -600,6 +600,7 @@ async def cancel_delete_tournament(callback_query: types.CallbackQuery):
         "Tournament deletion has been canceled.",
         reply_markup=upcoming_tournaments_button,
     )
+    await callback_query.message.delete()
 
 
 @dp.callback_query(F.data.startswith("confirm_delete:"))

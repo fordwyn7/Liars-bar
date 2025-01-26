@@ -15,11 +15,42 @@ from game.game_state import send_random_cards_to_players
 @dp.message(F.text == "🏆 tournaments")
 @admin_required()
 async def tournaments_admin_panel(message: types.Message):
-    # await message.answer(f"{create_groups([1,2,3,4,5,6,7,8,9])}")
     await message.answer(
         f"You are in tournaments section. \nPlease choose on of these options 👇",
         reply_markup=tournaments_admin_panel_button,
     )
+
+@dp.message(F.text == "🚫 delete this tournament")
+@admin_required()
+async def deleteeee_tourinit(message: types.Message, state: FSMContext):
+    ongoing_tournament = get_ongoing_tournaments()
+    if ongoing_tournament:
+        tournament = ongoing_tournament[0]
+        nop = get_current_players(tournament["name"])
+        tournament_id = tournament["name"]
+        response = (
+            f"🌟 Tournament ID: {tournament['id']}\n\n"
+            f"🗓 Started: {tournament['start_time']}\n"
+            f"🏁 Ends: {tournament['end_time']}\n\n"
+            f"🗓 Registration started: {tournament['register_start']}\n"
+            f"🏁 Registration ended: {tournament['register_end']}\n\n"
+            f"👥 Registered Players: {nop}/{tournament['maximum_players']}\n"
+            f"🏆 Prize: \n\n{tournament['prize']}\n\n"
+        )
+        keyboard = InlineKeyboardMarkup(
+            inline_keyboard=[
+                [
+                    InlineKeyboardButton(
+                        text="✅ Yes", callback_data=f"confirm_delete:{tournament_id}"
+                    ),
+                    InlineKeyboardButton(text="❌ No", callback_data="cancel_delete"),
+                ]
+            ]
+        )
+        await message.answer(response, reply_markup=keyboard)
+    else:
+        await message.reply("There is no upcoming tournament to delete.")
+        
 
 
 @dp.message(F.text == "back to tournaments panel 🔙")
@@ -573,7 +604,7 @@ def set_all_users_alive(tournament_id):
 
 async def notify_groups(groups, round_number):
     for idx, group in enumerate(groups, start=1):
-        group_text = ", ".join(f"Player {user_id}" for user_id in group)
+        group_text = ", ".join(f"Player {user_id}\n" for user_id in group)
         for user_id in group:
             try:
                 await bot.send_message(
@@ -607,7 +638,6 @@ async def notify_groups(groups, round_number):
         current_table = random.choice(suits)
         cur_table = set_current_table(game_id, current_table)
         players = gn
-        # await bot.send_message(chat_id=1155076760, text=f"{get_all_players_in_game(game_id)}")
         for player in players:
             create_game_record_if_not_exists(game_id, player)
             lent = len(players)

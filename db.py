@@ -930,7 +930,6 @@ async def delete_all_game_messages(game_id):
     conn = sqlite3.connect("users_database.db")
     cursor = conn.cursor()
     try:
-        # Fetch all messages for the given game
         cursor.execute(
             """
             SELECT user_id, message_id FROM user_game_messages WHERE game_id = ?
@@ -938,16 +937,12 @@ async def delete_all_game_messages(game_id):
             (game_id,),
         )
         rows = cursor.fetchall()
-
-        # Delete messages from Telegram
         for row in rows:
             user_id, message_id = row
             try:
                 await bot.delete_message(chat_id=user_id, message_id=message_id)
             except Exception as e:
                 print(f"Error deleting message {message_id} for user {user_id}: {e}")
-
-        # Delete messages from the database
         cursor.execute(
             """
             DELETE FROM user_game_messages WHERE game_id = ?

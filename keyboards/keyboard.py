@@ -212,6 +212,9 @@ ongoing_tournaments_button = ReplyKeyboardMarkup(
             KeyboardButton(text="✅ start the tournament"),
         ],
         [
+            KeyboardButton(text="🚫 delete this tournament"),
+        ],
+        [
             KeyboardButton(text="back to tournaments panel 🔙"),
         ],
     ],
