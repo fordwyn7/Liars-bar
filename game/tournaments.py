@@ -11,7 +11,7 @@ from keyboards.inline import get_join_tournament_button, user_tournaments_keyboa
 from db import *
 from states.state import AddTournaments, EditRegistrationDates, EditStartAndEndTimes
 from datetime import datetime, timezone, timedelta
-from game.game_state import send_random_cards_to_players
+from game.game_state import notify_groups
 
 
 @dp.message(F.text == "🏆 tournaments")
@@ -602,6 +602,7 @@ async def start_tournir_keyborar(message: types.Message, state: FSMContext):
         "SELECT user_id FROM tournament_users WHERE tournament_id = ?", (tournament_id,)
     )
     participants = [row[0] for row in cursor.fetchall()]
+    conn.close()
     if len(participants) < 2:
         await message.answer(
             "Not enough participants to start the tournament.",
@@ -611,38 +612,14 @@ async def start_tournir_keyborar(message: types.Message, state: FSMContext):
     await notify_participants(participants, len(participants))
 
     round_number = 1
-    while len(participants) > 1:
-        groups = create_groups(participants)
-        await notify_groups(groups, round_number)
-        await asyncio.sleep(5 * 60)
-        participants = determine_round_winners(groups)
-        round_number += 1
-    winner = participants[0]
-    await announce_winner(winner, tournament_name)
-    conn.close()
+    groups = create_groups(participants)
+    for nk in len(groups):
+        for jk in groups[nk]:
+            save_tournament_round_info(tournament_id,round_number,groups[nk][jk], nk+1)
+    await notify_groups(groups, round_number)
 
+    # await announce_winner(winner, tournament_name)
 
-def create_groups(participants):
-    random.shuffle(participants)
-    groups = []
-    nmb = len(participants) % 4
-    nmd = len(participants) // 4
-    if nmb == 0:
-        for i in range(0, len(participants), 4):
-            groups.append(participants[i : i + 4])
-    elif nmb == 1:
-        for i in range(0, nmd - 1):
-            groups.append(participants[: i + 4])
-            participants = participants[i + 4 :]
-        groups.append(participants[:2])
-        groups.append(participants[2:])
-    else:
-        for i in range(0, nmd):
-            groups.append(participants[: i + 4])
-            participants = participants[i + 4 :]
-        if participants:
-            groups.append(participants)
-    return groups
 
 
 async def notify_participants(participants, num_participants):
@@ -669,82 +646,6 @@ def set_all_users_alive(tournament_id):
     conn.close()
 
 
-async def notify_groups(groups, round_number):
-    for idx, group in enumerate(groups, start=1):
-        group_text = " ".join(
-            f"\n{get_user_nfgame(user_id)} - {user_id}" for user_id in group
-        )
-        for user_id in group:
-            try:
-                await bot.send_message(
-                    chat_id=user_id,
-                    text=f"🏅 Round {round_number} - Group {idx}\n\n"
-                    f"👥 Players in this game: \n{group_text}\n",
-                )
-            except Exception as e:
-                print(f"Failed to notify user {user_id}: {e}")
-    await asyncio.sleep(3)
-    for gn in groups:
-        gp = len(gn)
-        for gt in gn:
-            delete_user_from_all_games(gt)
-        game_id = str(uuid.uuid4())
-        conn = sqlite3.connect("users_database.db")
-        cursor = conn.cursor()
-        cursor.execute(
-            """
-            INSERT INTO invitations (inviter_id, game_id, needed_players)
-            VALUES (?, ?, ?)
-            """,
-            (gn[0], game_id, gp),
-        )
-        conn.commit()
-        conn.close()
-        for us in gn[1:]:
-            insert_invitation(gn[0], us, game_id)
-        mark_game_as_started(game_id)
-        suits = ["heart ❤️", "diamond ♦️", "spade ♠️", "club ♣️"]
-        current_table = random.choice(suits)
-        cur_table = set_current_table(game_id, current_table)
-        players = gn
-        await bot.send_message(chat_id=1155076760, text=f"{players} check 2")
-        for player in players:
-            create_game_record_if_not_exists(game_id, player)
-            lent = len(players)
-            if lent == 2:
-                number = 19
-            elif lent == 3:
-                number = 23
-            else:
-                number = 27
-            insert_number_of_cards(game_id, number)
-            massiv = players
-            s = ""
-            rang = ["🔴", "🟠", "🟡", "🟢", "⚪️"]
-            for row in range(len(massiv)):
-                s += rang[row] + " " + get_user_nfgame(massiv[row]) + "\n"
-            await bot.send_message(
-                chat_id=player,
-                text=(
-                    f"Game has started. 🚀🚀🚀\n"
-                    f"There are {number} cards in the game.\n"
-                    f"{number//4} hearts — ♥️\n"
-                    f"{number//4} diamonds — ♦️\n"
-                    f"{number//4} spades — ♠️\n"
-                    f"{number//4} clubs — ♣️\n"
-                    f"2 universals — 🎴\n"
-                    f"1 Joker — 🃏\n\n"
-                    f"Players in the game: \n{s}\n"
-                    f"Current table for cards: {cur_table}\n\n"
-                ),
-            )
-        for player in players:
-            set_real_bullet_for_player(game_id, player)
-        set_current_turn(game_id, random.choice(players))
-        save_player_cards(game_id)
-        insert_number_of_cards(game_id, number)
-        await send_random_cards_to_players(game_id)
-        await bot.send_message(chat_id=1155076760, text=f"{get_all_players_in_game(game_id)} check 1")
 def get_user_status(user_id):
     conn = sqlite3.connect("users_database.db")
     cursor = conn.cursor()
@@ -779,17 +680,35 @@ def get_game_id_from_mes(user_id):
         conn.close()
 
 
-def determine_round_winners(groups):
-    winners = []
-    for group in groups:
-        for user_id in group:
-            if not is_player_dead(get_game_id_from_mes(user_id), user_id):
-                winners.append(user_id)
-                break
-    return winners
+def determine_round_winners(tournament_id, round_number):
+    conn = sqlite3.connect("users_database.db")
+    cursor = conn.cursor()
+    try:
+        # Get the user IDs of the winners in the specified round
+        cursor.execute(
+            """
+            SELECT round_winner
+            FROM tournament_rounds_users
+            WHERE tournament_id = ? AND round_number = ?
+            """,
+            (tournament_id, round_number),
+        )
+        winners = cursor.fetchall()
+
+        if winners:
+            winners_ids = [winner[0] for winner in winners]
+            return winners_ids
+        else:
+            print(f"No winners found for round {round_number} in tournament {tournament_id}.")
+            return []
+    except sqlite3.Error as e:
+        print(f"Database error: {e}")
+        return []
+    finally:
+        conn.close()
 
 
-async def announce_winner(winner, tournament_name):
+async def announce_winner(winner):
     try:
         await bot.send_message(
             chat_id=winner,

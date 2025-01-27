@@ -409,7 +409,16 @@ async def handle_continue_or_liar(callback_query: types.CallbackQuery):
                             chat_id=users,
                             text=f"The game in which you died has ended ⭐️\nWinner: {get_user_nfgame(winner)} — {winner} 🏆",
                         )
-
+                tournament_id = get_tournament_id_by_user(winner)
+                if tournament_id and is_user_in_tournament(tournament_id, winner):
+                    save_round_winner(tournament_id, winner, winner)
+                    plrs = get_users_in_round(tournament_id, cur_round)
+                    cur_round = get_current_round_number(tournament_id)
+                    nopir = int(get_number_of_groups_in_round(tournament_id, cur_round))
+                    if int(get_number_of_winners(tournament_id, cur_round)) == nopir:
+                        notify_round_results(tournament_id, cur_round)
+                    if not update_tournament_winner_if_round_finished(tournament_id, cur_round) == 12:
+                        start_next_round(plrs, tournament_id, cur_round)
                 delete_game(game_id)
                 await delete_all_game_messages(game_id)
                 return
@@ -504,7 +513,16 @@ async def handle_continue_or_liar(callback_query: types.CallbackQuery):
                         chat_id=users,
                         text=f"The game in which you died has ended ⭐️\nWinner: {get_user_nfgame(winner)} — {winner} 🏆",
                     )
-
+            tournament_id = get_tournament_id_by_user(winner)
+            if tournament_id and is_user_in_tournament(tournament_id, winner):
+                save_round_winner(tournament_id, winner, winner)
+                plrs = get_users_in_round(tournament_id, cur_round)
+                cur_round = get_current_round_number(tournament_id)
+                nopir = int(get_number_of_groups_in_round(tournament_id, cur_round))
+                if int(get_number_of_winners(tournament_id, cur_round)) == nopir:
+                    notify_round_results(tournament_id, cur_round)
+                if not update_tournament_winner_if_round_finished(tournament_id, cur_round) == 12:
+                    start_next_round(plrs, tournament_id, cur_round)
             delete_game(game_id)
             await delete_all_game_messages(game_id)
             return
@@ -627,3 +645,85 @@ async def send_cards_update_to_players(game_id, player_id, num_cards_sent):
             ),
         )
         await save_message(p_id, game_id, mss.message_id)
+
+async def start_next_round(participants, tournament_id, round_number):
+    groups = create_groups(participants)
+    for nk in len(groups):
+        for jk in groups[nk]:
+            save_tournament_round_info(tournament_id,round_number,groups[nk][jk], nk+1)
+    await notify_groups(groups, round_number)
+import uuid
+async def notify_groups(groups, round_number):
+    for idx, group in enumerate(groups, start=1):
+        group_text = " ".join(
+            f"\n{get_user_nfgame(user_id)} - {user_id}" for user_id in group
+        )
+        for user_id in group:
+            try:
+                await bot.send_message(
+                    chat_id=user_id,
+                    text=f"🏅 Round {round_number} - Group {idx}\n\n"
+                    f"👥 Players in this game: \n{group_text}\n",
+                )
+            except Exception as e:
+                print(f"Failed to notify user {user_id}: {e}")
+    await asyncio.sleep(3)
+    for gn in groups:
+        gp = len(gn)
+        for gt in gn:
+            delete_user_from_all_games(gt)
+        game_id = str(uuid.uuid4())
+        conn = sqlite3.connect("users_database.db")
+        cursor = conn.cursor()
+        cursor.execute(
+            """
+            INSERT INTO invitations (inviter_id, game_id, needed_players)
+            VALUES (?, ?, ?)
+            """,
+            (gn[0], game_id, gp),
+        )
+        conn.commit()
+        conn.close()
+        for us in gn[1:]:
+            insert_invitation(gn[0], us, game_id)
+        mark_game_as_started(game_id)
+        suits = ["heart ❤️", "diamond ♦️", "spade ♠️", "club ♣️"]
+        current_table = random.choice(suits)
+        cur_table = set_current_table(game_id, current_table)
+        players = gn
+        for player in players:
+            create_game_record_if_not_exists(game_id, player)
+            lent = len(players)
+            if lent == 2:
+                number = 19
+            elif lent == 3:
+                number = 23
+            else:
+                number = 27
+            insert_number_of_cards(game_id, number)
+            massiv = players
+            s = ""
+            rang = ["🔴", "🟠", "🟡", "🟢", "⚪️"]
+            for row in range(len(massiv)):
+                s += rang[row] + " " + get_user_nfgame(massiv[row]) + "\n"
+            await bot.send_message(
+                chat_id=player,
+                text=(
+                    f"Game has started. 🚀🚀🚀\n"
+                    f"There are {number} cards in the game.\n"
+                    f"{number//4} hearts — ♥️\n"
+                    f"{number//4} diamonds — ♦️\n"
+                    f"{number//4} spades — ♠️\n"
+                    f"{number//4} clubs — ♣️\n"
+                    f"2 universals — 🎴\n"
+                    f"1 Joker — 🃏\n\n"
+                    f"Players in the game: \n{s}\n"
+                    f"Current table for cards: {cur_table}\n\n"
+                ),
+            )
+        for player in players:
+            set_real_bullet_for_player(game_id, player)
+        set_current_turn(game_id, random.choice(players))
+        save_player_cards(game_id)
+        insert_number_of_cards(game_id, number)
+        await send_random_cards_to_players(game_id)

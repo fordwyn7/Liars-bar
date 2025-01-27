@@ -21,11 +21,9 @@ def is_user_in_tournament_and_active(user_id):
         (user_id,),
     )
     tournament_data = cursor.fetchone()
-
     if not tournament_data:
         conn.close()
         return False
-
     tournament_id, user_status = tournament_data
     if user_status != "alive":
         conn.close()
@@ -840,7 +838,8 @@ async def shoot_self(game_id, player_id):
                 (game_id, player_id),
             )
             conn.commit()
-            set_user_status(player_id, "died")
+            if get_tournament_id_by_user(player_id) and is_user_in_tournament(get_tournament_id_by_user(player_id), player_id):
+                set_user_status(player_id, "died")
             return True
         else:
             blanks_count += 1
@@ -1121,6 +1120,27 @@ def get_upcoming_tournaments():
         return []
     finally:
         conn.close()
+def get_tournament_id_by_user(user_id: int):
+    conn = sqlite3.connect("users_database.db")
+    cursor = conn.cursor()
+    try:
+        cursor.execute(
+            """
+            SELECT tournament_id FROM tournament_users
+            WHERE user_id = ?
+            """,
+            (user_id,),
+        )
+        result = cursor.fetchone()
+        if result:
+            return result[-1][0]
+        else:
+            return None
+    except sqlite3.Error as e:
+        print(f"Database error: {e}")
+        return None
+    finally:
+        conn.close()
 
 
 def get_tournament_archive():
@@ -1268,6 +1288,350 @@ def get_ongoing_tournaments():
         return tournaments
     except sqlite3.Error as e:
         print(f"❌ Database error: {e}")
+        return []
+    finally:
+        conn.close()
+
+
+def save_tournament_round_info(tournament_id: str, round_number: str, round_user_id: str, group_number: str):
+    conn = sqlite3.connect("users_database.db")
+    cursor = conn.cursor()
+    try:
+        cursor.execute(
+            """
+            INSERT INTO tournament_rounds_users (tournament_id, round_number, round_user_id, group_number, round_winner)
+            VALUES (?, ?, ?, ?, NULL)
+            """,
+            (tournament_id, round_number, round_user_id, group_number),
+        )
+        conn.commit()
+    except sqlite3.Error as e:
+        print(f"Database error: {e}")
+    finally:
+        conn.close()
+
+
+def save_round_winner(tournament_id: str, round_user_id: str, round_winner: str):
+    conn = sqlite3.connect("users_database.db")
+    cursor = conn.cursor()
+    try:
+        cursor.execute(
+            """
+            SELECT round_number, group_number
+            FROM tournament_rounds_users
+            WHERE tournament_id = ? AND round_user_id = ?
+            LIMIT 1
+            """,
+            (tournament_id, round_user_id),
+        )
+        result = cursor.fetchone()
+
+        if result:
+            round_number, group_number = result
+            cursor.execute(
+                """
+                UPDATE tournament_rounds_users
+                SET round_winner = ?
+                WHERE tournament_id = ? AND round_number = ? AND group_number = ?
+                """,
+                (round_winner, tournament_id, round_number, group_number),
+            )
+            conn.commit()
+        else:
+            print("Round and group not found for the given user.")
+    except sqlite3.Error as e:
+        print(f"Database error: {e}")
+    finally:
+        conn.close()
+        
+def get_current_round_number(tournament_id: str) -> str:
+    conn = sqlite3.connect("users_database.db")
+    cursor = conn.cursor()
+    try:
+        # Fetch the latest round number for the given tournament
+        cursor.execute(
+            """
+            SELECT round_number
+            FROM tournament_rounds_users
+            WHERE tournament_id = ?
+            ORDER BY CAST(round_number AS INTEGER) DESC
+            LIMIT 1
+            """,
+            (tournament_id,),
+        )
+        result = cursor.fetchone()
+        return result[0] if result else "1"  # Return "1" if no rounds are found
+    except sqlite3.Error as e:
+        print(f"Database error: {e}")
+        return "1"
+    finally:
+        conn.close()
+
+
+def get_number_of_winners(tournament_id: str, round_number: str) -> int:
+    conn = sqlite3.connect("users_database.db")
+    cursor = conn.cursor()
+    try:
+        # Count the number of winners in the specified round
+        cursor.execute(
+            """
+            SELECT COUNT(DISTINCT round_winner)
+            FROM tournament_rounds_users
+            WHERE tournament_id = ? AND round_number = ? AND round_winner IS NOT NULL
+            """,
+            (tournament_id, round_number),
+        )
+        result = cursor.fetchone()
+        return result[0] if result else 0
+    except sqlite3.Error as e:
+        print(f"Database error: {e}")
+        return 0
+    finally:
+        conn.close()
+
+
+def get_all_users_in_tournament(tournament_id: str) -> list:
+    conn = sqlite3.connect("users_database.db")
+    cursor = conn.cursor()
+    try:
+        cursor.execute(
+            """
+            SELECT user_id
+            FROM tournament_users
+            WHERE tournament_id = ?
+            """,
+            (tournament_id,),
+        )
+        result = cursor.fetchall()
+        return len(result)
+    except sqlite3.Error as e:
+        print(f"Database error: {e}")
+        return []
+    finally:
+        conn.close()
+
+async def notify_round_results(tournament_id: str, round_number: str):
+    conn = sqlite3.connect("users_database.db")
+    cursor = conn.cursor()
+    try:
+        cursor.execute(
+            """
+            SELECT group_number, round_winner
+            FROM tournament_rounds_users
+            WHERE tournament_id = ? AND round_number = ?
+            """,
+            (tournament_id, round_number),
+        )
+        group_results = cursor.fetchall()
+
+        # Prepare the message with the results
+        if not group_results:
+            return f"No results found for round {round_number} in tournament {tournament_id}."
+        
+        results_message = f"🏆 **Round {round_number} Results** 🏆\n"
+        for group_number, winner_id in group_results:
+            if winner_id:
+                results_message += f"- Winner from Group {group_number}: Player {winner_id}\n"
+            else:
+                results_message += f"- Group {group_number}: No winner yet\n"
+
+        cursor.execute(
+            """
+            SELECT user_id
+            FROM tournament_users
+            WHERE tournament_id = ?
+            """,
+            (tournament_id,),
+        )
+        all_users = cursor.fetchall()
+        user_ids = [row[0] for row in all_users]
+
+        for user_id in user_ids:
+            try:
+                await bot.send_message(
+                    chat_id=user_id,
+                    text=results_message,
+                    parse_mode="Markdown",
+                )
+            except Exception as e:
+                print(f"Failed to send message to user {user_id}: {e}")
+
+        return f"Round {round_number} results sent to all players in tournament {tournament_id}."
+
+    except sqlite3.Error as e:
+        print(f"Database error: {e}")
+        return f"Error fetching round results for tournament {tournament_id}."
+    finally:
+        conn.close()
+
+def get_number_of_players_in_round(tournament_id: str, round_number: str):
+    conn = sqlite3.connect("users_database.db")
+    cursor = conn.cursor()
+    try:
+        # Count the number of players in the specific round
+        cursor.execute(
+            """
+            SELECT COUNT(*)
+            FROM tournament_rounds_users
+            WHERE tournament_id = ? AND round_number = ?
+            """,
+            (tournament_id, round_number),
+        )
+        result = cursor.fetchone()
+        return result[0] if result else 0
+    except sqlite3.Error as e:
+        print(f"Database error: {e}")
+        return 0
+    finally:
+        conn.close()
+def get_number_of_groups_in_round(tournament_id: str, round_number: str):
+    conn = sqlite3.connect("users_database.db")
+    cursor = conn.cursor()
+    try:
+        # Count the distinct groups in the specific round
+        cursor.execute(
+            """
+            SELECT COUNT(DISTINCT group_number)
+            FROM tournament_rounds_users
+            WHERE tournament_id = ? AND round_number = ?
+            """,
+            (tournament_id, round_number),
+        )
+        result = cursor.fetchone()
+        return result[0] if result else 0
+    except sqlite3.Error as e:
+        print(f"Database error: {e}")
+        return 0
+    finally:
+        conn.close()
+def update_tournament_winner_if_round_finished(tournament_id: str, round_number: str):
+    conn = sqlite3.connect("users_database.db")
+    cursor = conn.cursor()
+    try:
+        # Get the number of groups in the round
+        cursor.execute(
+            """
+            SELECT COUNT(DISTINCT group_number)
+            FROM tournament_rounds_users
+            WHERE tournament_id = ? AND round_number = ?
+            """,
+            (tournament_id, round_number),
+        )
+        result = cursor.fetchone()
+        
+        # If there is only one group in the round, update the winner of the tournament
+        if result and result[0] == 1:
+            # Find the winner of the round (from the round with 1 group)
+            cursor.execute(
+                """
+                SELECT round_winner
+                FROM tournament_rounds_users
+                WHERE tournament_id = ? AND round_number = ? AND group_number = '1'
+                LIMIT 1
+                """,
+                (tournament_id, round_number),
+            )
+            winner_result = cursor.fetchone()
+            if winner_result:
+                winner = winner_result[0]
+                cursor.execute(
+                    """
+                    UPDATE tournaments_table
+                    SET tournament_winner = ?
+                    WHERE tournament_id = ?
+                    """,
+                    (winner, tournament_id),
+                )
+                conn.commit()
+                inform_all_users_tournament_ended(tournament_id, winner)
+                print(f"Winner {winner} has been saved to the tournament.")
+                return 12
+            else:
+                print("No winner found for this round.")
+        else:
+            print("This round has more than one group, winner cannot be determined yet.")
+    except sqlite3.Error as e:
+        print(f"Database error: {e}")
+    finally:
+        conn.close()
+
+async def inform_all_users_tournament_ended(tournament_id: str, winner_id: int, bot):
+    conn = sqlite3.connect("users_database.db")
+    cursor = conn.cursor()
+    try:
+        # Step 1: Get all user IDs in the tournament
+        cursor.execute(
+            """
+            SELECT user_id
+            FROM tournament_users
+            WHERE tournament_id = ?
+            """,
+            (tournament_id,),
+        )
+        users = cursor.fetchall()
+
+        # Step 2: Get winner details (e.g., their name)
+        winner_name = get_user_nfgame(winner_id)  # Assuming this function gives winner's name
+
+        # Prepare the message to notify all players about the tournament end and the winner
+        message = (
+            f"🏁 **Tournament Ended!** 🏆\n\n"
+            f"Thank you for participating in **Tournament {tournament_id}**! 🎮\n\n"
+            f"🥇 **The Winner is: {winner_name} (ID: {winner_id})** 🎉\n\n"
+            f"Congrats to the champion! Stay tuned for more tournaments. 🏅"
+        )
+
+        # Step 3: Send the message to all users in the tournament
+        for user in users:
+            user_id = user[0]
+            try:
+                # Send the message to each user
+                await bot.send_message(chat_id=user_id, text=message)
+            except Exception as e:
+                print(f"Error sending message to {user_id}: {e}")
+    except sqlite3.Error as e:
+        print(f"Database error: {e}")
+    finally:
+        conn.close()
+
+def create_groups(participants):
+    random.shuffle(participants)
+    groups = []
+    nmb = len(participants) % 4
+    nmd = len(participants) // 4
+    if nmb == 0:
+        for i in range(0, len(participants), 4):
+            groups.append(participants[i : i + 4])
+    elif nmb == 1:
+        for i in range(0, nmd - 1):
+            groups.append(participants[: i + 4])
+            participants = participants[i + 4 :]
+        groups.append(participants[:2])
+        groups.append(participants[2:])
+    else:
+        for i in range(0, nmd):
+            groups.append(participants[: i + 4])
+            participants = participants[i + 4 :]
+        if participants:
+            groups.append(participants)
+    return groups
+
+def get_users_in_round(tournament_id: str, round_number: str):
+    conn = sqlite3.connect("users_database.db")
+    cursor = conn.cursor()
+    try:
+        cursor.execute(
+            """
+            SELECT round_user_id
+            FROM tournament_rounds_users
+            WHERE tournament_id = ? AND round_number = ?
+            """,
+            (tournament_id, round_number),
+        )
+        users = cursor.fetchall()
+        return [user[0] for user in users]  # Returns a list of user IDs
+    except sqlite3.Error as e:
+        print(f"Database error: {e}")
         return []
     finally:
         conn.close()

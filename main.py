@@ -67,6 +67,7 @@ CREATE TABLE IF NOT EXISTS game_archive (
 )
 """
 )
+
 cursor.execute(
     """
     CREATE TABLE IF NOT EXISTS invitations (
@@ -130,6 +131,18 @@ CREATE TABLE IF NOT EXISTS tournament_users (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     tournament_id TEXT,
     user_id INTEGER
+)
+"""
+)
+cursor.execute(
+    """
+CREATE TABLE IF NOT EXISTS tournament_rounds_users (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    tournament_id TEXT,
+    round_number TEXT,
+    round_user_id TEXT,
+    group_number TEXT,
+    round_winner TEXT
 )
 """
 )
