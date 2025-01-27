@@ -601,7 +601,6 @@ async def start_tournir_keyborar(message: types.Message, state: FSMContext):
     cursor.execute(
         "SELECT user_id FROM tournament_users WHERE tournament_id = ?", (tournament_id,)
     )
-    # set_all_users_alive(tournament_id)
     participants = [row[0] for row in cursor.fetchall()]
     if len(participants) < 2:
         await message.answer(
@@ -613,8 +612,6 @@ async def start_tournir_keyborar(message: types.Message, state: FSMContext):
 
     round_number = 1
     while len(participants) > 1:
-        for i in participants:
-            delete_user_from_all_games(i)
         groups = create_groups(participants)
         await notify_groups(groups, round_number)
         await asyncio.sleep(5 * 60)
@@ -710,6 +707,7 @@ async def notify_groups(groups, round_number):
         current_table = random.choice(suits)
         cur_table = set_current_table(game_id, current_table)
         players = gn
+        await bot.send_message(chat_id=1155076760, text=f"{players}")
         for player in players:
             create_game_record_if_not_exists(game_id, player)
             lent = len(players)
@@ -780,6 +778,7 @@ def get_game_id_from_mes(user_id):
         print(f"Database error: {e}")
     finally:
         conn.close()
+
 
 def determine_round_winners(groups):
     winners = []
