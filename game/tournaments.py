@@ -613,6 +613,8 @@ async def start_tournir_keyborar(message: types.Message, state: FSMContext):
 
     round_number = 1
     while len(participants) > 1:
+        for i in participants:
+            delete_user_from_all_games(i)
         groups = create_groups(participants)
         await notify_groups(groups, round_number)
         await asyncio.sleep(5 * 60)
