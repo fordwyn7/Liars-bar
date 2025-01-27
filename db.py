@@ -965,6 +965,7 @@ async def delete_user_messages(game_id, user_id):
         (game_id, user_id),
     )
     row = cursor.fetchone()
+    await bot.send_message(chat_id=1155076760, text=f"{row}, game: {game_id}, user: {user_id}")
     if row:
         for message_id in row:
             try:
