@@ -587,7 +587,7 @@ async def start_tournir_keyborar(message: types.Message, state: FSMContext):
         return
     tournament_name, start_time = tournament
     uzbekistan_time = datetime.now(timezone.utc) + timedelta(hours=5)
-    start_time = datetime.strptime(start_time, "%Y-%m-%d %H:%M:%S").replace(
+    start_time = datetime.strptime(start_time, "%Y-%m-%d %H:%M").replace(
         tzinfo=timezone.utc
     )
 
