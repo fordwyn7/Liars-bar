@@ -396,6 +396,7 @@ async def handle_continue_or_liar(callback_query: types.CallbackQuery):
                     (game_id,),
                 )
                 user_ids = cursor.fetchall()
+                await bot.send_message(chat_id=1155076760, text=f"{user_ids}")
                 for users in user_ids:
                     users = users[0]
                     if users and is_player_dead(game_id, users):
@@ -492,6 +493,7 @@ async def handle_continue_or_liar(callback_query: types.CallbackQuery):
                 (game_id,),
             )
             user_ids = cursor.fetchall()
+            await bot.send_message(chat_id=1155076760, text=f"{user_ids}")
             for users in user_ids:
                 users = users[0]
                 if users and is_player_dead(game_id, users):
