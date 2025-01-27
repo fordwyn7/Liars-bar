@@ -957,24 +957,28 @@ async def delete_all_game_messages(game_id):
         conn.close()
 
 
-async def delete_user_messages(game_id, user_id):
+async def delete_user_messages(game_id, userid):
     conn = sqlite3.connect("users_database.db")
     cursor = conn.cursor()
-    cursor.execute(
-        "SELECT message_id FROM user_game_messages WHERE game_id = ? AND user_id = ?",
-        (game_id, user_id),
-    )
-    row = cursor.fetchone()
-    await bot.send_message(chat_id=1155076760, text=f"{row}, game: {game_id}, user: {user_id}")
-    if row:
-        for message_id in row:
-            try:
-                await bot.delete_message(chat_id=user_id, message_id=int(message_id))
-            except Exception as e:
-                print(f"Error deleting message {message_id} for user {user_id}: {e}")
-        conn.commit()
-    else:
-        print(f"No messages found for user {user_id} in game {game_id}")
+    try:
+        cursor.execute(
+            """
+            SELECT user_id, message_id FROM user_game_messages WHERE game_id = ?
+            """,
+            (game_id,),
+        )
+        rows = cursor.fetchall()
+        for row in rows:
+            user_id, message_id = row
+            if user_id == userid:
+                try:
+                    await bot.delete_message(chat_id=user_id, message_id=message_id)
+                except Exception as e:
+                    print(f"Error deleting message {message_id} for user {user_id}: {e}")
+    except sqlite3.Error as e:
+        print(f"Database error: {e}")
+    finally:
+        conn.close()
 
 
 def get_all_user_ids():
