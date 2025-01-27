@@ -1215,14 +1215,28 @@ def get_current_players(tournament_id: str) -> int:
 def delete_tournament(tournament_id: str):
     conn = sqlite3.connect("users_database.db")
     cursor = conn.cursor()
-    cursor.execute(
-        "DELETE FROM tournament_users WHERE tournament_id = ?", (tournament_id,)
-    )
-    cursor.execute(
-        "DELETE FROM tournaments_table WHERE tournament_id = ?", (tournament_id,)
-    )
-    conn.commit()
-    conn.close()
+    try:
+        cursor.execute(
+            "SELECT user_id FROM tournament_users WHERE tournament_id = ?", (tournament_id,)
+        )
+        users = cursor.fetchall()
+
+        for user in users:
+            user_id = user[0]
+            delete_user_from_all_games(user_id)
+
+        cursor.execute(
+            "DELETE FROM tournament_users WHERE tournament_id = ?", (tournament_id,)
+        )
+        cursor.execute(
+            "DELETE FROM tournaments_table WHERE tournament_id = ?", (tournament_id,)
+        )
+
+        conn.commit()
+    except sqlite3.Error as e:
+        print(f"Database error: {e}")
+    finally:
+        conn.close()
 
 
 def get_ongoing_tournaments():
