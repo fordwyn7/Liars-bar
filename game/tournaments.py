@@ -192,7 +192,7 @@ async def set_registration_start_date(message: types.Message, state: FSMContext)
         await state.clear()
         return
     try:
-        start_date = datetime.strptime(message.text, "%Y-%m-%d %H:%M:%S")
+        start_date = datetime.strptime(message.text, "%Y-%m-%d %H:%M")
         await state.update_data(registration_start=start_date)
         await message.answer(
             "Please enter the registration end date (YYYY-MM-DD HH:MM):",
@@ -216,7 +216,7 @@ async def set_registration_end_date(message: types.Message, state: FSMContext):
         await state.clear()
         return
     try:
-        end_date = datetime.strptime(message.text, "%Y-%m-%d %H:%M:%S")
+        end_date = datetime.strptime(message.text, "%Y-%m-%d %H:%M")
         data = await state.get_data()
         if end_date <= data["registration_start"]:
             await message.answer(
@@ -247,7 +247,7 @@ async def set_tournament_start_date(message: types.Message, state: FSMContext):
         await state.clear()
         return
     try:
-        start_date = datetime.strptime(message.text, "%Y-%m-%d %H:%M:%S")
+        start_date = datetime.strptime(message.text, "%Y-%m-%d %H:%M")
         data = await state.get_data()
         if start_date <= data["registration_end"]:
             await message.answer(
@@ -278,7 +278,7 @@ async def set_tournament_end_date(message: types.Message, state: FSMContext):
         await state.clear()
         return
     try:
-        end_date = datetime.strptime(message.text, "%Y-%m-%d %H:%M:%S")
+        end_date = datetime.strptime(message.text, "%Y-%m-%d %H:%M")
         data = await state.get_data()
         if end_date <= data["tournament_start"]:
             await message.answer(
@@ -393,7 +393,7 @@ async def set_new_start_date_single(message: types.Message, state: FSMContext):
         return
     new_start_date = message.text.strip()
     try:
-        datetime.strptime(new_start_date, "%Y-%m-%d %H:%M:%S")
+        datetime.strptime(new_start_date, "%Y-%m-%d %H:%M")
     except ValueError:
         await message.answer(
             "Invalid date format. Please use `YYYY-MM-DD HH:MM`. Try again.",
@@ -422,7 +422,7 @@ async def set_new_end_date_single(message: types.Message, state: FSMContext):
         return
     new_end_date = message.text.strip()
     try:
-        datetime.strptime(new_end_date, "%Y-%m-%d %H:%M:%S")
+        datetime.strptime(new_end_date, "%Y-%m-%d %H:%M")
     except ValueError:
         await message.answer(
             "Invalid date format. Please use `YYYY-MM-DD HH:MM`. Try again.",
@@ -498,7 +498,7 @@ async def set_new_start_date(message: types.Message, state: FSMContext):
         return
     new_start_date = message.text.strip()
     try:
-        datetime.strptime(new_start_date, "%Y-%m-%d %H:%M:%S")
+        datetime.strptime(new_start_date, "%Y-%m-%d %H:%M")
     except ValueError:
         await message.answer(
             "Invalid date format. Please use `YYYY-MM-DD HH:MM`. Try again.",
@@ -527,7 +527,7 @@ async def set_new_end_date(message: types.Message, state: FSMContext):
         return
     new_end_date = message.text.strip()
     try:
-        datetime.strptime(new_end_date, "%Y-%m-%d %H:%M:%S")
+        datetime.strptime(new_end_date, "%Y-%m-%d %H:%M")
     except ValueError:
         await message.answer(
             "Invalid date format. Please use `YYYY-MM-DD HH:MM`. Try again.",
@@ -707,7 +707,7 @@ async def notify_groups(groups, round_number):
         current_table = random.choice(suits)
         cur_table = set_current_table(game_id, current_table)
         players = gn
-        await bot.send_message(chat_id=1155076760, text=f"{players}")
+        await bot.send_message(chat_id=1155076760, text=f"{players} check 2")
         for player in players:
             create_game_record_if_not_exists(game_id, player)
             lent = len(players)
@@ -744,7 +744,7 @@ async def notify_groups(groups, round_number):
         save_player_cards(game_id)
         insert_number_of_cards(game_id, number)
         await send_random_cards_to_players(game_id)
-        await bot.send_message(chat_id=1155076760, text=f"{get_all_players_in_game(game_id)}")
+        await bot.send_message(chat_id=1155076760, text=f"{get_all_players_in_game(game_id)} check 1")
 def get_user_status(user_id):
     conn = sqlite3.connect("users_database.db")
     cursor = conn.cursor()
