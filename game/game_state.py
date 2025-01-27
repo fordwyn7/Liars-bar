@@ -612,17 +612,6 @@ async def reset_game_for_all_players(game_id):
     await send_random_cards_to_players(game_id)
 
 
-def get_alive_number(game_id):
-    players = get_all_players_in_game(game_id)
-    alive = []
-    for i in players:
-        if not i or is_player_dead(game_id, i):
-            continue
-        alive.append(i)
-    if len(alive) == 1:
-        return alive[0]
-    return 0
-
 
 async def send_cards_update_to_players(game_id, player_id, num_cards_sent):
     players = get_all_players_in_game(game_id)

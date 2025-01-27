@@ -97,6 +97,16 @@ def add_admin(user_id):
     conn.commit()
     conn.close()
 
+def get_alive_number(game_id):
+    players = get_all_players_in_game(game_id)
+    alive = []
+    for i in players:
+        if not i or is_player_dead(game_id, i):
+            continue
+        alive.append(i)
+    if len(alive) == 1:
+        return alive[0]
+    return 0
 
 def get_game_inviter_id(game_id):
     try:

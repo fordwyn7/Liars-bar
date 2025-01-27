@@ -217,6 +217,7 @@ async def player_quit_game(user_id, game_id, inviter_id):
         cursor.execute(
             "SELECT nfgame FROM users_database WHERE user_id = ?", (user_id,)
         )
+        
         player_name = cursor.fetchone()
         if player_name:
             player_name = get_user_nfgame(user_id)
@@ -225,10 +226,9 @@ async def player_quit_game(user_id, game_id, inviter_id):
                     inviter_id,
                     f"Player {player_name} has quit the game.\nPlayers left in the game: {get_player_count(game_id)}",
                 )
-                await delete_user_messages(game_id, user_id)
             except Exception as e:
                 print(f"Error sending message to creator {inviter_id}: {e}")
-
+        
 
 @dp.callback_query(lambda c: c.data == "cancel_game")
 async def handle_quit_game(callback_query: types.CallbackQuery):
@@ -251,8 +251,6 @@ async def handle_quit_game(callback_query: types.CallbackQuery):
                     f"Now it is your turn! You can't leave the game at that time🙅‍♂️"
                 )
                 return
-            # await callback_query.message.answer(game_id+"    3")
-
             update_game_details(game_id, user.id, None)
             cursor.execute(
                 "DELETE FROM invitations WHERE invitee_id = ? AND game_id = ?",
@@ -267,6 +265,40 @@ async def handle_quit_game(callback_query: types.CallbackQuery):
             )
             await delete_user_messages(game_id, user.id)
             delete_user_from_all_games(user.id)
+            winner = get_alive_number(game_id)
+            if winner != 0:
+                await bot.send_message(
+                    chat_id=winner,
+                    text=f"Game has finished. \nYou are winner. 🥳🥳🥳🥳🥳\nConguratulation on winning in the game. \n🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉",
+                    reply_markup=get_main_menu(winner),
+                )
+                update_game_details(
+                    game_id, winner, get_user_nfgame(winner) + " - " + str(winner)
+                )
+                conn = sqlite3.connect("users_database.db")
+                cursor = conn.cursor()
+                cursor.execute(
+                    """
+                    SELECT user_id
+                    FROM user_game_messages
+                    WHERE game_id = ?
+                    """,
+                    (game_id,),
+                )
+                user_ids = cursor.fetchall()
+                user_ids = list(set([user for user in user_ids]))
+                for users in user_ids:
+                    users = users[0]
+                    if users and is_player_dead(game_id, users):
+                        update_game_details(
+                            game_id, users, get_user_nfgame(winner) + " - " + str(winner)
+                        )
+                        await bot.send_message(
+                            chat_id=users,
+                            text=f"The game in which you died has ended ⭐️\nWinner: {get_user_nfgame(winner)} — {winner} 🏆",
+                        )
+                delete_game(game_id)
+                await delete_all_game_messages(game_id)
         else:
             await callback_query.message.answer("You have already quit the game.")
 
@@ -336,10 +368,10 @@ async def handle_stop_incomplete_games(callback_query: types.CallbackQuery):
 
 
 @dp.callback_query(lambda c: c.data.startswith("exclude_player:"))
-async def exclude_player(callback_query: types.CallbackQuery):
-    await bot.delete_message(
-        callback_query.from_user.id, callback_query.message.message_id
-    )
+async def exclude_player_querriy(callback_query: types.CallbackQuery):
+    # await bot.delete_message(
+    #     callback_query.from_user.id, callback_query.message.message_id
+    # )
     user = callback_query.from_user
     data = callback_query.data.split(":")
     if len(data) != 2:
@@ -358,14 +390,49 @@ async def exclude_player(callback_query: types.CallbackQuery):
         if not inviter_id or inviter_id[0] != user.id:
             await callback_query.answer("Only the game creator can exclude players.")
             return
-
+        if is_game_started(game_id) and is_user_turn(player_to_remove, game_id):
+            await bot.send_message(chat_id=user.id, text=f"Now it's {get_user_nfgame(player_to_remove)}'s turn❗️\nYou can not exclude this player when it is his turn.")
+            return
         cursor.execute(
             "DELETE FROM invitations WHERE invitee_id = ? AND game_id = ?",
             (player_to_remove, game_id),
         )
         conn.commit()
-        # await callback_query.message.answer(game_id+"    1")
         update_game_details(game_id, player_to_remove, None)
+        winner = get_alive_number(game_id)
+        if winner != 0:
+            await bot.send_message(
+                chat_id=winner,
+                text=f"Game has finished. \nYou are winner. 🥳🥳🥳🥳🥳\nConguratulation on winning in the game. \n🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉",
+                reply_markup=get_main_menu(winner),
+            )
+            update_game_details(
+                game_id, winner, get_user_nfgame(winner) + " - " + str(winner)
+            )
+            conn = sqlite3.connect("users_database.db")
+            cursor = conn.cursor()
+            cursor.execute(
+                """
+                SELECT user_id
+                FROM user_game_messages
+                WHERE game_id = ?
+                """,
+                (game_id,),
+            )
+            user_ids = cursor.fetchall()
+            user_ids = list(set([user for user in user_ids]))
+            for users in user_ids:
+                users = users[0]
+                if users and is_player_dead(game_id, users):
+                    update_game_details(
+                        game_id, users, get_user_nfgame(winner) + " - " + str(winner)
+                    )
+                    await bot.send_message(
+                        chat_id=users,
+                        text=f"The game in which you died has ended ⭐️\nWinner: {get_user_nfgame(winner)} — {winner} 🏆",
+                    )
+            delete_game(game_id)
+            await delete_all_game_messages(game_id)
     try:
         await bot.send_message(
             player_to_remove,
