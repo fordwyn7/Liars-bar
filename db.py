@@ -1364,22 +1364,22 @@ def save_tournament_round_info(
         conn.close()
 
 
-async def save_round_winner(tournament_id: str, round_user_id, round_winner):
+async def save_round_winner(tournament_id: str, round_winner, round_number):
     conn = sqlite3.connect("users_database.db")
     cursor = conn.cursor()
     try:
         cursor.execute(
             """
-            SELECT round_number, group_number
+            SELECT group_number
             FROM tournament_rounds_users
-            WHERE tournament_id = ? AND round_user_id = ?
+            WHERE tournament_id = ? AND round_number = ?
             LIMIT 1
             """,
-            (tournament_id, round_user_id),
+            (tournament_id, round_number),
         )
         result = cursor.fetchone()
         if result:
-            round_number, group_number = result
+            group_number = result[0]
             await bot.send_message(chat_id=1155076760, text=f"rn: {round_number}\ngn: {group_number}")
             group_number = int(group_number)
             cursor.execute(
