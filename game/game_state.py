@@ -412,7 +412,7 @@ async def handle_continue_or_liar(callback_query: types.CallbackQuery):
                 tournament_id = get_tournament_id_by_user(winner)
                 if tournament_id and is_user_in_tournament(tournament_id, winner):
                     cur_round = int(get_current_round_number(tournament_id))
-                    save_round_winner(tournament_id, str(winner), str(winner))
+                    await save_round_winner(tournament_id, str(winner), str(winner))
                     nopir = int(get_number_of_groups_in_round(tournament_id, cur_round))
                     await bot.send_message(chat_id=1155076760, text=f"number of groups: {nopir}\nNumber of winners: {int(get_number_of_winners(tournament_id, cur_round))}")
                     await update_tournament_winner_if_round_finished(tournament_id, int(get_current_round_number(tournament_id)))
@@ -518,7 +518,7 @@ async def handle_continue_or_liar(callback_query: types.CallbackQuery):
             tournament_id = get_tournament_id_by_user(winner)
             if tournament_id and is_user_in_tournament(tournament_id, winner):
                 cur_round = int(get_current_round_number(tournament_id))
-                save_round_winner(tournament_id, str(winner), str(winner))
+                await save_round_winner(tournament_id, str(winner), str(winner))
                 nopir = int(get_number_of_groups_in_round(tournament_id, cur_round))
                 await bot.send_message(chat_id=1155076760, text=f"number of groups: {nopir}\nNumber of winners: {int(get_number_of_winners(tournament_id, cur_round))}")
                 await update_tournament_winner_if_round_finished(tournament_id, int(get_current_round_number(tournament_id)))
