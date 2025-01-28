@@ -1617,7 +1617,7 @@ def create_groups(participants):
             groups.append(participants)
     return groups
 
-def get_users_in_round(tournament_id: str, round_number):
+def get_users_in_round(tournament_id, round_number):
     conn = sqlite3.connect("users_database.db")
     cursor = conn.cursor()
     try:
@@ -1630,7 +1630,7 @@ def get_users_in_round(tournament_id: str, round_number):
             (tournament_id, round_number),
         )
         users = cursor.fetchall()
-        return [user[0] for user in users]  # Returns a unique list of user IDs
+        return [int(user[0]) for user in users]
     except sqlite3.Error as e:
         print(f"Database error: {e}")
         return []
