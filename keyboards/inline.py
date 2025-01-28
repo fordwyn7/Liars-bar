@@ -577,12 +577,12 @@ async def join_tournament(callback_query: types.CallbackQuery):
     try:
         register_start = datetime.strptime(tournament["register_start"], "%Y-%m-%d %H:%M:%S").replace(tzinfo=timezone.utc)
     except ValueError:
-        register_start = datetime.strptime(tournament["register_start"], "%Y-%m-%d %H:%M").replace(tzinfo=timezone.utc)
+        register_start = datetime.strptime(tournament["register_start"], "%Y-%m-%d %H:%M:%S").replace(tzinfo=timezone.utc)
 
     try:
         register_end = datetime.strptime(tournament["register_end"], "%Y-%m-%d %H:%M:%S").replace(tzinfo=timezone.utc)
     except ValueError:
-        register_end = datetime.strptime(tournament["register_end"], "%Y-%m-%d %H:%M").replace(tzinfo=timezone.utc)
+        register_end = datetime.strptime(tournament["register_end"], "%Y-%m-%d %H:%M:%S").replace(tzinfo=timezone.utc)
     if not (register_start <= current_time <= register_end):
         await callback_query.answer(
             f"❌ Registration is only open between {register_start.strftime('%Y-%m-%d %H:%M')} and {register_end.strftime('%Y-%m-%d %H:%M')}.",

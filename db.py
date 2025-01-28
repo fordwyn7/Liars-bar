@@ -42,10 +42,10 @@ def is_user_in_tournament_and_active(user_id):
     tournament_start, tournament_end = tournament
     uzbekistan_tz = timezone(timedelta(hours=5))
 
-    tournament_start = datetime.strptime(tournament_start, "%Y-%m-%d %H:%M").replace(
+    tournament_start = datetime.strptime(tournament_start, "%Y-%m-%d %H:%M:%S").replace(
         tzinfo=uzbekistan_tz
     )
-    tournament_end = datetime.strptime(tournament_end, "%Y-%m-%d %H:%M").replace(
+    tournament_end = datetime.strptime(tournament_end, "%Y-%m-%d %H:%M:%S").replace(
         tzinfo=uzbekistan_tz
     )
 
@@ -1041,7 +1041,7 @@ def create_game_record_if_not_exists(game_id: str, user_id: int):
     conn = sqlite3.connect("users_database.db")
     cursor = conn.cursor()
     try:
-        start_time = (datetime.now() + timedelta(hours=5)).strftime("%Y-%m-%d %H:%M")
+        start_time = (datetime.now() + timedelta(hours=5)).strftime("%Y-%m-%d %H:%M:%S")
         cursor.execute(
             """
             INSERT INTO game_archive (game_id, user_id, game_start_time)
@@ -1058,7 +1058,7 @@ def create_game_record_if_not_exists(game_id: str, user_id: int):
 
 
 def update_game_details(game_id: str, user_id: int, winner: str):
-    end_time = (datetime.now() + timedelta(hours=5)).strftime("%Y-%m-%d %H:%M")
+    end_time = (datetime.now() + timedelta(hours=5)).strftime("%Y-%m-%d %H:%M:%S")
     try:
         conn = sqlite3.connect("users_database.db")
         cursor = conn.cursor()

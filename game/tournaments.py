@@ -192,7 +192,7 @@ async def set_registration_start_date(message: types.Message, state: FSMContext)
         await state.clear()
         return
     try:
-        start_date = datetime.strptime(message.text, "%Y-%m-%d %H:%M")
+        start_date = datetime.strptime(message.text, "%Y-%m-%d %H:%M:%S")
         await state.update_data(registration_start=start_date)
         await message.answer(
             "Please enter the registration end date (YYYY-MM-DD HH:MM):",
@@ -216,7 +216,7 @@ async def set_registration_end_date(message: types.Message, state: FSMContext):
         await state.clear()
         return
     try:
-        end_date = datetime.strptime(message.text, "%Y-%m-%d %H:%M")
+        end_date = datetime.strptime(message.text, "%Y-%m-%d %H:%M:%S")
         data = await state.get_data()
         if end_date <= data["registration_start"]:
             await message.answer(
@@ -247,7 +247,7 @@ async def set_tournament_start_date(message: types.Message, state: FSMContext):
         await state.clear()
         return
     try:
-        start_date = datetime.strptime(message.text, "%Y-%m-%d %H:%M")
+        start_date = datetime.strptime(message.text, "%Y-%m-%d %H:%M:%S")
         data = await state.get_data()
         if start_date <= data["registration_end"]:
             await message.answer(
@@ -278,7 +278,7 @@ async def set_tournament_end_date(message: types.Message, state: FSMContext):
         await state.clear()
         return
     try:
-        end_date = datetime.strptime(message.text, "%Y-%m-%d %H:%M")
+        end_date = datetime.strptime(message.text, "%Y-%m-%d %H:%M:%S")
         data = await state.get_data()
         if end_date <= data["tournament_start"]:
             await message.answer(
@@ -393,7 +393,7 @@ async def set_new_start_date_single(message: types.Message, state: FSMContext):
         return
     new_start_date = message.text.strip()
     try:
-        datetime.strptime(new_start_date, "%Y-%m-%d %H:%M")
+        datetime.strptime(new_start_date, "%Y-%m-%d %H:%M:%S")
     except ValueError:
         await message.answer(
             "Invalid date format. Please use `YYYY-MM-DD HH:MM`. Try again.",
@@ -422,7 +422,7 @@ async def set_new_end_date_single(message: types.Message, state: FSMContext):
         return
     new_end_date = message.text.strip()
     try:
-        datetime.strptime(new_end_date, "%Y-%m-%d %H:%M")
+        datetime.strptime(new_end_date, "%Y-%m-%d %H:%M:%S")
     except ValueError:
         await message.answer(
             "Invalid date format. Please use `YYYY-MM-DD HH:MM`. Try again.",
@@ -498,7 +498,7 @@ async def set_new_start_date(message: types.Message, state: FSMContext):
         return
     new_start_date = message.text.strip()
     try:
-        datetime.strptime(new_start_date, "%Y-%m-%d %H:%M")
+        datetime.strptime(new_start_date, "%Y-%m-%d %H:%M:%S")
     except ValueError:
         await message.answer(
             "Invalid date format. Please use `YYYY-MM-DD HH:MM`. Try again.",
@@ -527,7 +527,7 @@ async def set_new_end_date(message: types.Message, state: FSMContext):
         return
     new_end_date = message.text.strip()
     try:
-        datetime.strptime(new_end_date, "%Y-%m-%d %H:%M")
+        datetime.strptime(new_end_date, "%Y-%m-%d %H:%M:%S")
     except ValueError:
         await message.answer(
             "Invalid date format. Please use `YYYY-MM-DD HH:MM`. Try again.",
@@ -587,7 +587,7 @@ async def start_tournir_keyborar(message: types.Message, state: FSMContext):
         return
     tournament_name, start_time = tournament
     uzbekistan_time = datetime.now(timezone.utc) + timedelta(hours=5)
-    start_time = datetime.strptime(start_time, "%Y-%m-%d %H:%M").replace(
+    start_time = datetime.strptime(start_time, "%Y-%m-%d %H:%M:%S").replace(
         tzinfo=timezone.utc
     )
 
