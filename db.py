@@ -1133,7 +1133,7 @@ def get_tournament_id_by_user(user_id: int):
         )
         result = cursor.fetchone()
         if result:
-            return result[-1][0]
+            return result[0]
         else:
             return None
     except sqlite3.Error as e:
