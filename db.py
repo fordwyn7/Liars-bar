@@ -1373,6 +1373,7 @@ async def save_round_winner(tournament_id: str, round_user_id, round_winner):
             SELECT round_number, group_number
             FROM tournament_rounds_users
             WHERE tournament_id = ? AND round_user_id = ?
+            ORDER BY round_number DESC
             LIMIT 1
             """,
             (tournament_id, round_user_id),
