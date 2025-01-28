@@ -1308,7 +1308,7 @@ def determine_round_winners(tournament_id, round_number):
         )
         winners = cursor.fetchall()
         if winners:
-            winners_ids = [winner[0] for winner in winners]
+            winners_ids = list(set([winner[0] for winner in winners]))
             return winners_ids
         else:
             print(f"No winners found for round {round_number} in tournament {tournament_id}.")
