@@ -1638,6 +1638,10 @@ async def inform_all_users_tournament_ended(tournament_id: str, winner_id: int):
 def create_groups(participants):
     random.shuffle(participants)
     groups = []
+    if len(participants) == 4:
+        groups.append(participants[:2])
+        groups.append(participants[2:])
+        return groups
     nmb = len(participants) % 4
     nmd = len(participants) // 4
     if nmb == 0:
