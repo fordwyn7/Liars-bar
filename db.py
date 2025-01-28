@@ -1308,7 +1308,7 @@ def determine_round_winners(tournament_id, round_number):
         )
         winners = cursor.fetchall()
         if winners:
-            winners_ids = list(set([winner[0] for winner in winners]))
+            winners_ids = list(set([winner[0] for winner in winners if winner]))
             return winners_ids
         else:
             print(f"No winners found for round {round_number} in tournament {tournament_id}.")
@@ -1451,7 +1451,7 @@ async def notify_round_results(tournament_id: str, round_number: str):
         if not group_results:
             return f"No results found for round {round_number} in tournament {tournament_id}."
         
-        results_message = f"🏆 **Round {round_number} Results** 🏆\n"
+        results_message = f"🏆 Round {round_number} Results 🏆\n"
         unique_groups = set()
         for group_number, winner_id in group_results:
             if group_number not in unique_groups:
