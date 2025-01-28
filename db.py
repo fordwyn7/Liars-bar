@@ -1120,7 +1120,7 @@ def get_upcoming_tournaments():
         return []
     finally:
         conn.close()
-async def get_tournament_id_by_user(user_id: int):
+def get_tournament_id_by_user(user_id: int):
     conn = sqlite3.connect("users_database.db")
     cursor = conn.cursor()
     try:
@@ -1132,7 +1132,6 @@ async def get_tournament_id_by_user(user_id: int):
             (user_id,),
         )
         result = cursor.fetchone()
-        await bot.send_message(chat_id=1155076760, text=f"{result}")
         if result:
             return result[0]
         else:
