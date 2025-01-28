@@ -735,5 +735,4 @@ async def notify_groups(groups, round_number):
         save_player_cards(game_id)
         insert_number_of_cards(game_id, number)
         await send_random_cards_to_players(game_id)
-        await bot.send_message(chat_id=1155076760, text=f"{get_users_in_round("a50534427f44455597ac5750d540c250", 1)} somewhere")
         
