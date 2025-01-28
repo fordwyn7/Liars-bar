@@ -415,7 +415,7 @@ async def handle_continue_or_liar(callback_query: types.CallbackQuery):
                     cur_round = int(get_current_round_number(tournament_id))
                     plrs = get_users_in_round(tournament_id, cur_round)
                     nopir = int(get_number_of_groups_in_round(tournament_id, cur_round))
-                    await bot.send_message(chat_id=1155076760, text=f"{plrs, cur_round, get_number_of_winners(tournament_id, cur_round)} check 4")
+                    await bot.send_message(chat_id=1155076760, text=f"{plrs}, {cur_round}, {get_number_of_winners(tournament_id, cur_round)} check 4")
                     if int(get_number_of_winners(tournament_id, cur_round)) == nopir:
                         notify_round_results(tournament_id, cur_round)
                     if not update_tournament_winner_if_round_finished(tournament_id, cur_round) == 12:
