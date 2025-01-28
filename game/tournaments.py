@@ -610,15 +610,12 @@ async def start_tournir_keyborar(message: types.Message, state: FSMContext):
         )
         return
     await notify_participants(participants, len(participants))
-
     round_number = 1
     groups = create_groups(participants)
     for nk in range(len(groups)):
         for jk in groups[nk]:
             save_tournament_round_info(tournament_id,round_number,jk, nk+1)
-    # await bot.send_message(chat_id=1155076760, text=f"{get_users_in_round(tournament_id, 1)} players {tournament_id}, {type(tournament_id)}")
     await notify_groups(groups, round_number)
-    # await announce_winner(winner, tournament_name)
 
 
 
@@ -680,32 +677,6 @@ def get_game_id_from_mes(user_id):
         conn.close()
 
 
-def determine_round_winners(tournament_id, round_number):
-    conn = sqlite3.connect("users_database.db")
-    cursor = conn.cursor()
-    try:
-        # Get the user IDs of the winners in the specified round
-        cursor.execute(
-            """
-            SELECT round_winner
-            FROM tournament_rounds_users
-            WHERE tournament_id = ? AND round_number = ?
-            """,
-            (tournament_id, round_number),
-        )
-        winners = cursor.fetchall()
-
-        if winners:
-            winners_ids = [winner[0] for winner in winners]
-            return winners_ids
-        else:
-            print(f"No winners found for round {round_number} in tournament {tournament_id}.")
-            return []
-    except sqlite3.Error as e:
-        print(f"Database error: {e}")
-        return []
-    finally:
-        conn.close()
 
 
 async def announce_winner(winner):

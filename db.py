@@ -1294,6 +1294,31 @@ def get_ongoing_tournaments():
         conn.close()
 
 
+def determine_round_winners(tournament_id, round_number):
+    conn = sqlite3.connect("users_database.db")
+    cursor = conn.cursor()
+    try:
+        cursor.execute(
+            """
+            SELECT round_winner
+            FROM tournament_rounds_users
+            WHERE tournament_id = ? AND round_number = ?
+            """,
+            (tournament_id, round_number),
+        )
+        winners = cursor.fetchall()
+        if winners:
+            winners_ids = [winner[0] for winner in winners]
+            return winners_ids
+        else:
+            print(f"No winners found for round {round_number} in tournament {tournament_id}.")
+            return []
+    except sqlite3.Error as e:
+        print(f"Database error: {e}")
+        return []
+    finally:
+        conn.close()
+
 def save_tournament_round_info(tournament_id: str, round_number: str, round_user_id: str, group_number: str):
     conn = sqlite3.connect("users_database.db")
     cursor = conn.cursor()
@@ -1350,7 +1375,6 @@ def get_current_round_number(tournament_id: str) -> str:
     conn = sqlite3.connect("users_database.db")
     cursor = conn.cursor()
     try:
-        # Fetch the latest round number for the given tournament
         cursor.execute(
             """
             SELECT round_number
@@ -1362,7 +1386,7 @@ def get_current_round_number(tournament_id: str) -> str:
             (tournament_id,),
         )
         result = cursor.fetchone()
-        return result[0] if result else "1"  # Return "1" if no rounds are found
+        return result[0] if result else "1"
     except sqlite3.Error as e:
         print(f"Database error: {e}")
         return "1"
@@ -1374,7 +1398,6 @@ def get_number_of_winners(tournament_id: str, round_number: str) -> int:
     conn = sqlite3.connect("users_database.db")
     cursor = conn.cursor()
     try:
-        # Count the number of winners in the specified round
         cursor.execute(
             """
             SELECT COUNT(DISTINCT round_winner)
@@ -1429,16 +1452,15 @@ async def notify_round_results(tournament_id: str, round_number: str):
             return f"No results found for round {round_number} in tournament {tournament_id}."
         
         results_message = f"🏆 **Round {round_number} Results** 🏆\n"
-        unique_groups = set()  # Track groups already processed
+        unique_groups = set()
         for group_number, winner_id in group_results:
             if group_number not in unique_groups:
-                unique_groups.add(group_number)  # Add group to the set
+                unique_groups.add(group_number)
                 if winner_id:
                     results_message += f"- Winner from Group {group_number}: Player {winner_id}\n"
                 else:
                     results_message += f"- Group {group_number}: No winner yet\n"
 
-        # Fetch all users in the tournament
         cursor.execute(
             """
             SELECT user_id
@@ -1490,11 +1512,11 @@ def get_number_of_players_in_round(tournament_id: str, round_number: str):
         return 0
     finally:
         conn.close()
+
 def get_number_of_groups_in_round(tournament_id: str, round_number: str):
     conn = sqlite3.connect("users_database.db")
     cursor = conn.cursor()
     try:
-        # Count the distinct groups in the specific round
         cursor.execute(
             """
             SELECT COUNT(DISTINCT group_number)
@@ -1510,11 +1532,11 @@ def get_number_of_groups_in_round(tournament_id: str, round_number: str):
         return 0
     finally:
         conn.close()
+
 async def update_tournament_winner_if_round_finished(tournament_id: str, round_number: str):
     conn = sqlite3.connect("users_database.db")
     cursor = conn.cursor()
     try:
-        # Get the number of groups in the round
         cursor.execute(
             """
             SELECT COUNT(DISTINCT group_number)
@@ -1565,7 +1587,6 @@ async def inform_all_users_tournament_ended(tournament_id: str, winner_id: int):
     conn = sqlite3.connect("users_database.db")
     cursor = conn.cursor()
     try:
-        # Step 1: Get all user IDs in the tournament
         cursor.execute(
             """
             SELECT user_id
@@ -1575,23 +1596,16 @@ async def inform_all_users_tournament_ended(tournament_id: str, winner_id: int):
             (tournament_id,),
         )
         users = cursor.fetchall()
-
-        # Step 2: Get winner details (e.g., their name)
-        winner_name = get_user_nfgame(winner_id)  # Assuming this function gives winner's name
-
-        # Prepare the message to notify all players about the tournament end and the winner
+        winner_name = get_user_nfgame(winner_id)
         message = (
             f"🏁 **Tournament Ended!** 🏆\n\n"
             f"Thank you for participating in **Tournament {tournament_id}**! 🎮\n\n"
             f"🥇 **The Winner is: {winner_name} (ID: {winner_id})** 🎉\n\n"
             f"Congrats to the champion! Stay tuned for more tournaments. 🏅"
         )
-
-        # Step 3: Send the message to all users in the tournament
         for user in users:
             user_id = user[0]
             try:
-                # Send the message to each user
                 await bot.send_message(chat_id=user_id, text=message)
             except Exception as e:
                 print(f"Error sending message to {user_id}: {e}")
