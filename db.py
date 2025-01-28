@@ -1506,7 +1506,7 @@ def get_number_of_groups_in_round(tournament_id: str, round_number: str):
         return 0
     finally:
         conn.close()
-def update_tournament_winner_if_round_finished(tournament_id: str, round_number: str):
+async def update_tournament_winner_if_round_finished(tournament_id: str, round_number: str):
     conn = sqlite3.connect("users_database.db")
     cursor = conn.cursor()
     try:
@@ -1545,7 +1545,7 @@ def update_tournament_winner_if_round_finished(tournament_id: str, round_number:
                     (winner, tournament_id),
                 )
                 conn.commit()
-                inform_all_users_tournament_ended(tournament_id, winner)
+                await inform_all_users_tournament_ended(tournament_id, winner)
                 print(f"Winner {winner} has been saved to the tournament.")
                 return 12
             else:

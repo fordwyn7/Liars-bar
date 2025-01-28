@@ -417,7 +417,7 @@ async def handle_continue_or_liar(callback_query: types.CallbackQuery):
                     nopir = int(get_number_of_groups_in_round(tournament_id, cur_round))
                     if int(get_number_of_winners(tournament_id, cur_round)) == nopir:
                         await notify_round_results(tournament_id, cur_round)
-                    if not update_tournament_winner_if_round_finished(tournament_id, cur_round) == 12:
+                    if not await update_tournament_winner_if_round_finished(tournament_id, cur_round) == 12:
                         await start_next_round(plrs, tournament_id, cur_round)
                 delete_game(game_id)
                 await delete_all_game_messages(game_id)
@@ -521,7 +521,7 @@ async def handle_continue_or_liar(callback_query: types.CallbackQuery):
                 nopir = int(get_number_of_groups_in_round(tournament_id, cur_round))
                 if int(get_number_of_winners(tournament_id, cur_round)) == nopir:
                     await notify_round_results(tournament_id, cur_round)
-                if not update_tournament_winner_if_round_finished(tournament_id, cur_round) == 12:
+                if not await update_tournament_winner_if_round_finished(tournament_id, cur_round) == 12:
                     await start_next_round(plrs, tournament_id, cur_round)
             delete_game(game_id)
             await delete_all_game_messages(game_id)
