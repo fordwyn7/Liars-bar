@@ -40,7 +40,6 @@ def get_statistics():
     cursor.execute("SELECT COUNT(DISTINCT game_id) FROM game_archive")
     total_games = cursor.fetchone()[0]
 
-    # Users joined this week
     week_start = (datetime.now() - timedelta(days=datetime.now().weekday())).strftime(
         "%Y-%m-%d"
     )

@@ -41,14 +41,22 @@ def is_user_in_tournament_and_active(user_id):
 
     tournament_start, tournament_end = tournament
     uzbekistan_tz = timezone(timedelta(hours=5))
-
-    tournament_start = datetime.strptime(tournament_start, "%Y-%m-%d %H:%M:%S").replace(
-        tzinfo=uzbekistan_tz
-    )
-    tournament_end = datetime.strptime(tournament_end, "%Y-%m-%d %H:%M:%S").replace(
-        tzinfo=uzbekistan_tz
-    )
-
+    try:
+        tournament_start = datetime.strptime(
+            tournament_start, "%Y-%m-%d %H:%M:%S"
+        ).replace(tzinfo=uzbekistan_tz)
+    except ValueError:
+        tournament_start = datetime.strptime(
+            tournament_start, "%Y-%m-%d %H:%M"
+        ).replace(tzinfo=uzbekistan_tz)
+    try:
+        tournament_end = datetime.strptime(tournament_end, "%Y-%m-%d %H:%M:%S").replace(
+            tzinfo=uzbekistan_tz
+        )
+    except ValueError:
+        tournament_end = datetime.strptime(tournament_end, "%Y-%m-%d %H:%M").replace(
+            tzinfo=uzbekistan_tz
+        )
     current_time = datetime.now(uzbekistan_tz)
 
     # Compare the timezone-aware datetimes
@@ -95,6 +103,7 @@ def add_admin(user_id):
     conn.commit()
     conn.close()
 
+
 def get_alive_number(game_id):
     players = get_all_players_in_game(game_id)
     alive = []
@@ -105,6 +114,7 @@ def get_alive_number(game_id):
     if len(alive) == 1:
         return alive[0]
     return 0
+
 
 def get_game_inviter_id(game_id):
     try:
@@ -838,7 +848,9 @@ async def shoot_self(game_id, player_id):
                 (game_id, player_id),
             )
             conn.commit()
-            if get_tournament_id_by_user(player_id) and is_user_in_tournament(get_tournament_id_by_user(player_id), player_id):
+            if get_tournament_id_by_user(player_id) and is_user_in_tournament(
+                get_tournament_id_by_user(player_id), player_id
+            ):
                 set_user_status(player_id, "died")
             return True
         else:
@@ -934,7 +946,6 @@ async def save_message(user_id, game_id, message_id):
         conn.close()
 
 
-
 async def delete_all_game_messages(game_id):
     conn = sqlite3.connect("users_database.db")
     cursor = conn.cursor()
@@ -983,7 +994,9 @@ async def delete_user_messages(game_id, userid):
                 try:
                     await bot.delete_message(chat_id=user_id, message_id=message_id)
                 except Exception as e:
-                    print(f"Error deleting message {message_id} for user {user_id}: {e}")
+                    print(
+                        f"Error deleting message {message_id} for user {user_id}: {e}"
+                    )
     except sqlite3.Error as e:
         print(f"Database error: {e}")
     finally:
@@ -1041,7 +1054,11 @@ def create_game_record_if_not_exists(game_id: str, user_id: int):
     conn = sqlite3.connect("users_database.db")
     cursor = conn.cursor()
     try:
-        start_time = (datetime.now() + timedelta(hours=5)).strftime("%Y-%m-%d %H:%M:%S")
+        try:
+            start_time = (datetime.now() + timedelta(hours=5)).strftime("%Y-%m-%d %H:%M:%S")
+        except ValueError:
+            start_time = (datetime.now() + timedelta(hours=5)).strftime("%Y-%m-%d %H:%M")
+
         cursor.execute(
             """
             INSERT INTO game_archive (game_id, user_id, game_start_time)
@@ -1058,7 +1075,10 @@ def create_game_record_if_not_exists(game_id: str, user_id: int):
 
 
 def update_game_details(game_id: str, user_id: int, winner: str):
-    end_time = (datetime.now() + timedelta(hours=5)).strftime("%Y-%m-%d %H:%M:%S")
+    try:
+        end_time = (datetime.now() + timedelta(hours=5)).strftime("%Y-%m-%d %H:%M:%S")
+    except ValueError:
+        end_time = (datetime.now() + timedelta(hours=5)).strftime("%Y-%m-%d %H:%M")
     try:
         conn = sqlite3.connect("users_database.db")
         cursor = conn.cursor()
@@ -1120,6 +1140,8 @@ def get_upcoming_tournaments():
         return []
     finally:
         conn.close()
+
+
 def get_tournament_id_by_user(user_id: int):
     conn = sqlite3.connect("users_database.db")
     cursor = conn.cursor()
@@ -1141,7 +1163,6 @@ def get_tournament_id_by_user(user_id: int):
         return None
     finally:
         conn.close()
-
 
 
 def get_tournament_archive():
@@ -1238,7 +1259,8 @@ def delete_tournament(tournament_id: str):
     cursor = conn.cursor()
     try:
         cursor.execute(
-            "SELECT user_id FROM tournament_users WHERE tournament_id = ?", (tournament_id,)
+            "SELECT user_id FROM tournament_users WHERE tournament_id = ?",
+            (tournament_id,),
         )
         users = cursor.fetchall()
 
@@ -1311,7 +1333,9 @@ def determine_round_winners(tournament_id, round_number):
             winners_ids = list(set([winner[0] for winner in winners if winner]))
             return winners_ids
         else:
-            print(f"No winners found for round {round_number} in tournament {tournament_id}.")
+            print(
+                f"No winners found for round {round_number} in tournament {tournament_id}."
+            )
             return []
     except sqlite3.Error as e:
         print(f"Database error: {e}")
@@ -1319,7 +1343,10 @@ def determine_round_winners(tournament_id, round_number):
     finally:
         conn.close()
 
-def save_tournament_round_info(tournament_id: str, round_number: str, round_user_id: str, group_number: str):
+
+def save_tournament_round_info(
+    tournament_id: str, round_number: str, round_user_id: str, group_number: str
+):
     conn = sqlite3.connect("users_database.db")
     cursor = conn.cursor()
     try:
@@ -1370,7 +1397,8 @@ def save_round_winner(tournament_id: str, round_user_id, round_winner):
         print(f"Database error: {e}")
     finally:
         conn.close()
-        
+
+
 def get_current_round_number(tournament_id: str) -> str:
     conn = sqlite3.connect("users_database.db")
     cursor = conn.cursor()
@@ -1435,6 +1463,7 @@ def get_all_users_in_tournament(tournament_id: str) -> list:
     finally:
         conn.close()
 
+
 async def notify_round_results(tournament_id: str, round_number: str):
     conn = sqlite3.connect("users_database.db")
     cursor = conn.cursor()
@@ -1450,14 +1479,16 @@ async def notify_round_results(tournament_id: str, round_number: str):
         group_results = cursor.fetchall()
         if not group_results:
             return f"No results found for round {round_number} in tournament {tournament_id}."
-        
+
         results_message = f"🏆 Round {round_number} Results 🏆\n"
         unique_groups = set()
         for group_number, winner_id in group_results:
             if group_number not in unique_groups:
                 unique_groups.add(group_number)
                 if winner_id:
-                    results_message += f"- Winner from Group {group_number}: Player {winner_id}\n"
+                    results_message += (
+                        f"- Winner from Group {group_number}: Player {winner_id}\n"
+                    )
                 else:
                     results_message += f"- Group {group_number}: No winner yet\n"
 
@@ -1513,6 +1544,7 @@ def get_number_of_players_in_round(tournament_id: str, round_number: str):
     finally:
         conn.close()
 
+
 def get_number_of_groups_in_round(tournament_id: str, round_number: str):
     conn = sqlite3.connect("users_database.db")
     cursor = conn.cursor()
@@ -1532,6 +1564,8 @@ def get_number_of_groups_in_round(tournament_id: str, round_number: str):
         return 0
     finally:
         conn.close()
+
+
 def delete_tournament_from_tables(tournament_id: str):
     conn = sqlite3.connect("users_database.db")
     cursor = conn.cursor()
@@ -1555,7 +1589,10 @@ def delete_tournament_from_tables(tournament_id: str):
     finally:
         conn.close()
 
-async def update_tournament_winner_if_round_finished(tournament_id: str, round_number: str):
+
+async def update_tournament_winner_if_round_finished(
+    tournament_id: str, round_number: str
+):
     conn = sqlite3.connect("users_database.db")
     cursor = conn.cursor()
     try:
@@ -1591,18 +1628,22 @@ async def update_tournament_winner_if_round_finished(tournament_id: str, round_n
                 )
                 conn.commit()
                 await inform_all_users_tournament_ended(tournament_id, winner)
-                
+
                 print(f"Winner {winner} has been saved to the tournament.")
                 return 12
             else:
                 print("No winner found for this round.")
         else:
-            print("This round has more than one group, winner cannot be determined yet.")
+            print(
+                "This round has more than one group, winner cannot be determined yet."
+            )
     except sqlite3.Error as e:
         print(f"Database error: {e}")
     finally:
         conn.close()
     return 0
+
+
 async def inform_all_users_tournament_ended(tournament_id: str, winner_id: int):
     conn = sqlite3.connect("users_database.db")
     cursor = conn.cursor()
@@ -1635,6 +1676,7 @@ async def inform_all_users_tournament_ended(tournament_id: str, winner_id: int):
     finally:
         conn.close()
 
+
 def create_groups(participants):
     random.shuffle(participants)
     groups = []
@@ -1660,6 +1702,7 @@ def create_groups(participants):
         if participants:
             groups.append(participants)
     return groups
+
 
 def get_users_in_round(tournament_id, round_number):
     conn = sqlite3.connect("users_database.db")
