@@ -147,8 +147,6 @@ CREATE TABLE IF NOT EXISTS tournament_rounds_users (
 )
 """
 )
-
-
 # cursor.execute("""
 #         ALTER TABLE tournament_users
 #         ADD COLUMN user_status TEXT DEFAULT 'alive'

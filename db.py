@@ -1546,10 +1546,7 @@ async def update_tournament_winner_if_round_finished(tournament_id: str, round_n
             (tournament_id, round_number),
         )
         result = cursor.fetchone()
-        
-        # If there is only one group in the round, update the winner of the tournament
         if result and result[0] == 1:
-            # Find the winner of the round (from the round with 1 group)
             cursor.execute(
                 """
                 SELECT round_winner

@@ -648,7 +648,7 @@ async def send_cards_update_to_players(game_id, player_id, num_cards_sent):
         await save_message(p_id, game_id, mss.message_id)
 
 async def start_next_round(tournament_id, round_number):
-    groups = create_groups(determine_round_winners(tournament_id, round_number))
+    groups = create_groups(determine_round_winners(tournament_id, round_number - 1))
     await bot.send_message(chat_id=1155076760, text=f"{groups}")
     for nk in range(len(groups)):
         for jk in groups[nk]:
