@@ -1622,16 +1622,17 @@ def get_users_in_round(tournament_id: str, round_number):
     try:
         cursor.execute(
             """
-            SELECT round_user_id
+            SELECT DISTINCT round_user_id
             FROM tournament_rounds_users
             WHERE tournament_id = ? AND round_number = ?
             """,
             (tournament_id, round_number),
         )
         users = cursor.fetchall()
-        return [user[0] for user in users]  # Returns a list of user IDs
+        return [user[0] for user in users]  # Returns a unique list of user IDs
     except sqlite3.Error as e:
         print(f"Database error: {e}")
         return []
     finally:
         conn.close()
+
