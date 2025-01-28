@@ -147,9 +147,9 @@ CREATE TABLE IF NOT EXISTS tournament_rounds_users (
 )
 """
 )
-cursor.execute("DELETE FROM tournament_rounds_users;")
-cursor.execute("DELETE FROM tournament_users;")
-cursor.execute("DELETE FROM tournaments_table;")
+# cursor.execute("DELETE FROM tournament_rounds_users;")
+# cursor.execute("DELETE FROM tournament_users;")
+# cursor.execute("DELETE FROM tournaments_table;")
 # cursor.execute("""
 #         ALTER TABLE tournament_users
 #         ADD COLUMN user_status TEXT DEFAULT 'alive'
