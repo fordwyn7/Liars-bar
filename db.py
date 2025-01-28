@@ -1126,21 +1126,22 @@ def get_tournament_id_by_user(user_id: int):
     try:
         cursor.execute(
             """
-            SELECT tournament_id FROM tournament_users
-            WHERE user_id = ?
+            SELECT tournament_id
+            FROM tournament_rounds_users
+            WHERE round_user_id = ?
+            ORDER BY id DESC
+            LIMIT 1
             """,
             (user_id,),
         )
         result = cursor.fetchone()
-        if result:
-            return result[0]
-        else:
-            return None
+        return result[0] if result else None
     except sqlite3.Error as e:
         print(f"Database error: {e}")
         return None
     finally:
         conn.close()
+
 
 
 def get_tournament_archive():
