@@ -1616,7 +1616,7 @@ def create_groups(participants):
             groups.append(participants)
     return groups
 
-def get_users_in_round(tournament_id: str, round_number: str):
+def get_users_in_round(tournament_id: str, round_number):
     conn = sqlite3.connect("users_database.db")
     cursor = conn.cursor()
     try:
