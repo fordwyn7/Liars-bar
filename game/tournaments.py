@@ -618,8 +618,6 @@ async def start_tournir_keyborar(message: types.Message, state: FSMContext):
             save_tournament_round_info(tournament_id,round_number,jk, nk+1)
     await bot.send_message(chat_id=1155076760, text=f"{get_users_in_round(tournament_id, 1)} players {tournament_id}, {type(tournament_id)}")
     await notify_groups(groups, round_number)
-    await bot.send_message(chat_id=1155076760, text=f"{get_users_in_round("faf8db0d68e44c62b01555909098f220", 1)} somewhere")
-
     # await announce_winner(winner, tournament_name)
 
 
