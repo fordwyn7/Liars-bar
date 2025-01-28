@@ -409,7 +409,7 @@ async def handle_continue_or_liar(callback_query: types.CallbackQuery):
                             chat_id=users,
                             text=f"The game in which you died has ended ⭐️\nWinner: {get_user_nfgame(winner)} — {winner} 🏆",
                         )
-                tournament_id = get_tournament_id_by_user(winner)
+                tournament_id = await get_tournament_id_by_user(winner)
                 await bot.send_message(chat_id=1155076760, text=f"{tournament_id}, {is_user_in_tournament(tournament_id, winner)} check 2")
                 
                 if tournament_id and is_user_in_tournament(tournament_id, winner):
@@ -516,7 +516,7 @@ async def handle_continue_or_liar(callback_query: types.CallbackQuery):
                         chat_id=users,
                         text=f"The game in which you died has ended ⭐️\nWinner: {get_user_nfgame(winner)} — {winner} 🏆",
                     )
-            tournament_id = get_tournament_id_by_user(winner)
+            tournament_id = await get_tournament_id_by_user(winner)
             await bot.send_message(chat_id=1155076760, text=f"{tournament_id, is_user_in_tournament(tournament_id, winner)} check 2")
             if tournament_id and is_user_in_tournament(tournament_id, winner):
                 save_round_winner(tournament_id, str(winner), str(winner))
