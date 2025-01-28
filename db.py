@@ -1418,25 +1418,27 @@ async def notify_round_results(tournament_id: str, round_number: str):
     try:
         cursor.execute(
             """
-            SELECT group_number, round_winner
+            SELECT DISTINCT group_number, round_winner
             FROM tournament_rounds_users
             WHERE tournament_id = ? AND round_number = ?
             """,
             (tournament_id, round_number),
         )
         group_results = cursor.fetchall()
-
-        # Prepare the message with the results
         if not group_results:
             return f"No results found for round {round_number} in tournament {tournament_id}."
         
         results_message = f"🏆 **Round {round_number} Results** 🏆\n"
+        unique_groups = set()  # Track groups already processed
         for group_number, winner_id in group_results:
-            if winner_id:
-                results_message += f"- Winner from Group {group_number}: Player {winner_id}\n"
-            else:
-                results_message += f"- Group {group_number}: No winner yet\n"
+            if group_number not in unique_groups:
+                unique_groups.add(group_number)  # Add group to the set
+                if winner_id:
+                    results_message += f"- Winner from Group {group_number}: Player {winner_id}\n"
+                else:
+                    results_message += f"- Group {group_number}: No winner yet\n"
 
+        # Fetch all users in the tournament
         cursor.execute(
             """
             SELECT user_id
@@ -1448,6 +1450,7 @@ async def notify_round_results(tournament_id: str, round_number: str):
         all_users = cursor.fetchall()
         user_ids = [row[0] for row in all_users]
 
+        # Send the results to all users
         for user_id in user_ids:
             try:
                 await bot.send_message(
@@ -1465,6 +1468,7 @@ async def notify_round_results(tournament_id: str, round_number: str):
         return f"Error fetching round results for tournament {tournament_id}."
     finally:
         conn.close()
+
 
 def get_number_of_players_in_round(tournament_id: str, round_number: str):
     conn = sqlite3.connect("users_database.db")
@@ -1637,4 +1641,3 @@ def get_users_in_round(tournament_id, round_number):
         return []
     finally:
         conn.close()
-
