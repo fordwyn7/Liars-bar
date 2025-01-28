@@ -415,11 +415,12 @@ async def handle_continue_or_liar(callback_query: types.CallbackQuery):
                     save_round_winner(tournament_id, str(winner), str(winner))
                     nopir = int(get_number_of_groups_in_round(tournament_id, cur_round))
                     await bot.send_message(chat_id=1155076760, text=f"number of groups: {nopir}\nNumber of winners: {int(get_number_of_winners(tournament_id, cur_round))}")
+                    await update_tournament_winner_if_round_finished(tournament_id, int(get_current_round_number(tournament_id)))
                     if int(get_number_of_winners(tournament_id, cur_round)) == nopir:
                         await notify_round_results(tournament_id, cur_round)
                         await asyncio.sleep(5)
+                    if int(get_number_of_winners(tournament_id, cur_round)) > 1:
                         await start_next_round(tournament_id, cur_round + 1)
-                    await update_tournament_winner_if_round_finished(tournament_id, cur_round)
                 delete_game(game_id)
                 await delete_all_game_messages(game_id)
                 return
@@ -520,11 +521,12 @@ async def handle_continue_or_liar(callback_query: types.CallbackQuery):
                 save_round_winner(tournament_id, str(winner), str(winner))
                 nopir = int(get_number_of_groups_in_round(tournament_id, cur_round))
                 await bot.send_message(chat_id=1155076760, text=f"number of groups: {nopir}\nNumber of winners: {int(get_number_of_winners(tournament_id, cur_round))}")
+                await update_tournament_winner_if_round_finished(tournament_id, int(get_current_round_number(tournament_id)))
                 if int(get_number_of_winners(tournament_id, cur_round)) == nopir:
                     await notify_round_results(tournament_id, cur_round)
                     await asyncio.sleep(5)
+                if int(get_number_of_winners(tournament_id, cur_round)) > 1:
                     await start_next_round(tournament_id, cur_round + 1)
-                await update_tournament_winner_if_round_finished(tournament_id, cur_round)
             delete_game(game_id)
             await delete_all_game_messages(game_id)
             return
