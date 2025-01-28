@@ -1311,7 +1311,7 @@ def save_tournament_round_info(tournament_id: str, round_number: str, round_user
         conn.close()
 
 
-def save_round_winner(tournament_id: str, round_user_id: str, round_winner: str):
+def save_round_winner(tournament_id: str, round_user_id, round_winner):
     conn = sqlite3.connect("users_database.db")
     cursor = conn.cursor()
     try:
@@ -1328,6 +1328,7 @@ def save_round_winner(tournament_id: str, round_user_id: str, round_winner: str)
 
         if result:
             round_number, group_number = result
+            group_number = int(group_number)
             cursor.execute(
                 """
                 UPDATE tournament_rounds_users
