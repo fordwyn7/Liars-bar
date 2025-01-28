@@ -648,7 +648,7 @@ async def send_cards_update_to_players(game_id, player_id, num_cards_sent):
 
 async def start_next_round(participants, tournament_id, round_number):
     groups = create_groups(participants)
-    for nk in len(groups):
+    for nk in range(len(groups)):
         for jk in groups[nk]:
             save_tournament_round_info(tournament_id,round_number,groups[nk][jk], nk+1)
     await notify_groups(groups, round_number)
