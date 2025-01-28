@@ -814,3 +814,16 @@ async def handle_subtract_unity_coins(message: types.Message, state: FSMContext)
 
         await message.answer(f"✅ {subtract_amount} Unity Coins have been subtracted from the user's balance!", reply_markup=change_users_balance)
         await state.clear()
+        
+
+@dp.message(F.text == "/stop_all_incomplete_games")
+@admin_required()
+async def stop_all_incomplete_games_command(message: types.Message, state: FSMContext):
+    users = get_all_user_ids()
+    
+    for userid in users:
+        try: 
+            delete_user_from_all_games(userid)
+        except:
+            continue
+    await message.answer(f"All users' incomplete games has been stopped ✅")
