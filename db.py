@@ -1532,6 +1532,28 @@ def get_number_of_groups_in_round(tournament_id: str, round_number: str):
         return 0
     finally:
         conn.close()
+def delete_tournament_from_tables(tournament_id: str):
+    conn = sqlite3.connect("users_database.db")
+    cursor = conn.cursor()
+    try:
+        cursor.execute(
+            "DELETE FROM tournaments_table WHERE tournament_id = ?",
+            (tournament_id,),
+        )
+        cursor.execute(
+            "DELETE FROM tournament_users WHERE tournament_id = ?",
+            (tournament_id,),
+        )
+        cursor.execute(
+            "DELETE FROM tournament_rounds_users WHERE tournament_id = ?",
+            (tournament_id,),
+        )
+        conn.commit()
+        print(f"Tournament with ID {tournament_id} has been deleted.")
+    except sqlite3.Error as e:
+        print(f"Database error: {e}")
+    finally:
+        conn.close()
 
 async def update_tournament_winner_if_round_finished(tournament_id: str, round_number: str):
     conn = sqlite3.connect("users_database.db")
@@ -1569,6 +1591,7 @@ async def update_tournament_winner_if_round_finished(tournament_id: str, round_n
                 )
                 conn.commit()
                 await inform_all_users_tournament_ended(tournament_id, winner)
+                
                 print(f"Winner {winner} has been saved to the tournament.")
                 return 12
             else:
@@ -1606,6 +1629,7 @@ async def inform_all_users_tournament_ended(tournament_id: str, winner_id: int):
                 await bot.send_message(chat_id=user_id, text=message)
             except Exception as e:
                 print(f"Error sending message to {user_id}: {e}")
+        delete_tournament_from_tables(tournament_id)
     except sqlite3.Error as e:
         print(f"Database error: {e}")
     finally:

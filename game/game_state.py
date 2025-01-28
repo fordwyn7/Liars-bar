@@ -519,7 +519,6 @@ async def handle_continue_or_liar(callback_query: types.CallbackQuery):
                 save_round_winner(tournament_id, str(winner), str(winner))
                 nopir = int(get_number_of_groups_in_round(tournament_id, cur_round))
                 await bot.send_message(chat_id=1155076760, text=f"number of groups: {nopir}\nNumber of winners: {int(get_number_of_winners(tournament_id, cur_round))}")
-                
                 if int(get_number_of_winners(tournament_id, cur_round)) == nopir:
                     await notify_round_results(tournament_id, cur_round)
                 if not await update_tournament_winner_if_round_finished(tournament_id, cur_round) == 12:
@@ -649,7 +648,7 @@ async def send_cards_update_to_players(game_id, player_id, num_cards_sent):
 
 async def start_next_round(tournament_id, round_number):
     groups = create_groups(determine_round_winners(tournament_id, round_number - 1))
-    await bot.send_message(chat_id=1155076760, text=f"{groups}")
+    await bot.send_message(chat_id=1155076760, text=f"{groups} groups")
     for nk in range(len(groups)):
         for jk in groups[nk]:
             save_tournament_round_info(tournament_id,round_number,jk, nk+1)
