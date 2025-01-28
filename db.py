@@ -1602,7 +1602,7 @@ async def update_tournament_winner_if_round_finished(tournament_id: str, round_n
         print(f"Database error: {e}")
     finally:
         conn.close()
-
+    return 0
 async def inform_all_users_tournament_ended(tournament_id: str, winner_id: int):
     conn = sqlite3.connect("users_database.db")
     cursor = conn.cursor()
