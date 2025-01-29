@@ -306,7 +306,6 @@ async def set_tournament_prize(message: types.Message, state: FSMContext):
     unique_id = f"{uuid.uuid4().hex}"
     await state.update_data(tournament_link=unique_id)
     save_tournament_to_db(data, unique_id)
-
     await message.answer(
         f"✅ Tournament created successfully:\n\n"
         f"🎮 Players: {data['number_of_players']}\n\n"

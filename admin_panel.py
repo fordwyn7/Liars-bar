@@ -1217,3 +1217,15 @@ async def cancel_withdraw_queer(callback_query: types.CallbackQuery, state: FSMC
     )
     await callback_query.message.answer(f"You have canceled your order successfully ✅")
     await state.clear()
+    
+
+@dp.message(F.text == "👀 watch results")
+@admin_required()
+async def watch_results_f(message: types.Message):
+    result = ""
+    tournament = get_ongoing_tournaments()
+    tournament_id = tournament['name']
+    current_round = get_current_round_number()
+    for i in range(1, current_round + 1):
+        result += get_round_results(tournament_id, i) + "\n"
+    await message.answer(result)

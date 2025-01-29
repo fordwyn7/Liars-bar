@@ -1503,8 +1503,6 @@ async def notify_round_results(tournament_id: str, round_number: str):
         )
         all_users = cursor.fetchall()
         user_ids = [row[0] for row in all_users]
-
-        # Send the results to all users
         for user_id in user_ids:
             try:
                 await bot.send_message(
@@ -1722,5 +1720,39 @@ def get_users_in_round(tournament_id, round_number):
     except sqlite3.Error as e:
         print(f"Database error: {e}")
         return []
+    finally:
+        conn.close()
+
+def get_round_results(tournament_id, round_number): 
+    conn = sqlite3.connect("users_database.db")
+    cursor = conn.cursor()
+    try:
+        cursor.execute(
+            """
+            SELECT DISTINCT group_number, round_winner
+            FROM tournament_rounds_users
+            WHERE tournament_id = ? AND round_number = ?
+            """,
+            (tournament_id, round_number),
+        )
+        group_results = cursor.fetchall()
+        if not group_results:
+            return f"No results found for round {round_number} in tournament {tournament_id}."
+
+        results_message = f"🏆 Round {round_number} Results 🏆\n"
+        unique_groups = set()
+        for group_number, winner_id in group_results:
+            if group_number not in unique_groups:
+                unique_groups.add(group_number)
+                if winner_id:
+                    results_message += (
+                        f"- Winner from Group {group_number}: Player {winner_id}\n"
+                    )
+                else:
+                    results_message += f"- Group {group_number}: No winner yet\n"
+        return results_message
+    except sqlite3.Error as e:
+        print(f"Database error: {e}")
+        return f"Error fetching round results for tournament {tournament_id}."
     finally:
         conn.close()
