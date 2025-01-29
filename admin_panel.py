@@ -1088,7 +1088,6 @@ async def get_username_for_withdraw(message: types.Message, state: FSMContext):
     state_data = await state.get_data()
     reward_name = state_data["reward_name"]
     cost = state_data["cost"]
-
     confirmation_message = (
         f"💬 Please confirm your withdrawal details:\n\n"
         f"🎁 *Item Name*: {reward_name}\n"
@@ -1096,7 +1095,7 @@ async def get_username_for_withdraw(message: types.Message, state: FSMContext):
         f"💰 *Cost*: {cost} Unity Coins\n\n"
         "Do you confirm?"
     )
-
+    await state.clear()
     keyboard = InlineKeyboardMarkup(
         inline_keyboard=[
             [
@@ -1111,6 +1110,7 @@ async def get_username_for_withdraw(message: types.Message, state: FSMContext):
     await message.answer(
         confirmation_message, parse_mode="Markdown", reply_markup=keyboard
     )
+    await state.set_data({"reward_name": reward_name, "cost": cost})
     await state.update_data(username=username)
 
 
