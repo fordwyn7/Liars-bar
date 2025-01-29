@@ -10,7 +10,7 @@ from aiogram.utils.keyboard import InlineKeyboardBuilder
 from states.state import *
 from hendlers import get_user_game_archive
 from datetime import datetime, timedelta
-# from aiogram.utils.markdown import mention
+# from aiogram.utils import  
 
 def generate_callback(action: str, admin_id: int) -> str:
     return f"{action}:{admin_id}"
@@ -31,12 +31,8 @@ def get_admins2():
 def get_statistics():
     conn = sqlite3.connect("users_database.db")
     cursor = conn.cursor()
-
-    # Total users
     cursor.execute("SELECT COUNT(*) FROM users_database")
     total_users = cursor.fetchone()[0]
-
-    # Total games played
     cursor.execute("SELECT COUNT(DISTINCT game_id) FROM game_archive")
     total_games = cursor.fetchone()[0]
 
@@ -97,8 +93,7 @@ async def generate_user_list(users, page):
     user_list = []
     for index, (user_id, nfgame) in enumerate(page_users, start=start_index + 1):
         chat = await bot.get_chat(user_id)
-        mention_text = f"[{chat.first_name}](tg://user?id={user_id})"  # MarkdownV2 format
-
+        mention_text = f"[{chat.full_name}](tg://user?id={user_id})"
         user_list.append(f"{index}. {mention_text} — {nfgame}")
 
     return user_list
@@ -416,7 +411,7 @@ async def list_users(message: types.Message):
         pagination_buttons = create_pagination_buttons(page, len(users))
         await message.answer(
             f"Here is the list of users (page {page}):\n\n{user_details}",
-            parse_mode="MarkdownV2",
+            parse_mode="Markdown",
             reply_markup=pagination_buttons,
         )
 
@@ -449,7 +444,7 @@ async def paginate_users(callback_query: types.CallbackQuery):
     pagination_buttons = create_pagination_buttons(page, len(users))
     await callback_query.message.edit_text(
         f"List of users (page {page}):\n\n{user_details}",
-        parse_mode="MarkdownV2",
+        parse_mode="Markdown",
         reply_markup=pagination_buttons,
     )
     await callback_query.answer()
