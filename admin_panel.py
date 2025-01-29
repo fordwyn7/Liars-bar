@@ -1117,7 +1117,7 @@ async def get_username_for_withdraw(message: types.Message, state: FSMContext):
 async def confirm_withdraw_queer(
     callback_query: types.CallbackQuery, state: FSMContext
 ):
-    await bot.delete_message(chat_id=callback_query.message.message_id)
+    await bot.delete_message(chat_id=callback_query.from_user.id, message_id=callback_query.message.message_id)
     user_id = callback_query.from_user.id
     state_data = await state.get_data()
     
@@ -1182,7 +1182,7 @@ async def confirm_withdraw_queer(
 
 @dp.callback_query(lambda c: c.data.startswith("admin_confirm_"))
 async def admin_confirm_withdraw(callback_query: types.CallbackQuery):
-    await bot.delete_message(chat_id=callback_query.message.message_id)
+    await bot.delete_message(chat_id=-1002261491678, message_id=callback_query.message.message_id)
     user_id = callback_query.data.split("_")[-1]
     await bot.send_message(
         user_id,
@@ -1193,7 +1193,8 @@ async def admin_confirm_withdraw(callback_query: types.CallbackQuery):
 
 @dp.callback_query(lambda c: c.data.startswith("admin_cancel_"))
 async def admin_cancel_withdraw(callback_query: types.CallbackQuery):
-    await bot.delete_message(chat_id=callback_query.message.message_id)
+    await bot.delete_message(chat_id=-1002261491678, message_id=callback_query.message.message_id)
+
     user_id = callback_query.data.split("_")[-1]
     await bot.send_message(user_id, "❌ Your withdrawal request was canceled.")
     await callback_query.answer("❌ Withdrawal canceled.")
