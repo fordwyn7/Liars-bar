@@ -160,7 +160,7 @@ CREATE TABLE IF NOT EXISTS withdraw_options (
 )
 """
 )
-
+cursor.execute("""DELETE withdraw_options;""")
 cursor.execute("""
 INSERT INTO withdraw_options (
     three_month_premium, 
