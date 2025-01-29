@@ -1415,10 +1415,10 @@ def get_current_round_number(tournament_id: str) -> str:
             (tournament_id,),
         )
         result = cursor.fetchone()
-        return result[0] if result else "1"
+        return result[0] if result else "0"
     except sqlite3.Error as e:
         print(f"Database error: {e}")
-        return "1"
+        return "0"
     finally:
         conn.close()
 

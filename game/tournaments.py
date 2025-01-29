@@ -9,7 +9,12 @@ from keyboards.keyboard import *
 from middlewares.registered import admin_required
 from keyboards.inline import get_join_tournament_button, user_tournaments_keyboard
 from db import *
-from states.state import AddTournaments, EditRegistrationDates, EditStartAndEndTimes, EditMaxPlayers
+from states.state import (
+    AddTournaments,
+    EditRegistrationDates,
+    EditStartAndEndTimes,
+    EditMaxPlayers,
+)
 from datetime import datetime, timezone, timedelta
 from game.game_state import notify_groups
 
@@ -73,7 +78,16 @@ async def ongoing_tournaments_sekshn(message: types.Message):
             reply_markup=tournaments_admin_panel_button,
         )
         return
-
+    start_button = InlineKeyboardMarkup(
+        inline_keyboard=[
+            [
+                InlineKeyboardButton(
+                    text="▶ Start Tournament",
+                    callback_data=f"start_tournament_k",
+                )
+            ]
+        ]
+    )
     response = "⚡️ *Ongoing Tournaments:*\n\n"
     for tournament in ongoing_tournaments:
         response += (
@@ -83,12 +97,12 @@ async def ongoing_tournaments_sekshn(message: types.Message):
             f"👥 Registered Players: {tournament['current_players']}/{tournament['maximum_players']}\n\n"
             f"🏆 Prize: \n{tournament['prize']}\n\n"
         )
-
     await message.answer(
         response,
-        reply_markup=ongoing_tournaments_button,
+        reply_markup=start_button if get_current_round_number(tournament["name"]) == "0" else ongoing_tournaments_button,
         parse_mode="Markdown",
     )
+    await message.answer(f"Here what you can do with ongoing tournaments.", reply_markup=ongoing_tournaments_button)
 
 
 @dp.message(F.text == "⏳ Upcoming")
@@ -566,9 +580,12 @@ def update_start_and_end_dates(tournament_id: str, start_date: str, end_date: st
         conn.close()
 
 
-@dp.message(F.text == "✅ start the tournament")
-@admin_required()
-async def start_tournir_keyborar(message: types.Message, state: FSMContext):
+@dp.callback_query(lambda c: c.data == "start_tournament_k")
+async def start_turninr(callback_query: types.CallbackQuery, state: FSMContext):
+    await bot.delete_message(
+        chat_id=callback_query.from_user.id,
+        message_id=callback_query.message.message_id,
+    )
     turnir = get_ongoing_tournaments()[0]
     tournament_id = turnir["name"]
     conn = sqlite3.connect("users_database.db")
@@ -579,7 +596,7 @@ async def start_tournir_keyborar(message: types.Message, state: FSMContext):
     )
     tournament = cursor.fetchone()
     if not tournament:
-        await message.answer(
+        await callback_query.message.answer(
             f"Tournament with ID {tournament_id} not found.",
             reply_markup=tournaments_admin_panel_button,
         )
@@ -587,12 +604,16 @@ async def start_tournir_keyborar(message: types.Message, state: FSMContext):
     tournament_name, start_time = tournament
     uzbekistan_time = datetime.now(timezone.utc) + timedelta(hours=5)
     try:
-        start_time = datetime.strptime(start_time, "%Y-%m-%d %H:%M:%S").replace(tzinfo=timezone.utc)
+        start_time = datetime.strptime(start_time, "%Y-%m-%d %H:%M:%S").replace(
+            tzinfo=timezone.utc
+        )
     except ValueError:
-        start_time = datetime.strptime(start_time, "%Y-%m-%d %H:%M").replace(tzinfo=timezone.utc)
+        start_time = datetime.strptime(start_time, "%Y-%m-%d %H:%M").replace(
+            tzinfo=timezone.utc
+        )
 
     if uzbekistan_time < start_time:
-        await message.answer(
+        await callback_query.message.answer(
             "Tournament cannot start before the scheduled time.",
             reply_markup=tournaments_admin_panel_button,
         )
@@ -604,7 +625,7 @@ async def start_tournir_keyborar(message: types.Message, state: FSMContext):
     participants = [row[0] for row in cursor.fetchall()]
     conn.close()
     if len(participants) < 2:
-        await message.answer(
+        await callback_query.message.answer(
             "Not enough participants to start the tournament.",
             reply_markup=tournaments_admin_panel_button,
         )
@@ -614,9 +635,8 @@ async def start_tournir_keyborar(message: types.Message, state: FSMContext):
     groups = create_groups(participants)
     for nk in range(len(groups)):
         for jk in groups[nk]:
-            save_tournament_round_info(tournament_id,round_number,jk, nk+1)
+            save_tournament_round_info(tournament_id, round_number, jk, nk + 1)
     await notify_groups(groups, round_number)
-
 
 
 async def notify_participants(participants, num_participants):
@@ -676,6 +696,7 @@ def get_game_id_from_mes(user_id):
     finally:
         conn.close()
 
+
 @dp.message(F.text == "✒️ edit maximum players")
 @admin_required()
 async def edit_maximum_players(message: types.Message, state: FSMContext):
@@ -719,12 +740,15 @@ async def set_new_max_players(message: types.Message, state: FSMContext):
             reply_markup=back_to_tournaments_button,
         )
         return
-    
+
     data = await state.get_data()
     tournament_id = data["tournament_id"]
     nop = get_current_players(tournament_id)
     if new_max_players < nop:
-        await message.answer("The new maximum number of players MUST not be less than registrated players ❌", reply_markup=tournaments_admin_panel_button)
+        await message.answer(
+            "The new maximum number of players MUST not be less than registrated players ❌",
+            reply_markup=tournaments_admin_panel_button,
+        )
         await state.clear()
         return
     update_maximum_players(tournament_id, new_max_players)

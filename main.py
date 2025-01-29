@@ -316,7 +316,6 @@ async def start_game_handler(message: types.Message, state: FSMContext):
             await message.answer(f"You are participating in a tournament and can't use this button until the tournament ends!")
             return
     if message.chat.type == "private":
-        
         if has_incomplete_games(message.from_user.id):
             await message.answer(
                 "You have incomplete games. Please finish or stop them before creating a new one.",
