@@ -267,7 +267,7 @@ async def my_cabinet(message: types.Message):
 
     # Create the inline keyboard with the withdraw button
     withdraw_button = InlineKeyboardButton("💸 Withdraw", callback_data="withdraw")
-    keyboard = InlineKeyboardMarkup(row_width=1).add(withdraw_button)
+    keyboard = InlineKeyboardMarkup(inline_keyboard=[]).add(withdraw_button)
 
     user_cabinet_message = (
         f"📱 *Your Cabinet*\n\n"
