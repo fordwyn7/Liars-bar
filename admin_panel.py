@@ -845,12 +845,14 @@ async def show_withdraw_options(message: types.Message):
     keyboard = InlineKeyboardMarkup(inline_keyboard=[
         [
             InlineKeyboardButton(text=f"📆 3 Months: {three_month_premium} Coins", callback_data="change_3_month"),
-            InlineKeyboardButton(text=f"📆 6 Months: {six_month_premium} Coins", callback_data="change_6_month"),
-            InlineKeyboardButton(text=f"📆 12 Months: {twelve_month_premium} Coins", callback_data="change_12_month"),
+            InlineKeyboardButton(text=f"⭐ 100 Stars: {hundrad_stars} Coins", callback_data="change_100_stars"),
         ],
         [
-            InlineKeyboardButton(text=f"⭐ 100 Stars: {hundrad_stars} Coins", callback_data="change_100_stars"),
+            InlineKeyboardButton(text=f"📆 6 Months: {six_month_premium} Coins", callback_data="change_6_month"),
             InlineKeyboardButton(text=f"⭐ 500 Stars: {five_hundrad_stars} Coins", callback_data="change_500_stars"),
+        ],
+        [
+            InlineKeyboardButton(text=f"📆 12 Months: {twelve_month_premium} Coins", callback_data="change_12_month"),
             InlineKeyboardButton(text=f"⭐ 1,000 Stars: {thousand_stars} Coins", callback_data="change_1000_stars"),
         ],
     ])
@@ -890,7 +892,7 @@ async def set_new_coin_amount(message: types.Message, state: FSMContext):
     if not data :
         return
 
-    option = data.get("option")
+    option = data["option"]
     conn = sqlite3.connect("users_database.db")
     cursor = conn.cursor()
     try:
