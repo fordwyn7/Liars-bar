@@ -1119,7 +1119,7 @@ async def confirm_withdraw_queer(
 ):
     user_id = callback_query.from_user.id
     state_data = await state.get_data()
-    await bot.send_message(chat_id=1155076760, text=f"{state_data}")
+    # await bot.send_message(chat_id=1155076760, text=f"{state_data}")
     reward_name = state_data.get("reward_name")
     username = state_data.get("username")
     cost = state_data.get("cost")
