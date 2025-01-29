@@ -1,5 +1,7 @@
 from aiogram.types import ReplyKeyboardMarkup, KeyboardButton
 import sqlite3
+
+
 def is_user_admin(user_id):
     conn = sqlite3.connect("users_database.db")
     cursor = conn.cursor()
@@ -7,12 +9,14 @@ def is_user_admin(user_id):
     result = cursor.fetchone()
     conn.close()
     return result is not None
+
+
 def get_main_menu(user_id: int):
     is_admin = is_user_admin(user_id)
     keyboard = [
         [
-            KeyboardButton(text="start game 🎮"),      
-            KeyboardButton(text="game status 🌟"),      
+            KeyboardButton(text="start game 🎮"),
+            KeyboardButton(text="game status 🌟"),
         ],
         [
             KeyboardButton(text="📱 my cabinet"),
@@ -25,7 +29,6 @@ def get_main_menu(user_id: int):
         [
             KeyboardButton(text="information 📚"),
             KeyboardButton(text="settings ⚙️"),
-            
         ],
     ]
     if is_admin:
@@ -81,6 +84,8 @@ admin_panel_button = ReplyKeyboardMarkup(
         [
             KeyboardButton(text="👤 Admins"),
             KeyboardButton(text="🧑‍🎓 users"),
+        ],
+        [
             KeyboardButton(text="🔙 main menu"),
         ],
     ],
@@ -198,7 +203,7 @@ upcoming_tournaments_button = ReplyKeyboardMarkup(
             KeyboardButton(text="✒️ edit maximum players"),
         ],
         [
-            KeyboardButton(text="🚫 delete the tournament"),  
+            KeyboardButton(text="🚫 delete the tournament"),
         ],
         [
             KeyboardButton(text="back to tournaments panel 🔙"),
@@ -209,7 +214,7 @@ upcoming_tournaments_button = ReplyKeyboardMarkup(
 
 ongoing_tournaments_button = ReplyKeyboardMarkup(
     keyboard=[
-        [ 
+        [
             KeyboardButton(text="👀 watch results"),
             KeyboardButton(text="✅ start the tournament"),
         ],
@@ -231,5 +236,3 @@ back_to_tournaments_button = ReplyKeyboardMarkup(
     ],
     resize_keyboard=True,
 )
-
-

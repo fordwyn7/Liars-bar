@@ -302,8 +302,44 @@ async def my_cabinet(message: types.Message):
 
 
 @dp.callback_query(lambda c: c.data == "withdraw")
-async def process_withdraw(callback_query: types.CallbackQuery):
-    await callback_query.answer("💸 Withdraw feature is coming soon!")
+async def process_withdraw_user(callback_query: types.CallbackQuery):
+    conn = sqlite3.connect("users_database.db")
+    cursor = conn.cursor()
+    cursor.execute("SELECT * FROM withdraw_options LIMIT 1")
+    withdraw_options = cursor.fetchone()
+    if not withdraw_options:
+        await callback_query.answer("❌ No withdrawal options found.")
+        conn.close()
+        return
+    three_month_premium, six_month_premium, twelve_month_premium, hundrad_stars, five_hundrad_stars, thousand_stars = withdraw_options
+    conn.close()
+    keyboard = InlineKeyboardMarkup(inline_keyboard=[
+        [
+            InlineKeyboardButton(text=f"❄️ 3 Months", callback_data="get_3_month"),
+            InlineKeyboardButton(text=f"⭐ 100 Stars", callback_data="get_100_stars"),
+        ],
+        [
+            InlineKeyboardButton(text=f"❄️ 6 Months", callback_data="get_6_month"),
+            InlineKeyboardButton(text=f"⭐ 500 Stars", callback_data="get_500_stars"),
+        ],
+        [
+            InlineKeyboardButton(text=f"❄️ 12 Months", callback_data="get_12_month"),
+            InlineKeyboardButton(text=f"⭐ 1,000 Stars", callback_data="get_1000_stars"),
+        ],
+    ])
+    withdraw_message = (
+        "💰 *Withdrawal options.*\n\n"
+        f"🚀 *Telegram Premium*\n"
+        f"❄️ *3 Months*: {three_month_premium} Unity Coins 💰\n"
+        f"❄️ *6 Months*: {six_month_premium} Unity Coins 💰\n"
+        f"❄️ *12 Months*: {twelve_month_premium} Unity Coins 💰\n\n"
+        f"⭐️ *Telegram Stars* \n"
+        f"✨ *100 Stars*: {hundrad_stars} Unity Coins 💰\n"
+        f"✨ *500 Stars*: {five_hundrad_stars} Unity Coins 💰\n"
+        f"✨ *1,000 Stars*: {thousand_stars} Unity Coins 💰\n\n"
+        "Press a button to change the Unity Coins for each option 👇"
+    )
+    await callback_query.message.answer(withdraw_message, parse_mode="Markdown", reply_markup=keyboard)
 
 
 @dp.message(F.text == "🤩 tournaments")
