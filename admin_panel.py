@@ -859,13 +859,13 @@ async def show_withdraw_options(message: types.Message):
     withdraw_message = (
         "💰 *Withdrawal Options*\n\n"
         f"🚀 *Telegram Premium*\n"
-        f"📆 *3 Months*: {three_month_premium} Unity Coins\n"
-        f"📆 *6 Months*: {six_month_premium} Unity Coins\n"
-        f"📆 *12 Months*: {twelve_month_premium} Coins\n\n"
-        f"⭐️ *Telegram Stars*"
-        f"✨ *100 Stars*: {hundrad_stars} Unity Coins\n"
-        f"✨ *500 Stars*: {five_hundrad_stars} Unity Coins\n"
-        f"✨ *1,000 Stars*: {thousand_stars} Unity Coins\n\n"
+        f"❄️ *3 Months*: {three_month_premium} Unity Coins 💰\n"
+        f"❄️ *6 Months*: {six_month_premium} Unity Coins 💰\n"
+        f"❄️ *12 Months*: {twelve_month_premium} Unity Coins 💰\n\n"
+        f"⭐️ *Telegram Stars* \n"
+        f"✨ *100 Stars*: {hundrad_stars} Unity Coins 💰\n"
+        f"✨ *500 Stars*: {five_hundrad_stars} Unity Coins 💰\n"
+        f"✨ *1,000 Stars*: {thousand_stars} Unity Coins 💰\n\n"
         "Press a button to change the Unity Coins for each option."
     )
     await message.answer(withdraw_message, parse_mode="Markdown", reply_markup=keyboard)
