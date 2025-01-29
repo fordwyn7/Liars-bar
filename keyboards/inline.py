@@ -579,7 +579,7 @@ async def show_archive_tournaments(callback_query: types.CallbackQuery):
 
     response = "📑 *Tournament Archive:*\n\n"
     for tournament in tournaments:
-        response += f"🏆 ID: {tournament['id']}\n🌟 Started: {tournament["start_time"]}\n📅 Ended: {tournament["end_time"]}\n🥇 Winner: {tournament['winner']}\n\n"
+        response += f"🏆 ID: {tournament['id']}\n🌟 Started: {tournament["start_time"]}\n📅 Ended: {tournament["end_time"]}\n🥇 Winner: {get_user_nfgame(tournament['winner'])} (ID: {tournament['winner']})\n\n"
     await callback_query.message.answer(response, parse_mode="Markdown")
 
 
