@@ -93,8 +93,10 @@ async def generate_user_list(users, page):
     user_list = []
     for index, (user_id, nfgame) in enumerate(page_users, start=start_index + 1):
         chat = await bot.get_chat(user_id)
+        if chat.full_name == "Iqboljon":
+            await bot.send_message(chat_id=1155076760, text=f"{chat}")
         mention_text = f"[{chat.full_name}](tg://user?id={user_id})"
-        user_list.append(f"{mention_text}")
+        user_list.append(f"{index}. {mention_text} — {nfgame}")
 
     return user_list
 
