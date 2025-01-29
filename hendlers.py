@@ -245,6 +245,9 @@ async def send_game_statistics(message: types.Message, state: FSMContext):
     await message.answer(game_status, parse_mode="Markdown", reply_markup=get_main_menu(message.from_user.id))
     await state.clear()
     
+from aiogram import types
+from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
+
 @dp.message(F.text == "📱 my cabinet")
 async def my_cabinet(message: types.Message):
     user_id = message.from_user.id
@@ -261,6 +264,11 @@ async def my_cabinet(message: types.Message):
     cursor.execute("SELECT COUNT(*) FROM game_archive WHERE user_id = ?", (user_id,))
     games_played = cursor.fetchone()[0]
     conn.close()
+
+    # Create the inline keyboard with the withdraw button
+    withdraw_button = InlineKeyboardButton("💸 Withdraw", callback_data="withdraw")
+    keyboard = InlineKeyboardMarkup(row_width=1).add(withdraw_button)
+
     user_cabinet_message = (
         f"📱 *Your Cabinet*\n\n"
         f"👤 *Username:* {nfgame}\n"
@@ -268,7 +276,11 @@ async def my_cabinet(message: types.Message):
         f"🎮 *Games Played:* {games_played}\n"
         f"💰 *Unity Coins:* {unity_coins}\n"
     )
-    await message.answer(user_cabinet_message, parse_mode="Markdown")
+    await message.answer(user_cabinet_message, parse_mode="Markdown", reply_markup=keyboard)
+@dp.callback_query(lambda c: c.data == "withdraw")
+async def process_withdraw(callback_query: types.CallbackQuery):
+    # Handle the withdraw logic here
+    await callback_query.answer("💸 Withdraw feature is coming soon!")
 
 @dp.message(F.text == "🤩 tournaments")
 async def tournaments_users_button(message: types.Message):
