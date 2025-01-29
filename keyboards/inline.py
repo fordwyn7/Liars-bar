@@ -217,7 +217,7 @@ async def player_quit_game(user_id, game_id, inviter_id):
         cursor.execute(
             "SELECT nfgame FROM users_database WHERE user_id = ?", (user_id,)
         )
-        
+
         player_name = cursor.fetchone()
         if player_name:
             player_name = get_user_nfgame(user_id)
@@ -228,7 +228,7 @@ async def player_quit_game(user_id, game_id, inviter_id):
                 )
             except Exception as e:
                 print(f"Error sending message to creator {inviter_id}: {e}")
-        
+
 
 @dp.callback_query(lambda c: c.data == "cancel_game")
 async def handle_quit_game(callback_query: types.CallbackQuery):
@@ -291,7 +291,9 @@ async def handle_quit_game(callback_query: types.CallbackQuery):
                     users = users[0]
                     if users and is_player_dead(game_id, users):
                         update_game_details(
-                            game_id, users, get_user_nfgame(winner) + " - " + str(winner)
+                            game_id,
+                            users,
+                            get_user_nfgame(winner) + " - " + str(winner),
                         )
                         await bot.send_message(
                             chat_id=users,
@@ -391,7 +393,10 @@ async def exclude_player_querriy(callback_query: types.CallbackQuery):
             await callback_query.answer("Only the game creator can exclude players.")
             return
         if is_game_started(game_id) and is_user_turn(player_to_remove, game_id):
-            await bot.send_message(chat_id=user.id, text=f"Now it's {get_user_nfgame(player_to_remove)}'s turn❗️\nYou can not exclude this player when it is his turn.")
+            await bot.send_message(
+                chat_id=user.id,
+                text=f"Now it's {get_user_nfgame(player_to_remove)}'s turn❗️\nYou can not exclude this player when it is his turn.",
+            )
             return
         cursor.execute(
             "DELETE FROM invitations WHERE invitee_id = ? AND game_id = ?",
@@ -517,12 +522,24 @@ async def show_upcoming_tournaments(callback_query: types.CallbackQuery):
             reply_markup=get_main_menu(callback_query.from_user.id),
         )
         return
-    
     for tournament in tournaments:
-        if "_" in tournament['name']:
-            nop = get_current_players(tournament['name'].split("_")[1])
+        if "_" in tournament["name"]:
+            nop = get_current_players(tournament["name"].split("_")[1])
         else:
-            nop = get_current_players(tournament['name'])
+            nop = get_current_players(tournament["name"])
+        if is_user_in_tournament(tournament["name"], callback_query.from_user.id):
+            response = (
+                f"🌟 Tournament ID: {tournament['id']}\n"
+                f"🗓 Starts: {tournament['start_time']}\n"
+                f"🏁 Ends: {tournament['end_time']}\n\n"
+                f"🗓 Registration starts: {tournament['register_start']}\n"
+                f"🏁 Registration ends: {tournament['register_end']}\n\n"
+                f"👥 Registered Players: {nop}/{tournament['maximum_players']}\n\n"
+                f"🏆 Prize: \n\n{tournament['prize']}\n\n"
+                f"You are participating in this tournament ⚡️⚡️⚡️"
+            )
+            await callback_query.message.answer(response, parse_mode="Markdown")
+            return
         response = (
             f"🌟 Tournament ID: {tournament['id']}\n"
             f"🗓 Starts: {tournament['start_time']}\n"
@@ -534,19 +551,20 @@ async def show_upcoming_tournaments(callback_query: types.CallbackQuery):
             f"⚠️Once you register for the tournament, you can't quit it ❗️\n"
             f"🔗 Join using the button below:"
         )
-        keyboard = InlineKeyboardMarkup(inline_keyboard=[
-            [
-                InlineKeyboardButton(
-                    text="🔥 Join the Tournament 🔥",
-                    callback_data=f"join_tournament:{tournament['name']}"
-                )
+        keyboard = InlineKeyboardMarkup(
+            inline_keyboard=[
+                [
+                    InlineKeyboardButton(
+                        text="🔥 Join the Tournament 🔥",
+                        callback_data=f"join_tournament:{tournament['name']}",
+                    )
+                ]
             ]
-        ])
+        )
 
         await callback_query.message.answer(
             response, reply_markup=keyboard, parse_mode="Markdown"
         )
-
 
 
 async def show_archive_tournaments(callback_query: types.CallbackQuery):
@@ -564,6 +582,7 @@ async def show_archive_tournaments(callback_query: types.CallbackQuery):
         response += f"🏆 ID: {tournament['id']}\n🌟 Started: {tournament["start_time"]}\n📅 Ended: {tournament["end_time"]}\n🥇 Winner: {tournament['winner']}\n\n"
     await callback_query.message.answer(response, parse_mode="Markdown")
 
+
 @dp.callback_query(lambda c: c.data.startswith("join_tournament:"))
 async def join_tournament(callback_query: types.CallbackQuery):
     tournament_id = callback_query.data.split(":")[1]
@@ -571,18 +590,28 @@ async def join_tournament(callback_query: types.CallbackQuery):
     current_time = datetime.now(timezone.utc) + timedelta(hours=5)
     tournament = get_upcoming_tournaments()
     if not tournament:
-        await callback_query.answer(f"Tournament not found or already started/finished 😕", show_alert=True)
+        await callback_query.answer(
+            f"Tournament not found or already started/finished 😕", show_alert=True
+        )
         return
     tournament = tournament[0]
     try:
-        register_start = datetime.strptime(tournament["register_start"], "%Y-%m-%d %H:%M:%S").replace(tzinfo=timezone.utc)
+        register_start = datetime.strptime(
+            tournament["register_start"], "%Y-%m-%d %H:%M:%S"
+        ).replace(tzinfo=timezone.utc)
     except ValueError:
-        register_start = datetime.strptime(tournament["register_start"], "%Y-%m-%d %H:%M").replace(tzinfo=timezone.utc)
+        register_start = datetime.strptime(
+            tournament["register_start"], "%Y-%m-%d %H:%M"
+        ).replace(tzinfo=timezone.utc)
 
     try:
-        register_end = datetime.strptime(tournament["register_end"], "%Y-%m-%d %H:%M:%S").replace(tzinfo=timezone.utc)
+        register_end = datetime.strptime(
+            tournament["register_end"], "%Y-%m-%d %H:%M:%S"
+        ).replace(tzinfo=timezone.utc)
     except ValueError:
-        register_end = datetime.strptime(tournament["register_end"], "%Y-%m-%d %H:%M").replace(tzinfo=timezone.utc)
+        register_end = datetime.strptime(
+            tournament["register_end"], "%Y-%m-%d %H:%M"
+        ).replace(tzinfo=timezone.utc)
     if not (register_start <= current_time <= register_end):
         await callback_query.answer(
             f"❌ Registration is only open between {register_start.strftime('%Y-%m-%d %H:%M')} and {register_end.strftime('%Y-%m-%d %H:%M')}.",
@@ -590,17 +619,21 @@ async def join_tournament(callback_query: types.CallbackQuery):
         )
         return
     if is_user_in_tournament(tournament_id, user_id):
-        await callback_query.answer("❕ You are already registered for this tournament.", show_alert=True)
+        await callback_query.answer(
+            "❕ You are already registered for this tournament.", show_alert=True
+        )
         return
-    nop = get_current_players(tournament['name'])
-    max_num = tournament['maximum_players']
+    nop = get_current_players(tournament["name"])
+    max_num = tournament["maximum_players"]
     if nop == max_num:
         await callback_query.answer("No free spots available 😔", show_alert=True)
         return
     try:
         add_user_to_tournament(tournament_id, user_id)
-        await callback_query.answer("✅ You have successfully joined the tournament!", show_alert=True)
-        updated_nop = get_current_players(tournament['name'])
+        await callback_query.answer(
+            "✅ You have successfully joined the tournament!", show_alert=True
+        )
+        updated_nop = get_current_players(tournament["name"])
         message_id = callback_query.message.message_id
         chat_id = callback_query.message.chat.id
         response = (
@@ -614,13 +647,10 @@ async def join_tournament(callback_query: types.CallbackQuery):
             f"You are participating in this tournament ⚡️⚡️⚡️"
         )
         await bot.edit_message_text(
-            chat_id=chat_id,
-            message_id=message_id,
-            text=response,
-            parse_mode="Markdown"
+            chat_id=chat_id, message_id=message_id, text=response, parse_mode="Markdown"
         )
     except Exception as e:
         print(f"❌ Error adding user to tournament: {e}")
-        await callback_query.answer("❌ Failed to join the tournament. Please try again later.", show_alert=True)
-
-
+        await callback_query.answer(
+            "❌ Failed to join the tournament. Please try again later.", show_alert=True
+        )
