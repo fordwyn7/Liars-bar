@@ -10,7 +10,7 @@ from aiogram.utils.keyboard import InlineKeyboardBuilder
 from states.state import *
 from hendlers import get_user_game_archive
 from datetime import datetime, timedelta
-from aiogram.utils.markdown import mention
+# from aiogram.utils.markdown import mention
 
 
 def generate_callback(action: str, admin_id: int) -> str:
@@ -98,7 +98,9 @@ async def generate_user_list(users, page):
     user_list = []
     for index, (user_id, nfgame) in enumerate(page_users, start=start_index + 1):
         chat = await bot.get_chat(user_id)
-        user_list.append(f"{index}. {mention(chat.first_name, user_id)} — {nfgame}")
+        mention_text = f"[{chat.first_name}](tg://user?id={user_id})"
+        user_list.append(f"{index}. {mention_text} — {nfgame}")
+
 
     return user_list
 
@@ -415,7 +417,7 @@ async def list_users(message: types.Message):
         pagination_buttons = create_pagination_buttons(page, len(users))
         await message.answer(
             f"Here is the list of users (page {page}):\n\n{user_details}",
-            parse_mode="HTML",
+            parse_mode="MarkdownV2",
             reply_markup=pagination_buttons,
         )
 
@@ -448,7 +450,7 @@ async def paginate_users(callback_query: types.CallbackQuery):
     pagination_buttons = create_pagination_buttons(page, len(users))
     await callback_query.message.edit_text(
         f"List of users (page {page}):\n\n{user_details}",
-        parse_mode="HTML",
+        parse_mode="MarkdownV2",
         reply_markup=pagination_buttons,
     )
     await callback_query.answer()
