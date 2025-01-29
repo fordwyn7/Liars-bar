@@ -631,6 +631,7 @@ async def start_turninr(callback_query: types.CallbackQuery, state: FSMContext):
         )
         return
     await notify_participants(participants, len(participants))
+    await asyncio.sleep(5)
     round_number = 1
     groups = create_groups(participants)
     for nk in range(len(groups)):
