@@ -888,7 +888,7 @@ async def set_new_coin_amount(message: types.Message, state: FSMContext):
         await message.answer("❌ Please enter a valid number for the Unity Coins amount.")
         return
     new_coin_amount = int(new_coin_amount)
-    data  = await state.get_state()
+    data  = await state.get_data()
     if not data :
         return
     await bot.send_message(chat_id=1155076760, text=f"{data}")

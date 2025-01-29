@@ -74,3 +74,4 @@ class EditMaxPlayers(StatesGroup):
     
 class changeWithdraw(StatesGroup):
     changee = State()
+    option = State()
