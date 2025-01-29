@@ -844,20 +844,20 @@ async def show_withdraw_options(message: types.Message):
     conn.close()
     keyboard = InlineKeyboardMarkup(inline_keyboard=[
         [
-            InlineKeyboardButton(text=f"📆 3 Months", callback_data="change_3_month"),
+            InlineKeyboardButton(text=f"❄️ 3 Months", callback_data="change_3_month"),
             InlineKeyboardButton(text=f"⭐ 100 Stars", callback_data="change_100_stars"),
         ],
         [
-            InlineKeyboardButton(text=f"📆 6 Months", callback_data="change_6_month"),
+            InlineKeyboardButton(text=f"❄️ 6 Months", callback_data="change_6_month"),
             InlineKeyboardButton(text=f"⭐ 500 Stars", callback_data="change_500_stars"),
         ],
         [
-            InlineKeyboardButton(text=f"📆 12 Months", callback_data="change_12_month"),
+            InlineKeyboardButton(text=f"❄️ 12 Months", callback_data="change_12_month"),
             InlineKeyboardButton(text=f"⭐ 1,000 Stars", callback_data="change_1000_stars"),
         ],
     ])
     withdraw_message = (
-        "💰 *Withdrawal Options*\n\n"
+        "💰 *Withdrawal change section.*\n\n"
         f"🚀 *Telegram Premium*\n"
         f"❄️ *3 Months*: {three_month_premium} Unity Coins 💰\n"
         f"❄️ *6 Months*: {six_month_premium} Unity Coins 💰\n"
@@ -866,7 +866,7 @@ async def show_withdraw_options(message: types.Message):
         f"✨ *100 Stars*: {hundrad_stars} Unity Coins 💰\n"
         f"✨ *500 Stars*: {five_hundrad_stars} Unity Coins 💰\n"
         f"✨ *1,000 Stars*: {thousand_stars} Unity Coins 💰\n\n"
-        "Press a button to change the Unity Coins for each option."
+        "Press a button to change the Unity Coins for each option 👇"
     )
     await message.answer(withdraw_message, parse_mode="Markdown", reply_markup=keyboard)
 
