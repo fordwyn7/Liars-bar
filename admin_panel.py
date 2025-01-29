@@ -1111,7 +1111,7 @@ async def get_username_for_withdraw(message: types.Message, state: FSMContext):
     await message.answer(
         confirmation_message, parse_mode="Markdown", reply_markup=keyboard
     )
-    await state.set_data({"username": username, "reward_name": reward_name, "cost": cost})
+    await state.update_data(username=username)
 
 @dp.callback_query(lambda c: c.data == "confirm_withdraw")
 async def confirm_withdraw_queer(
@@ -1130,7 +1130,6 @@ async def confirm_withdraw_queer(
         f"👤 *To Who*: {username}\n"
         f"💰 *Cost*: {cost} Unity Coins\n"
         f"🔢 *User ID*: {user_id}\n\n"
-        "Options: ✅ Confirm | ❌ Cancel"
     )
     conn = sqlite3.connect("users_database.db")
     cursor = conn.cursor()
