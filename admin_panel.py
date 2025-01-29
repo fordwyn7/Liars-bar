@@ -871,9 +871,8 @@ async def show_withdraw_options(message: types.Message):
 @dp.callback_query(lambda c: c.data.startswith("change_"))
 async def change_withdraw_option(callback_query: types.CallbackQuery, state: FSMContext):
     option = callback_query.data
-    user_id = callback_query.from_user.id
     await callback_query.message.answer(f"💬 Please enter the new Unity Coins amount for {option.replace('change_', '').replace('_', ' ').title()}:", reply_markup=back_to_admin_panel)
-    await state.set_data(option=option)
+    await state.set_data({"option": option})
     await state.set_state(changeWithdraw.changee)
 
 @dp.message(changeWithdraw.changee)
