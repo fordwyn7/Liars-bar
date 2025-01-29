@@ -75,3 +75,6 @@ class EditMaxPlayers(StatesGroup):
 class changeWithdraw(StatesGroup):
     changee = State()
     option = State()
+    
+class waiting_for_username_withdraw(StatesGroup):
+    username_withdraw = State()

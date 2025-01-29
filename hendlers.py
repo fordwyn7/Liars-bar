@@ -337,7 +337,7 @@ async def process_withdraw_user(callback_query: types.CallbackQuery):
         f"✨ *100 Stars*: {hundrad_stars} Unity Coins 💰\n"
         f"✨ *500 Stars*: {five_hundrad_stars} Unity Coins 💰\n"
         f"✨ *1,000 Stars*: {thousand_stars} Unity Coins 💰\n\n"
-        "Press a button to change the Unity Coins for each option 👇"
+        "Choose a button to get 👇"
     )
     await callback_query.message.answer(withdraw_message, parse_mode="Markdown", reply_markup=keyboard)
 

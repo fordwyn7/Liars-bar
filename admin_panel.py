@@ -10,7 +10,9 @@ from aiogram.utils.keyboard import InlineKeyboardBuilder
 from states.state import *
 from hendlers import get_user_game_archive
 from datetime import datetime, timedelta
+
 # from aiogram.utils.markdown import mention
+
 
 def generate_callback(action: str, admin_id: int) -> str:
     return f"{action}:{admin_id}"
@@ -645,15 +647,17 @@ async def users_balance(message: types.Message, state: FSMContext):
         reply_markup=users_balance_button,
     )
 
+
 @dp.message(F.text == "➕ Add Unity Coins to All Users")
 @admin_required()
 async def add_unity_coins_to_all(message: types.Message, state: FSMContext):
     await message.answer(
         "Please enter the amount of Unity Coins you want to add to all users:",
-        reply_markup=back_to_admin_panel
+        reply_markup=back_to_admin_panel,
     )
     await state.set_state(waiting_for_coin_amount.unity_coin_amount)
-    
+
+
 @dp.message(waiting_for_coin_amount.unity_coin_amount)
 @admin_required()
 async def process_coin_amount(message: types.Message, state: FSMContext):
@@ -666,7 +670,10 @@ async def process_coin_amount(message: types.Message, state: FSMContext):
     try:
         coin_amount = int(message.text.strip())
     except ValueError:
-        await message.answer("Please enter a valid number of Unity Coins.", reply_markup=back_to_admin_panel)
+        await message.answer(
+            "Please enter a valid number of Unity Coins.",
+            reply_markup=back_to_admin_panel,
+        )
     conn = sqlite3.connect("users_database.db")
     cursor = conn.cursor()
     cursor.execute("SELECT user_id FROM users_database")
@@ -690,14 +697,16 @@ async def process_coin_amount(message: types.Message, state: FSMContext):
     )
     await state.clear()
 
+
 @dp.message(F.text == "👀 View User Unity Coins")
 @admin_required()
 async def view_users_balance(message: types.Message, state: FSMContext):
     await message.answer(
         "Please provide the user ID or username to view the Unity coin balance.",
-        reply_markup=back_to_admin_panel
+        reply_markup=back_to_admin_panel,
     )
     await state.set_state(waiting_for_user_id_or_username.waiting_amount)
+
 
 @dp.message(waiting_for_user_id_or_username.waiting_amount)
 async def handle_user_input_for_balance(message: types.Message, state: FSMContext):
@@ -712,10 +721,10 @@ async def handle_user_input_for_balance(message: types.Message, state: FSMContex
     cursor = conn.cursor()
     cursor.execute(
         "SELECT user_id, nfgame, unity_coin FROM users_database WHERE user_id = ? OR nfgame = ?",
-        (user_input, user_input)
+        (user_input, user_input),
     )
     user = cursor.fetchone()
-    
+
     if user:
         global username
         user_id, username, unity_coin = user
@@ -725,14 +734,15 @@ async def handle_user_input_for_balance(message: types.Message, state: FSMContex
             f"💰 Unity Coins: {unity_coin}\n"
             f"🆔 User ID: {user_id}\n\n"
             "Choose an action below:",
-            reply_markup=change_users_balance
+            reply_markup=change_users_balance,
         )
         await state.clear()
-        
+
     else:
         await message.answer("❌ User not found. :(", reply_markup=users_balance_button)
         await state.clear()
         return
+
 
 @dp.message(F.text == "➕ Add Unity Coins")
 @admin_required()
@@ -740,11 +750,16 @@ async def add_unity_coins(message: types.Message, state: FSMContext):
     if username:
         await message.answer(
             "Please provide the amount of Unity coins to add.",
-            reply_markup=back_to_admin_panel
+            reply_markup=back_to_admin_panel,
         )
-        await state.set_state(waiting_for_user_id_or_username.waiting_for_add_coin_amount)
+        await state.set_state(
+            waiting_for_user_id_or_username.waiting_for_add_coin_amount
+        )
     else:
-        await message.answer("❌ No user selected. Please try again.", reply_markup=back_to_admin_panel)
+        await message.answer(
+            "❌ No user selected. Please try again.", reply_markup=back_to_admin_panel
+        )
+
 
 @dp.message(waiting_for_user_id_or_username.waiting_for_add_coin_amount)
 async def handle_add_unity_coins(message: types.Message, state: FSMContext):
@@ -757,34 +772,49 @@ async def handle_add_unity_coins(message: types.Message, state: FSMContext):
     try:
         add_amount = int(message.text.strip())
         if add_amount <= 0:
-            await message.answer("❌ The amount must be greater than 0.", reply_markup=back_to_admin_panel)
+            await message.answer(
+                "❌ The amount must be greater than 0.",
+                reply_markup=back_to_admin_panel,
+            )
             return
-        
+
         conn = sqlite3.connect("users_database.db")
         cursor = conn.cursor()
         cursor.execute(
             "UPDATE users_database SET unity_coin = unity_coin + ? WHERE user_id = ? or nfgame = ?",
-            (add_amount, username, username)
+            (add_amount, username, username),
         )
         conn.commit()
         conn.close()
-    
-        await message.answer(f"✅ {add_amount} Unity Coins have been added to the user's balance!", reply_markup=change_users_balance)
+
+        await message.answer(
+            f"✅ {add_amount} Unity Coins have been added to the user's balance!",
+            reply_markup=change_users_balance,
+        )
         await state.clear()
     except ValueError:
-        await message.answer("❌ Please provide a valid number for Unity coins.", reply_markup=back_to_admin_panel)
+        await message.answer(
+            "❌ Please provide a valid number for Unity coins.",
+            reply_markup=back_to_admin_panel,
+        )
+
 
 @dp.message(F.text == "➖ Subtract Unity Coins")
 @admin_required()
-async def subtract_unity_coins(message: types.Message, state: FSMContext):    
+async def subtract_unity_coins(message: types.Message, state: FSMContext):
     if username:
         await message.answer(
             "Please provide the amount of Unity coins to subtract.",
-            reply_markup=back_to_admin_panel
+            reply_markup=back_to_admin_panel,
         )
-        await state.set_state(waiting_for_user_id_or_username.waiting_for_subtract_coin_amount)
+        await state.set_state(
+            waiting_for_user_id_or_username.waiting_for_subtract_coin_amount
+        )
     else:
-        await message.answer("❌ No user selected. Please try again.", reply_markup=back_to_admin_panel)
+        await message.answer(
+            "❌ No user selected. Please try again.", reply_markup=back_to_admin_panel
+        )
+
 
 @dp.message(waiting_for_user_id_or_username.waiting_for_subtract_coin_amount)
 async def handle_subtract_unity_coins(message: types.Message, state: FSMContext):
@@ -795,38 +825,46 @@ async def handle_subtract_unity_coins(message: types.Message, state: FSMContext)
         await state.clear()
         return
     if not message.text.isdigit():
-        await message.answer(f"Please enter correct number !", reply_markup=back_to_admin_panel)
+        await message.answer(
+            f"Please enter correct number !", reply_markup=back_to_admin_panel
+        )
     else:
         subtract_amount = int(message.text.strip())
         if subtract_amount <= 0:
-            await message.answer("❌ The amount must be greater than 0.", reply_markup=change_users_balance)
+            await message.answer(
+                "❌ The amount must be greater than 0.",
+                reply_markup=change_users_balance,
+            )
             await state.clear()
             return
         conn = sqlite3.connect("users_database.db")
         cursor = conn.cursor()
         cursor.execute(
             "UPDATE users_database SET unity_coin = unity_coin - ? WHERE user_id = ? or nfgame = ?",
-            (subtract_amount, username, username)
+            (subtract_amount, username, username),
         )
         conn.commit()
         conn.close()
 
-        await message.answer(f"✅ {subtract_amount} Unity Coins have been subtracted from the user's balance!", reply_markup=change_users_balance)
+        await message.answer(
+            f"✅ {subtract_amount} Unity Coins have been subtracted from the user's balance!",
+            reply_markup=change_users_balance,
+        )
         await state.clear()
-        
+
 
 @dp.message(F.text == "/stop_all_incomplete_games")
 @admin_required()
 async def stop_all_incomplete_games_command(message: types.Message, state: FSMContext):
     users = get_all_user_ids()
-    
+
     for userid in users:
-        try: 
+        try:
             delete_user_from_all_games(userid)
         except:
             continue
     await message.answer(f"All users' incomplete games has been stopped ✅")
-    
+
 
 @dp.message(F.text == "💰 withdraw change")
 @admin_required()
@@ -839,23 +877,44 @@ async def show_withdraw_options(message: types.Message):
         await message.answer("❌ No withdrawal options found.")
         conn.close()
         return
-    
-    three_month_premium, six_month_premium, twelve_month_premium, hundrad_stars, five_hundrad_stars, thousand_stars = withdraw_options
+
+    (
+        three_month_premium,
+        six_month_premium,
+        twelve_month_premium,
+        hundrad_stars,
+        five_hundrad_stars,
+        thousand_stars,
+    ) = withdraw_options
     conn.close()
-    keyboard = InlineKeyboardMarkup(inline_keyboard=[
-        [
-            InlineKeyboardButton(text=f"❄️ 3 Months", callback_data="change_3_month"),
-            InlineKeyboardButton(text=f"⭐ 100 Stars", callback_data="change_100_stars"),
-        ],
-        [
-            InlineKeyboardButton(text=f"❄️ 6 Months", callback_data="change_6_month"),
-            InlineKeyboardButton(text=f"⭐ 500 Stars", callback_data="change_500_stars"),
-        ],
-        [
-            InlineKeyboardButton(text=f"❄️ 12 Months", callback_data="change_12_month"),
-            InlineKeyboardButton(text=f"⭐ 1,000 Stars", callback_data="change_1000_stars"),
-        ],
-    ])
+    keyboard = InlineKeyboardMarkup(
+        inline_keyboard=[
+            [
+                InlineKeyboardButton(
+                    text=f"❄️ 3 Months", callback_data="change_3_month"
+                ),
+                InlineKeyboardButton(
+                    text=f"⭐ 100 Stars", callback_data="change_100_stars"
+                ),
+            ],
+            [
+                InlineKeyboardButton(
+                    text=f"❄️ 6 Months", callback_data="change_6_month"
+                ),
+                InlineKeyboardButton(
+                    text=f"⭐ 500 Stars", callback_data="change_500_stars"
+                ),
+            ],
+            [
+                InlineKeyboardButton(
+                    text=f"❄️ 12 Months", callback_data="change_12_month"
+                ),
+                InlineKeyboardButton(
+                    text=f"⭐ 1,000 Stars", callback_data="change_1000_stars"
+                ),
+            ],
+        ]
+    )
     withdraw_message = (
         "💰 *Withdrawal change section.*\n\n"
         f"🚀 *Telegram Premium*\n"
@@ -870,26 +929,37 @@ async def show_withdraw_options(message: types.Message):
     )
     await message.answer(withdraw_message, parse_mode="Markdown", reply_markup=keyboard)
 
+
 @dp.callback_query(lambda c: c.data.startswith("change_"))
-async def change_withdraw_option(callback_query: types.CallbackQuery, state: FSMContext):
+async def change_withdraw_option(
+    callback_query: types.CallbackQuery, state: FSMContext
+):
     option = callback_query.data
-    await callback_query.message.answer(f"💬 Please enter the new Unity Coins amount for {option.replace('change_', '').replace('_', ' ').title()}:", reply_markup=back_to_admin_panel)
+    await callback_query.message.answer(
+        f"💬 Please enter the new Unity Coins amount for {option.replace('change_', '').replace('_', ' ').title()}:",
+        reply_markup=back_to_admin_panel,
+    )
     await state.set_data({"option": option})
     await state.set_state(changeWithdraw.changee)
+
 
 @dp.message(changeWithdraw.changee)
 async def set_new_coin_amount(message: types.Message, state: FSMContext):
     if message.text == "back to admin panel 🔙":
-        await message.answer("You are in admin panel 👇", reply_markup=admin_panel_button)
+        await message.answer(
+            "You are in admin panel 👇", reply_markup=admin_panel_button
+        )
         await state.clear()
         return
     new_coin_amount = message.text.strip()
     if not new_coin_amount.isdigit():
-        await message.answer("❌ Please enter a valid number for the Unity Coins amount.")
+        await message.answer(
+            "❌ Please enter a valid number for the Unity Coins amount."
+        )
         return
     new_coin_amount = int(new_coin_amount)
-    data  = await state.get_data()
-    if not data :
+    data = await state.get_data()
+    if not data:
         return
     option = data.get("option")
     conn = sqlite3.connect("users_database.db")
@@ -897,25 +967,221 @@ async def set_new_coin_amount(message: types.Message, state: FSMContext):
     try:
         conn = sqlite3.connect("users_database.db")
         cursor = conn.cursor()
-        
+
         if option == "change_3_month":
-            cursor.execute("UPDATE withdraw_options SET three_month_premium = ? WHERE rowid = 1", (new_coin_amount,))
+            cursor.execute(
+                "UPDATE withdraw_options SET three_month_premium = ? WHERE rowid = 1",
+                (new_coin_amount,),
+            )
         elif option == "change_6_month":
-            cursor.execute("UPDATE withdraw_options SET six_month_premium = ? WHERE rowid = 1", (new_coin_amount,))
+            cursor.execute(
+                "UPDATE withdraw_options SET six_month_premium = ? WHERE rowid = 1",
+                (new_coin_amount,),
+            )
         elif option == "change_12_month":
-            cursor.execute("UPDATE withdraw_options SET twelve_month_premium = ? WHERE rowid = 1", (new_coin_amount,))
+            cursor.execute(
+                "UPDATE withdraw_options SET twelve_month_premium = ? WHERE rowid = 1",
+                (new_coin_amount,),
+            )
         elif option == "change_100_stars":
-            cursor.execute("UPDATE withdraw_options SET hundrad_stars = ? WHERE rowid = 1", (new_coin_amount,))
+            cursor.execute(
+                "UPDATE withdraw_options SET hundrad_stars = ? WHERE rowid = 1",
+                (new_coin_amount,),
+            )
         elif option == "change_500_stars":
-            cursor.execute("UPDATE withdraw_options SET five_hundrad_stars = ? WHERE rowid = 1", (new_coin_amount,))
+            cursor.execute(
+                "UPDATE withdraw_options SET five_hundrad_stars = ? WHERE rowid = 1",
+                (new_coin_amount,),
+            )
         elif option == "change_1000_stars":
-            cursor.execute("UPDATE withdraw_options SET thousand_stars = ? WHERE rowid = 1", (new_coin_amount,))
-        
+            cursor.execute(
+                "UPDATE withdraw_options SET thousand_stars = ? WHERE rowid = 1",
+                (new_coin_amount,),
+            )
+
         conn.commit()
         conn.close()
-        await message.answer(f"✅ The Unity Coins amount for {option.replace('change_', '').replace('_', ' ').title()} has been updated to {new_coin_amount} coins.", reply_markup=admin_panel_button)
+        await message.answer(
+            f"✅ The Unity Coins amount for {option.replace('change_', '').replace('_', ' ').title()} has been updated to {new_coin_amount} coins.",
+            reply_markup=admin_panel_button,
+        )
     except sqlite3.Error as e:
         await message.answer(f"❌ There was an error while updating the database: {e}")
-    
+
     finally:
         await state.clear()
+
+
+@dp.callback_query(lambda c: c.data.startswith("get_"))
+async def process_withdraw_user(callback_query: types.CallbackQuery, state: FSMContext):
+    user_id = callback_query.from_user.id
+    option = callback_query.data
+    conn = sqlite3.connect("users_database.db")
+    cursor = conn.cursor()
+    cursor.execute("SELECT * FROM withdraw_options LIMIT 1")
+    withdraw_options = cursor.fetchone()
+    if not withdraw_options:
+        await callback_query.answer("❌ No withdrawal options found.")
+        conn.close()
+        return
+    (
+        three_month_premium,
+        six_month_premium,
+        twelve_month_premium,
+        hundrad_stars,
+        five_hundrad_stars,
+        thousand_stars,
+    ) = withdraw_options
+    conn.close()
+    conn = sqlite3.connect("users_database.db")
+    cursor = conn.cursor()
+    cursor.execute(
+        "SELECT unity_coin FROM users_database WHERE user_id = ?", (user_id,)
+    )
+    user_info = cursor.fetchone()
+
+    if not user_info:
+        await callback_query.answer("❌ You are not registered in the system.")
+        conn.close()
+        return
+
+    user_unity_coins = user_info[0]
+    cost = 0
+    reward_name = ""
+
+    if option == "get_3_month":
+        cost = int(three_month_premium)
+        reward_name = "🚀 3 Months Telegram Premium"
+    elif option == "get_6_month":
+        cost = int(six_month_premium)
+        reward_name = "🚀 6 Months Telegram Premium"
+    elif option == "get_12_month":
+        cost = int(twelve_month_premium)
+        reward_name = "🚀 12 Months Telegram Premium"
+    elif option == "get_100_stars":
+        cost = int(hundrad_stars)
+        reward_name = "⭐️ 100 Stars"
+    elif option == "get_500_stars":
+        cost = int(five_hundrad_stars)
+        reward_name = "⭐️ 500 Stars"
+    elif option == "get_1000_stars":
+        cost = int(thousand_stars)
+        reward_name = "⭐️ 1,000 Stars"
+    if user_unity_coins < cost:
+        await callback_query.answer(
+            f"❌ You need {cost - user_unity_coins} more Unity Coins to get this item.",
+            show_alert=True,
+        )
+        return
+
+    await callback_query.message.answer(
+        f"💬 You selected - {reward_name}! \nPlease provide any Telegram username that you want to get item to:\n\n❗️Note that if the username you entered is incorrect, your reward won't be given."
+    )
+    await state.set_data({"reward_name": reward_name, "cost": cost})
+    await state.set_state(waiting_for_username_withdraw.username_withdraw)
+
+
+@dp.message(waiting_for_username_withdraw.username_withdraw)
+async def get_username_for_withdraw(message: types.Message, state: FSMContext):
+    user_id = message.from_user.id
+    username = message.text.strip()
+    state_data = await state.get_data()
+    reward_name = state_data["reward_name"]
+    cost = state_data["cost"]
+
+    confirmation_message = (
+        f"💬 Please confirm your withdrawal details:\n\n"
+        f"🎁 *Item Name*: {reward_name}\n"
+        f"👤 *To Who*: {username}\n"
+        f"💰 *Cost*: {cost} Unity Coins\n\n"
+        "Do you confirm?"
+    )
+
+    keyboard = InlineKeyboardMarkup(
+        inline_keyboard=[
+            [
+                InlineKeyboardButton(text="✅ Yes", callback_data="confirm_withdraw"),
+            ],
+            [
+                InlineKeyboardButton(text="❌ No", callback_data="cancel_withdraw"),
+            ],
+        ]
+    )
+
+    await message.answer(
+        confirmation_message, parse_mode="Markdown", reply_markup=keyboard
+    )
+    await state.set_data({"username": username})
+
+
+@dp.callback_query(lambda c: c.data == "confirm_withdraw")
+async def confirm_withdraw_queer(
+    callback_query: types.CallbackQuery, state: FSMContext
+):
+    user_id = callback_query.from_user.id
+    state_data = await state.get_data()
+    reward_name = state_data["reward_name"]
+    username = state_data["username"]
+    cost = state_data["cost"]
+    admin_channel_id = 2261491678
+    admin_message = (
+        f"🛒 *New Withdrawal Request*\n\n"
+        f"🎁 *Item*: {reward_name}\n"
+        f"👤 *To Who*: {username}\n"
+        f"💰 *Cost*: {cost} Unity Coins\n"
+        f"🔢 *User ID*: {user_id}\n\n"
+        "Options: ✅ Confirm | ❌ Cancel"
+    )
+    conn = sqlite3.connect("users_database.db")
+    cursor = conn.cursor()
+    cursor.execute(
+        "SELECT unity_coin FROM users_database WHERE user_id = ?", (user_id,)
+    )
+    user_info = cursor.fetchone()
+    user_unity_coins = user_info[0]
+    new_balance = user_unity_coins - cost
+    cursor.execute(
+        "UPDATE users_database SET unity_coin = ? WHERE user_id = ?",
+        (new_balance, user_id),
+    )
+    conn.commit()
+    conn.close()
+    await bot.send_message(
+        admin_channel_id,
+        admin_message,
+        reply_markup=InlineKeyboardMarkup(
+            inline_keyboard=[
+                [
+                    InlineKeyboardButton(
+                        text="✅ Confirm", callback_data=f"admin_confirm_{user_id}"
+                    )
+                ],
+                [
+                    InlineKeyboardButton(
+                        text="❌ Cancel", callback_data=f"admin_cancel_{user_id}"
+                    )
+                ],
+            ]
+        ),
+    )
+
+    await callback_query.message.answer(
+        "✅ Your withdrawal request has been submitted to our admins.\nIt will be processed within 24 hours."
+    )
+
+
+@dp.callback_query(lambda c: c.data.startswith("admin_confirm_"))
+async def admin_confirm_withdraw(callback_query: types.CallbackQuery):
+    user_id = callback_query.data.split("_")[-1]
+    await bot.send_message(
+        user_id,
+        "✅ Your withdrawal request has been confirmed! The item has been successfully delivered to the user you selected.",
+    )
+    await callback_query.answer("✅ Withdrawal confirmed!")
+
+
+@dp.callback_query(lambda c: c.data.startswith("admin_cancel_"))
+async def admin_cancel_withdraw(callback_query: types.CallbackQuery):
+    user_id = callback_query.data.split("_")[-1]
+    await bot.send_message(user_id, "❌ Your withdrawal request was canceled.")
+    await callback_query.answer("❌ Withdrawal canceled.")
