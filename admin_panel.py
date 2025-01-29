@@ -89,15 +89,16 @@ async def main_to_menu(message: types.Message, state: FSMContext):
 USERS_PER_PAGE = 10
 
 
-def generate_user_list(users, page):
+async def generate_user_list(users, page):
     start_index = (page - 1) * USERS_PER_PAGE
     end_index = start_index + USERS_PER_PAGE
     page_users = users[start_index:end_index]
 
     user_list = []
     for index, (user_id, nfgame) in enumerate(page_users, start=start_index + 1):
+        chat = await bot.get_chat(user_id)
         user_list.append(
-            f"{index}. <a href='tg://user?id={user_id}'>{user_id}</a> — {nfgame}"
+            f"{index}. <a href='tg://user?id={user_id}'>{chat.first_name}</a> — {nfgame}"
         )
 
     return user_list
@@ -410,7 +411,7 @@ async def list_users(message: types.Message):
         return
 
     async def show_users(page=1):
-        user_list = generate_user_list(users, page)
+        user_list = await generate_user_list(users, page)
         user_details = "\n".join(user_list)
         pagination_buttons = create_pagination_buttons(page, len(users))
         await message.answer(
@@ -443,7 +444,7 @@ async def paginate_users(callback_query: types.CallbackQuery):
         )
         return
 
-    user_list = generate_user_list(users, page)
+    user_list = await generate_user_list(users, page)
     user_details = "\n".join(user_list)
     pagination_buttons = create_pagination_buttons(page, len(users))
     await callback_query.message.edit_text(
