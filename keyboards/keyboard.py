@@ -192,8 +192,9 @@ tournaments_admin_panel_button = ReplyKeyboardMarkup(
 upcoming_tournaments_button = ReplyKeyboardMarkup(
     keyboard=[
         [
-            KeyboardButton(text="✏️ edit registration dates"),
-            KeyboardButton(text="📝 edit starting dates"),
+            KeyboardButton(text="✏️ edit registration"),
+            KeyboardButton(text="📝 edit starting"),
+            KeyboardButton(text="✒️ edit maximum players"),
         ],
         [
             KeyboardButton(text="🚫 delete the tournament"),  

@@ -68,3 +68,6 @@ class waiting_for_user_id_or_username(StatesGroup):
     waiting_for_add_coin_amount = State()
     waiting_for_subtract_coin_amount = State()
     user_id = State()
+    
+class EditMaxPlayers(StatesGroup):
+    new_max_players = State()

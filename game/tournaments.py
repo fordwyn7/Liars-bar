@@ -9,7 +9,7 @@ from keyboards.keyboard import *
 from middlewares.registered import admin_required
 from keyboards.inline import get_join_tournament_button, user_tournaments_keyboard
 from db import *
-from states.state import AddTournaments, EditRegistrationDates, EditStartAndEndTimes
+from states.state import AddTournaments, EditRegistrationDates, EditStartAndEndTimes, EditMaxPlayers
 from datetime import datetime, timezone, timedelta
 from game.game_state import notify_groups
 
@@ -359,7 +359,7 @@ async def show_tournaments_menu(message: types.Message):
     await message.answer("Choose an option:", reply_markup=user_tournaments_keyboard)
 
 
-@dp.message(F.text == "✏️ edit registration dates")
+@dp.message(F.text == "✏️ edit registration")
 @admin_required()
 async def edit_registration_dates_single(message: types.Message, state: FSMContext):
     tournaments = get_upcoming_tournaments()
@@ -463,7 +463,7 @@ def update_registration_dates(tournament_id: str, start_date: str, end_date: str
         conn.close()
 
 
-@dp.message(F.text == "📝 edit starting dates")
+@dp.message(F.text == "📝 edit starting")
 @admin_required()
 async def edit_start_and_end_times(message: types.Message, state: FSMContext):
     tournaments = get_upcoming_tournaments()
@@ -677,14 +677,81 @@ def get_game_id_from_mes(user_id):
     finally:
         conn.close()
 
-
-
-
-async def announce_winner(winner):
-    try:
-        await bot.send_message(
-            chat_id=winner,
-            text=f"🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉\n\n Congratulations! You are the winner of the tournament! 🏆\nYour prizes will be given in a few hours 🏅",
+@dp.message(F.text == "✍️ edit maximum players")
+@admin_required()
+async def edit_maximum_players(message: types.Message, state: FSMContext):
+    tournaments = get_upcoming_tournaments()
+    if not tournaments:
+        await message.answer(
+            "No upcoming tournaments available to edit.",
+            reply_markup=tournaments_admin_panel_button,
         )
-    except Exception as e:
-        print(f"Failed to notify the winner {winner}: {e}")
+        await state.clear()
+        return
+    await state.clear()
+    tournament = tournaments[0]
+    await state.update_data(tournament_id=tournament["name"])
+    await message.answer(
+        f"Editing the MAXIMUM players for tournament.
+\n"
+        f"👥 Current Maximum Players: {tournament['maximum_players']}\n\n"
+        "Please enter the new *maximum players* count:",
+        parse_mode="Markdown",
+        reply_markup=back_to_tournaments_button,
+    )
+    await state.set_state(EditMaxPlayers.new_max_players)
+
+
+@dp.message(EditMaxPlayers.new_max_players)
+async def set_new_max_players(message: types.Message, state: FSMContext):
+    if message.text == "back to tournaments panel 🖙":
+        await message.answer(
+            f"You are in tournaments section.",
+            reply_markup=tournaments_admin_panel_button,
+        )
+        await state.clear()
+        return
+    try:
+        new_max_players = int(message.text.strip())
+        if new_max_players <= 0:
+            raise ValueError
+    except ValueError:
+        await message.answer(
+            "❌ Invalid input. Please enter a positive number.",
+            reply_markup=back_to_tournaments_button,
+        )
+        return
+    
+    data = await state.get_data()
+    tournament_id = data["tournament_id"]
+    nop = get_current_players(tournament_id)
+    if new_max_players < nop:
+        await message.answer("The new maximum number of players MUST not be less than registrated players ❌", reply_markup=tournaments_admin_panel_button)
+        await state.clear()
+        return
+    update_maximum_players(tournament_id, new_max_players)
+    await message.answer(
+        f"✅ Maximum players updated successfully!\n\n"
+        f"👥 New Maximum Players: {new_max_players}",
+        reply_markup=tournaments_admin_panel_button,
+    )
+    await state.clear()
+
+
+def update_maximum_players(tournament_id: str, max_players: int):
+    conn = sqlite3.connect("users_database.db")
+    cursor = conn.cursor()
+    try:
+        cursor.execute(
+            """
+            UPDATE tournaments_table
+            SET maximum_players = ?
+            WHERE tournament_id = ?
+            """,
+            (max_players, tournament_id),
+        )
+        conn.commit()
+    except sqlite3.Error as e:
+        print(f"❌ Database error: {e}")
+    finally:
+        conn.close()
