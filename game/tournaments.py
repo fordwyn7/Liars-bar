@@ -692,8 +692,7 @@ async def edit_maximum_players(message: types.Message, state: FSMContext):
     tournament = tournaments[0]
     await state.update_data(tournament_id=tournament["name"])
     await message.answer(
-        f"Editing the MAXIMUM players for tournament.
-\n"
+        f"Editing the MAXIMUM players for tournament\n"
         f"👥 Current Maximum Players: {tournament['maximum_players']}\n\n"
         "Please enter the new *maximum players* count:",
         parse_mode="Markdown",
