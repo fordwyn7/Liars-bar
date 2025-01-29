@@ -592,9 +592,33 @@ async def join_tournament(callback_query: types.CallbackQuery):
     if is_user_in_tournament(tournament_id, user_id):
         await callback_query.answer("❕ You are already registered for this tournament.", show_alert=True)
         return
+    nop = get_current_players(tournament['name'])
+    max_num = tournament['maximum_players']
+    if nop == max_num:
+        await callback_query.answer("No free spots available 😔", show_alert=True)
+        return
     try:
         add_user_to_tournament(tournament_id, user_id)
         await callback_query.answer("✅ You have successfully joined the tournament!", show_alert=True)
+        updated_nop = get_current_players(tournament['name'])
+        message_id = callback_query.message.message_id
+        chat_id = callback_query.message.chat.id
+        response = (
+            f"🌟 Tournament ID: {tournament['id']}\n"
+            f"🗓 Starts: {tournament['start_time']}\n"
+            f"🏁 Ends: {tournament['end_time']}\n\n"
+            f"🗓 Registration starts: {tournament['register_start']}\n"
+            f"🏁 Registration ends: {tournament['register_end']}\n\n"
+            f"👥 Registered Players: {updated_nop}/{tournament['maximum_players']}\n\n"
+            f"🏆 Prize: \n\n{tournament['prize']}\n\n"
+            f"You are participating in this tournament ⚡️⚡️⚡️"
+        )
+        await bot.edit_message_text(
+            chat_id=chat_id,
+            message_id=message_id,
+            text=response,
+            parse_mode="Markdown"
+        )
     except Exception as e:
         print(f"❌ Error adding user to tournament: {e}")
         await callback_query.answer("❌ Failed to join the tournament. Please try again later.", show_alert=True)

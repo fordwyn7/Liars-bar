@@ -1381,7 +1381,7 @@ async def save_round_winner(tournament_id: str, round_user_id, round_winner):
         result = cursor.fetchone()
         if result:
             round_number, group_number = result
-            await bot.send_message(chat_id=1155076760, text=f"rn: {round_number}\ngn: {group_number}")
+            # await bot.send_message(chat_id=1155076760, text=f"rn: {round_number}\ngn: {group_number}")
             group_number = int(group_number)
             cursor.execute(
                 """
@@ -1628,7 +1628,7 @@ async def update_tournament_winner_if_round_finished(
                     (winner, tournament_id),
                 )
                 conn.commit()
-                await bot.send_message(chat_id=1155076760, text=f"winner result: {winner_result}")
+                # await bot.send_message(chat_id=1155076760, text=f"winner result: {winner_result}")
                 await inform_all_users_tournament_ended(tournament_id, winner)
                 print(f"Winner {winner} has been saved to the tournament.")
                 return 12
@@ -1660,9 +1660,9 @@ async def inform_all_users_tournament_ended(tournament_id: str, winner_id: int):
         users = cursor.fetchall()
         winner_name = get_user_nfgame(winner_id)
         message = (
-            f"🏁 **Tournament Ended!** 🏆\n\n"
-            f"Thank you for participating in **Tournament {tournament_id}**! 🎮\n\n"
-            f"🥇 **The Winner is: {winner_name} (ID: {winner_id})** 🎉\n\n"
+            f"🏁 Tournament Ended! 🏆\n\n"
+            f"Thank you for participating in a Tournament 🎮\n\n"
+            f"🥇 The Winner is: {winner_name} (ID: {winner_id}) 🎉\n\n"
             f"Congrats to the champion! Stay tuned for more tournaments. 🏅"
         )
         for user in users:
@@ -1671,7 +1671,7 @@ async def inform_all_users_tournament_ended(tournament_id: str, winner_id: int):
                 await bot.send_message(chat_id=user_id, text=message)
             except Exception as e:
                 print(f"Error sending message to {user_id}: {e}")
-        # delete_tournament_from_tables(tournament_id)
+        delete_tournament_from_tables(tournament_id)
     except sqlite3.Error as e:
         print(f"Database error: {e}")
     finally:
@@ -1681,10 +1681,10 @@ async def inform_all_users_tournament_ended(tournament_id: str, winner_id: int):
 def create_groups(participants):
     random.shuffle(participants)
     groups = []
-    if len(participants) == 4:
-        groups.append(participants[:2])
-        groups.append(participants[2:])
-        return groups
+    # if len(participants) == 4:
+    #     groups.append(participants[:2])
+    #     groups.append(participants[2:])
+    #     return groups
     nmb = len(participants) % 4
     nmd = len(participants) // 4
     if nmb == 0:
