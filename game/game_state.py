@@ -407,7 +407,7 @@ async def handle_continue_or_liar(callback_query: types.CallbackQuery):
                         )
                         await bot.send_message(
                             chat_id=users,
-                            text=f"The game in which you died has ended ⭐️\nWinner: {get_user_nfgame(winner)} — {winner} 🏆",
+                            text=f"The game in which you died has ended ⭐️\nWinner: {get_user_nfgame(winner)}(ID: {winner}) 🏆",
                         )
                 tournament_id = get_tournament_id_by_user(winner)
                 if tournament_id and is_user_in_tournament(tournament_id, winner):
@@ -514,7 +514,7 @@ async def handle_continue_or_liar(callback_query: types.CallbackQuery):
                     )
                     await bot.send_message(
                         chat_id=users,
-                        text=f"The game in which you died has ended ⭐️\nWinner: {get_user_nfgame(winner)} — {winner} 🏆",
+                        text=f"The game in which you died has ended ⭐️\nWinner: {get_user_nfgame(winner)} (ID: {winner}) 🏆",
                     )
             tournament_id = get_tournament_id_by_user(winner)
             if tournament_id and is_user_in_tournament(tournament_id, winner):

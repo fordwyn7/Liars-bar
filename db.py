@@ -734,8 +734,6 @@ def set_real_bullet_for_player(game_id, player_id):
                 )
                 conn.commit()
                 print("Added 'blanks_count' column to game_state table.")
-
-            # Check if a record exists for this player and game
             cursor.execute(
                 """
                 SELECT COUNT(*)
@@ -747,7 +745,6 @@ def set_real_bullet_for_player(game_id, player_id):
             exists = cursor.fetchone()[0] > 0
 
             if exists:
-                # Update existing record
                 cursor.execute(
                     """
                     UPDATE game_state
@@ -1488,7 +1485,7 @@ async def notify_round_results(tournament_id: str, round_number: str):
                 unique_groups.add(group_number)
                 if winner_id:
                     results_message += (
-                        f"- Winner from Group {group_number}: Player {winner_id}\n"
+                        f"- Winner from Group {group_number}: {get_user_nfgame(winner_id)}(ID: {winner_id})\n"
                     )
                 else:
                     results_message += f"- Group {group_number}: No winner yet\n"
@@ -1746,7 +1743,7 @@ def get_round_results(tournament_id, round_number):
                 unique_groups.add(group_number)
                 if winner_id:
                     results_message += (
-                        f"- Winner from Group {group_number}: Player {winner_id}\n"
+                        f"- Winner from Group {group_number}: {get_user_nfgame(winner_id)} (ID: {winner_id})\n"
                     )
                 else:
                     results_message += f"- Group {group_number}: No winner yet\n"
