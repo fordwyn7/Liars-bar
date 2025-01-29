@@ -826,3 +826,96 @@ async def stop_all_incomplete_games_command(message: types.Message, state: FSMCo
         except:
             continue
     await message.answer(f"All users' incomplete games has been stopped ✅")
+    
+
+@dp.message(F.text == "💰 withdraw change")
+@admin_required()
+async def show_withdraw_options(message: types.Message):
+    conn = sqlite3.connect("users_database.db")
+    cursor = conn.cursor()
+    cursor.execute("SELECT * FROM withdraw_options LIMIT 1")
+    withdraw_options = cursor.fetchone()
+    if not withdraw_options:
+        await message.answer("❌ No withdrawal options found.")
+        conn.close()
+        return
+    
+    three_month_premium, six_month_premium, twelve_month_premium, hundrad_stars, five_hundrad_stars, thousand_stars = withdraw_options
+    conn.close()
+    keyboard = InlineKeyboardMarkup(inline_keyboard=[
+        [
+            InlineKeyboardButton(text=f"📆 3 Months: {three_month_premium} Coins", callback_data="change_3_month"),
+            InlineKeyboardButton(text=f"📆 6 Months: {six_month_premium} Coins", callback_data="change_6_month"),
+            InlineKeyboardButton(text=f"📆 12 Months: {twelve_month_premium} Coins", callback_data="change_12_month"),
+        ],
+        [
+            InlineKeyboardButton(text=f"⭐ 100 Stars: {hundrad_stars} Coins", callback_data="change_100_stars"),
+            InlineKeyboardButton(text=f"⭐ 500 Stars: {five_hundrad_stars} Coins", callback_data="change_500_stars"),
+            InlineKeyboardButton(text=f"⭐ 1,000 Stars: {thousand_stars} Coins", callback_data="change_1000_stars"),
+        ],
+    ])
+    withdraw_message = (
+        "💰 *Withdrawal Options*\n\n"
+        f"📆 *3 Months Telegram Premium*: {three_month_premium} Coins\n"
+        f"📆 *6 Months Telegram Premium*: {six_month_premium} Coins\n"
+        f"📆 *12 Months Telegram Premium*: {twelve_month_premium} Coins\n"
+        f"⭐ *100 Stars*: {hundrad_stars} Coins\n"
+        f"⭐ *500 Stars*: {five_hundrad_stars} Coins\n"
+        f"⭐ *1,000 Stars*: {thousand_stars} Coins\n\n"
+        "Press a button to change the Unity Coins for each option."
+    )
+    await message.answer(withdraw_message, parse_mode="Markdown", reply_markup=keyboard)
+
+@dp.callback_query(lambda c: c.data.startswith("change_"))
+async def change_withdraw_option(callback_query: types.CallbackQuery, state: FSMContext):
+    option = callback_query.data
+    user_id = callback_query.from_user.id
+    await callback_query.message.answer(f"💬 Please enter the new Unity Coins amount for {option.replace('change_', '').replace('_', ' ').title()}:", reply_markup=back_to_admin_panel)
+    await state.update_data(option=option)
+    await state.set_state(changeWithdraw.changee)
+
+@dp.message(changeWithdraw.changee)
+async def set_new_coin_amount(message: types.Message, state: FSMContext):
+    if message.text == "back to admin panel 🔙":
+        await message.answer("You are in admin panel 👇", reply_markup=admin_panel_button)
+        await state.clear()
+        return
+    user_id = message.from_user.id
+    new_coin_amount = message.text.strip()
+    if not new_coin_amount.isdigit():
+        await message.answer("❌ Please enter a valid number for the Unity Coins amount.")
+        return
+    new_coin_amount = int(new_coin_amount)
+    data  = await state.get_state()
+    if not data :
+        return
+
+    option = data.get("option")
+    conn = sqlite3.connect("users_database.db")
+    cursor = conn.cursor()
+    try:
+        conn = sqlite3.connect("users_database.db")
+        cursor = conn.cursor()
+        
+        if option == "change_3_month":
+            cursor.execute("UPDATE withdraw_options SET three_month_premium = ? WHERE rowid = 1", (new_coin_amount,))
+        elif option == "change_6_month":
+            cursor.execute("UPDATE withdraw_options SET six_month_premium = ? WHERE rowid = 1", (new_coin_amount,))
+        elif option == "change_12_month":
+            cursor.execute("UPDATE withdraw_options SET twelve_month_premium = ? WHERE rowid = 1", (new_coin_amount,))
+        elif option == "change_100_stars":
+            cursor.execute("UPDATE withdraw_options SET hundrad_stars = ? WHERE rowid = 1", (new_coin_amount,))
+        elif option == "change_500_stars":
+            cursor.execute("UPDATE withdraw_options SET five_hundrad_stars = ? WHERE rowid = 1", (new_coin_amount,))
+        elif option == "change_1000_stars":
+            cursor.execute("UPDATE withdraw_options SET thousand_stars = ? WHERE rowid = 1", (new_coin_amount,))
+        
+        conn.commit()
+        conn.close()
+        await message.answer(f"✅ The Unity Coins amount for {option.replace('change_', '').replace('_', ' ').title()} has been updated to {new_coin_amount} coins.")
+    
+    except sqlite3.Error as e:
+        await message.answer(f"❌ There was an error while updating the database: {e}")
+    
+    finally:
+        await state.clear()

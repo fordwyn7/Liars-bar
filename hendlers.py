@@ -284,7 +284,7 @@ async def my_cabinet(message: types.Message):
     keyboard = InlineKeyboardMarkup(
         inline_keyboard=[
             [
-                InlineKeyboardButton(text="💸 Withdraw", callback_data="withdraw"),
+                InlineKeyboardButton(text="💸 Withdraw Unity coins", callback_data="withdraw"),
             ],
         ]
     )
@@ -303,7 +303,6 @@ async def my_cabinet(message: types.Message):
 
 @dp.callback_query(lambda c: c.data == "withdraw")
 async def process_withdraw(callback_query: types.CallbackQuery):
-    # Handle the withdraw logic here
     await callback_query.answer("💸 Withdraw feature is coming soon!")
 
 

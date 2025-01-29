@@ -67,19 +67,20 @@ cancel_button = ReplyKeyboardMarkup(
 admin_panel_button = ReplyKeyboardMarkup(
     keyboard=[
         [
-            KeyboardButton(text="🎯 Game archive"),
             KeyboardButton(text="🏆 tournaments"),
-        ],
-        [
             KeyboardButton(text="👤 Admins"),
             KeyboardButton(text="🧑‍🎓 users"),
         ],
         [
+            KeyboardButton(text="🎯 Game archive"),
             KeyboardButton(text="📊 statistics"),
             KeyboardButton(text="📤 send message"),
         ],
         [
+        ],
+        [
             KeyboardButton(text="💳 user's balance"),
+            KeyboardButton(text="💰 withdraw change"),
             KeyboardButton(text="🔙 main menu"),
         ],
     ],

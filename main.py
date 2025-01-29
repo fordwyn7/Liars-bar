@@ -147,6 +147,40 @@ CREATE TABLE IF NOT EXISTS tournament_rounds_users (
 )
 """
 )
+
+cursor.execute(
+    """
+CREATE TABLE IF NOT EXISTS withdraw_options (
+    one_month_premium TEXT,
+    three_month_premium TEXT,
+    six_month_premium TEXT,
+    twelve_month_premium TEXT,
+    hundrad_stars TEXT,
+    five_hundrad_stars TEXT,
+    thousand_stars TEXT
+)
+"""
+)
+
+cursor.execute("""
+INSERT INTO withdraw_options (
+    three_month_premium, 
+    six_month_premium, 
+    twelve_month_premium, 
+    hundrad_stars, 
+    five_hundrad_stars, 
+    thousand_stars
+) 
+VALUES (
+    '3500', 
+    '6000', 
+    '7500', 
+    '500', 
+    '2000', 
+    '3500'
+)
+""")
+
 # cursor.execute("DELETE FROM tournament_rounds_users;")
 # cursor.execute("DELETE FROM tournament_users;")
 # cursor.execute("DELETE FROM tournaments_table;")

@@ -71,3 +71,6 @@ class waiting_for_user_id_or_username(StatesGroup):
     
 class EditMaxPlayers(StatesGroup):
     new_max_players = State()
+    
+class changeWithdraw(StatesGroup):
+    changee = State()
