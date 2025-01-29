@@ -1123,7 +1123,7 @@ async def confirm_withdraw_queer(
     reward_name = state_data.get("reward_name")
     username = state_data.get("username")
     cost = state_data.get("cost")
-    admin_channel_id = 2261491678
+    admin_channel_id = -1002261491678
     admin_message = (
         f"🛒 *New Withdrawal Request*\n\n"
         f"🎁 *Item*: {reward_name}\n"
