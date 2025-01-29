@@ -58,11 +58,11 @@ async def changeee(message: types.Message, state: FSMContext):
     await state.clear()
     await message.answer(
         f"Your current username is: {get_user_nfgame(message.from_user.id)}\nIf you'd like to change it, please type your new username:\n"
-                f"⚠️ Note: Your username must be UNIQUE and can only contain:\n"
-                f"- Latin alphabet characters (a-z, A-Z)\n"
-                f"- Numbers (0-9)\n"
-                f"- Underscores (_)\n"
-                f"and you can use up to 20 characters",
+        f"⚠️ Note: Your username must be UNIQUE and can only contain:\n"
+        f"- Latin alphabet characters (a-z, A-Z)\n"
+        f"- Numbers (0-9)\n"
+        f"- Underscores (_)\n"
+        f"and you can use up to 20 characters",
         reply_markup=cancel_button,
     )
     await state.set_state(NewGameState.waiting_for_nfgame)
@@ -87,9 +87,14 @@ async def set_new_nfgame(message: types.Message, state: FSMContext):
     h = is_name_valid(new_nfgame)
     if not h:
         await message.answer(
-            "Your data is incorrect! Please enter your username in a given format", reply_markup=cancel_button)
+            "Your data is incorrect! Please enter your username in a given format",
+            reply_markup=cancel_button,
+        )
     elif h == 2:
-        await message.answer("There is already user with this username in the bot. Please enter another username.", reply_markup=cancel_button)
+        await message.answer(
+            "There is already user with this username in the bot. Please enter another username.",
+            reply_markup=cancel_button,
+        )
     else:
         user_id = message.from_user.id
         with sqlite3.connect("users_database.db") as conn:
@@ -230,7 +235,8 @@ async def send_game_statistics(message: types.Message, state: FSMContext):
     game_number = int(message.text)
     if game_number < 1 or game_number > len(games):
         await message.answer(
-            "❌ Invalid game number. Please try again.", reply_markup=get_main_menu(user_id)
+            "❌ Invalid game number. Please try again.",
+            reply_markup=get_main_menu(user_id),
         )
         await state.clear()
         return
@@ -242,19 +248,28 @@ async def send_game_statistics(message: types.Message, state: FSMContext):
         f"🏁 End Time: {end_time if end_time else 'Has not finished'}\n"
         f"🏆 Winner: {winner if winner else 'No Winner'}"
     )
-    await message.answer(game_status, parse_mode="Markdown", reply_markup=get_main_menu(message.from_user.id))
+    await message.answer(
+        game_status,
+        parse_mode="Markdown",
+        reply_markup=get_main_menu(message.from_user.id),
+    )
     await state.clear()
-    
+
+
 from aiogram import types
 from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
+
 
 @dp.message(F.text == "📱 my cabinet")
 async def my_cabinet(message: types.Message):
     user_id = message.from_user.id
     conn = sqlite3.connect("users_database.db")
     cursor = conn.cursor()
-    
-    cursor.execute("SELECT registration_date, nfgame, unity_coin FROM users_database WHERE user_id = ?", (user_id,))
+
+    cursor.execute(
+        "SELECT registration_date, nfgame, unity_coin FROM users_database WHERE user_id = ?",
+        (user_id,),
+    )
     user_info = cursor.fetchone()
     if not user_info:
         await message.answer("❌ You are not registered in the database.")
@@ -266,8 +281,13 @@ async def my_cabinet(message: types.Message):
     conn.close()
 
     # Create the inline keyboard with the withdraw button
-    withdraw_button = InlineKeyboardButton(text="💸 Withdraw", callback_data="withdraw")
-    keyboard = InlineKeyboardMarkup(inline_keyboard=[]).add(withdraw_button)
+    keyboard = InlineKeyboardMarkup(
+        inline_keyboard=[
+            [
+                InlineKeyboardButton(text="💸 Withdraw", callback_data="withdraw"),
+            ],
+        ]
+    )
 
     user_cabinet_message = (
         f"📱 *Your Cabinet*\n\n"
@@ -276,14 +296,18 @@ async def my_cabinet(message: types.Message):
         f"🎮 *Games Played:* {games_played}\n"
         f"💰 *Unity Coins:* {unity_coins}\n"
     )
-    await message.answer(user_cabinet_message, parse_mode="Markdown", reply_markup=keyboard)
+    await message.answer(
+        user_cabinet_message, parse_mode="Markdown", reply_markup=keyboard
+    )
+
+
 @dp.callback_query(lambda c: c.data == "withdraw")
 async def process_withdraw(callback_query: types.CallbackQuery):
     # Handle the withdraw logic here
     await callback_query.answer("💸 Withdraw feature is coming soon!")
 
+
 @dp.message(F.text == "🤩 tournaments")
 async def tournaments_users_button(message: types.Message):
     # if message.from_user.id in [6807731973, 5219280507]:
     await message.answer("Choose an option:", reply_markup=user_tournaments_keyboard)
-    
