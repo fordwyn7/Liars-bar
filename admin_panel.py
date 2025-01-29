@@ -97,9 +97,9 @@ async def generate_user_list(users, page):
     user_list = []
     for index, (user_id, nfgame) in enumerate(page_users, start=start_index + 1):
         chat = await bot.get_chat(user_id)
-        user_list.append(
-            f"{index}. <a href='tg://user?id={user_id}'>{chat.first_name}</a> — {nfgame}"
-        )
+        mention_text = f"[{chat.first_name}](tg://user?id={user_id})"  # MarkdownV2 format
+
+        user_list.append(f"{index}. {mention_text} — {nfgame}")
 
     return user_list
 
@@ -416,7 +416,7 @@ async def list_users(message: types.Message):
         pagination_buttons = create_pagination_buttons(page, len(users))
         await message.answer(
             f"Here is the list of users (page {page}):\n\n{user_details}",
-            parse_mode="HTML",
+            parse_mode="MarkdownV2",
             reply_markup=pagination_buttons,
         )
 
@@ -449,7 +449,7 @@ async def paginate_users(callback_query: types.CallbackQuery):
     pagination_buttons = create_pagination_buttons(page, len(users))
     await callback_query.message.edit_text(
         f"List of users (page {page}):\n\n{user_details}",
-        parse_mode="HTML",
+        parse_mode="MarkdownV2",
         reply_markup=pagination_buttons,
     )
     await callback_query.answer()
