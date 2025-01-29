@@ -151,7 +151,6 @@ CREATE TABLE IF NOT EXISTS tournament_rounds_users (
 cursor.execute(
     """
 CREATE TABLE IF NOT EXISTS withdraw_options (
-    one_month_premium TEXT,
     three_month_premium TEXT,
     six_month_premium TEXT,
     twelve_month_premium TEXT,
