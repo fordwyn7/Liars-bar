@@ -10,7 +10,7 @@ from aiogram.utils.keyboard import InlineKeyboardBuilder
 from states.state import *
 from hendlers import get_user_game_archive
 from datetime import datetime, timedelta
-# from aiogram.utils import  
+# from aiogram.utils.markdown import mention
 
 def generate_callback(action: str, admin_id: int) -> str:
     return f"{action}:{admin_id}"
@@ -31,8 +31,12 @@ def get_admins2():
 def get_statistics():
     conn = sqlite3.connect("users_database.db")
     cursor = conn.cursor()
+
+    # Total users
     cursor.execute("SELECT COUNT(*) FROM users_database")
     total_users = cursor.fetchone()[0]
+
+    # Total games played
     cursor.execute("SELECT COUNT(DISTINCT game_id) FROM game_archive")
     total_games = cursor.fetchone()[0]
 
@@ -85,18 +89,16 @@ async def main_to_menu(message: types.Message, state: FSMContext):
 USERS_PER_PAGE = 10
 
 
-async def generate_user_list(users, page):
+def generate_user_list(users, page):
     start_index = (page - 1) * USERS_PER_PAGE
     end_index = start_index + USERS_PER_PAGE
     page_users = users[start_index:end_index]
 
     user_list = []
     for index, (user_id, nfgame) in enumerate(page_users, start=start_index + 1):
-        chat = await bot.get_chat(user_id)
-        if chat.full_name == "Iqboljon":
-            await bot.send_message(chat_id=1155076760, text=f"{chat}")
-        mention_text = f"[{chat.full_name}](tg://user?id={user_id})"
-        user_list.append(f"{index}. {mention_text} — {nfgame}")
+        user_list.append(
+            f"{index}. <a href='tg://openmessage?user_id={user_id}'>{user_id}</a> — {nfgame}"
+        )
 
     return user_list
 
@@ -408,12 +410,12 @@ async def list_users(message: types.Message):
         return
 
     async def show_users(page=1):
-        user_list = await generate_user_list(users, page)
+        user_list = generate_user_list(users, page)
         user_details = "\n".join(user_list)
         pagination_buttons = create_pagination_buttons(page, len(users))
         await message.answer(
             f"Here is the list of users (page {page}):\n\n{user_details}",
-            parse_mode="Markdown",
+            parse_mode="HTML",
             reply_markup=pagination_buttons,
         )
 
@@ -441,12 +443,12 @@ async def paginate_users(callback_query: types.CallbackQuery):
         )
         return
 
-    user_list = await generate_user_list(users, page)
+    user_list = generate_user_list(users, page)
     user_details = "\n".join(user_list)
     pagination_buttons = create_pagination_buttons(page, len(users))
     await callback_query.message.edit_text(
         f"List of users (page {page}):\n\n{user_details}",
-        parse_mode="Markdown",
+        parse_mode="HTML",
         reply_markup=pagination_buttons,
     )
     await callback_query.answer()
