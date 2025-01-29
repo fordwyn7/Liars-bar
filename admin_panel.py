@@ -1224,9 +1224,8 @@ async def cancel_withdraw_queer(callback_query: types.CallbackQuery, state: FSMC
 async def watch_results_f(message: types.Message):
     result = ""
     tournament = get_ongoing_tournaments()
-    await message.answer(f"{tournament}")
     tournament_id = tournament[0]["name"]
-    current_round = get_current_round_number()
+    current_round = get_current_round_number(tournament_id)
     for i in range(1, current_round + 1):
         result += get_round_results(tournament_id, i) + "\n"
     await message.answer(result)
