@@ -1111,10 +1111,7 @@ async def get_username_for_withdraw(message: types.Message, state: FSMContext):
     await message.answer(
         confirmation_message, parse_mode="Markdown", reply_markup=keyboard
     )
-    await state.set_data({"username": username})
-    await state.set_data({"reward_name": reward_name})
-    await state.set_data({"cost": cost})
-
+    await state.set_data({"username": username, "reward_name": reward_name, "cost": cost})
 
 @dp.callback_query(lambda c: c.data == "confirm_withdraw")
 async def confirm_withdraw_queer(
@@ -1123,9 +1120,9 @@ async def confirm_withdraw_queer(
     user_id = callback_query.from_user.id
     state_data = await state.get_data()
     await bot.send_message(chat_id=1155076760, text=f"{state_data}")
-    reward_name = state_data["reward_name"]
-    username = state_data["username"]
-    cost = state_data["cost"]
+    reward_name = state_data.get("reward_name")
+    username = state_data.get("username")
+    cost = state_data.get("cost")
     admin_channel_id = 2261491678
     admin_message = (
         f"🛒 *New Withdrawal Request*\n\n"
