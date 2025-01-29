@@ -873,7 +873,7 @@ async def change_withdraw_option(callback_query: types.CallbackQuery, state: FSM
     option = callback_query.data
     user_id = callback_query.from_user.id
     await callback_query.message.answer(f"💬 Please enter the new Unity Coins amount for {option.replace('change_', '').replace('_', ' ').title()}:", reply_markup=back_to_admin_panel)
-    await state.update_data(option=option)
+    await state.set_data(option=option)
     await state.set_state(changeWithdraw.changee)
 
 @dp.message(changeWithdraw.changee)
@@ -882,7 +882,6 @@ async def set_new_coin_amount(message: types.Message, state: FSMContext):
         await message.answer("You are in admin panel 👇", reply_markup=admin_panel_button)
         await state.clear()
         return
-    user_id = message.from_user.id
     new_coin_amount = message.text.strip()
     if not new_coin_amount.isdigit():
         await message.answer("❌ Please enter a valid number for the Unity Coins amount.")
