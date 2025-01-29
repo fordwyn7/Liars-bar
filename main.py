@@ -147,8 +147,6 @@ CREATE TABLE IF NOT EXISTS tournament_rounds_users (
 )
 """
 )
-cursor.execute("DROP TABLE IF EXISTS withdraw_options")
-
 cursor.execute(
     """
     CREATE TABLE IF NOT EXISTS withdraw_options (

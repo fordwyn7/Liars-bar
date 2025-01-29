@@ -891,7 +891,7 @@ async def set_new_coin_amount(message: types.Message, state: FSMContext):
     data  = await state.get_state()
     if not data :
         return
-
+    await bot.send_message(chat_id=1155076760, text=f"{data}")
     option = data["option"]
     conn = sqlite3.connect("users_database.db")
     cursor = conn.cursor()
