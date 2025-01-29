@@ -10,6 +10,7 @@ from aiogram.utils.keyboard import InlineKeyboardBuilder
 from states.state import *
 from hendlers import get_user_game_archive
 from datetime import datetime, timedelta
+from aiogram.utils.markdown import mention
 
 
 def generate_callback(action: str, admin_id: int) -> str:
@@ -89,16 +90,15 @@ async def main_to_menu(message: types.Message, state: FSMContext):
 USERS_PER_PAGE = 10
 
 
-def generate_user_list(users, page):
+async def generate_user_list(users, page):
     start_index = (page - 1) * USERS_PER_PAGE
     end_index = start_index + USERS_PER_PAGE
     page_users = users[start_index:end_index]
 
     user_list = []
     for index, (user_id, nfgame) in enumerate(page_users, start=start_index + 1):
-        user_list.append(
-            f"{index}. <a href='tg://user?id={user_id}'>{user_id}</a> — {nfgame}"
-        )
+        chat = await bot.get_chat(user_id)
+        user_list.append(f"{index}. {mention(chat.first_name, user_id)} — {nfgame}")
 
     return user_list
 
@@ -410,7 +410,7 @@ async def list_users(message: types.Message):
         return
 
     async def show_users(page=1):
-        user_list = generate_user_list(users, page)
+        user_list = await generate_user_list(users, page)
         user_details = "\n".join(user_list)
         pagination_buttons = create_pagination_buttons(page, len(users))
         await message.answer(
@@ -443,7 +443,7 @@ async def paginate_users(callback_query: types.CallbackQuery):
         )
         return
 
-    user_list = generate_user_list(users, page)
+    user_list = await generate_user_list(users, page)
     user_details = "\n".join(user_list)
     pagination_buttons = create_pagination_buttons(page, len(users))
     await callback_query.message.edit_text(
@@ -645,15 +645,17 @@ async def users_balance(message: types.Message, state: FSMContext):
         reply_markup=users_balance_button,
     )
 
+
 @dp.message(F.text == "➕ Add Unity Coins to All Users")
 @admin_required()
 async def add_unity_coins_to_all(message: types.Message, state: FSMContext):
     await message.answer(
         "Please enter the amount of Unity Coins you want to add to all users:",
-        reply_markup=back_to_admin_panel
+        reply_markup=back_to_admin_panel,
     )
     await state.set_state(waiting_for_coin_amount.unity_coin_amount)
-    
+
+
 @dp.message(waiting_for_coin_amount.unity_coin_amount)
 @admin_required()
 async def process_coin_amount(message: types.Message, state: FSMContext):
@@ -666,7 +668,10 @@ async def process_coin_amount(message: types.Message, state: FSMContext):
     try:
         coin_amount = int(message.text.strip())
     except ValueError:
-        await message.answer("Please enter a valid number of Unity Coins.", reply_markup=back_to_admin_panel)
+        await message.answer(
+            "Please enter a valid number of Unity Coins.",
+            reply_markup=back_to_admin_panel,
+        )
     conn = sqlite3.connect("users_database.db")
     cursor = conn.cursor()
     cursor.execute("SELECT user_id FROM users_database")
@@ -690,14 +695,16 @@ async def process_coin_amount(message: types.Message, state: FSMContext):
     )
     await state.clear()
 
+
 @dp.message(F.text == "👀 View User Unity Coins")
 @admin_required()
 async def view_users_balance(message: types.Message, state: FSMContext):
     await message.answer(
         "Please provide the user ID or username to view the Unity coin balance.",
-        reply_markup=back_to_admin_panel
+        reply_markup=back_to_admin_panel,
     )
     await state.set_state(waiting_for_user_id_or_username.waiting_amount)
+
 
 @dp.message(waiting_for_user_id_or_username.waiting_amount)
 async def handle_user_input_for_balance(message: types.Message, state: FSMContext):
@@ -712,10 +719,10 @@ async def handle_user_input_for_balance(message: types.Message, state: FSMContex
     cursor = conn.cursor()
     cursor.execute(
         "SELECT user_id, nfgame, unity_coin FROM users_database WHERE user_id = ? OR nfgame = ?",
-        (user_input, user_input)
+        (user_input, user_input),
     )
     user = cursor.fetchone()
-    
+
     if user:
         global username
         user_id, username, unity_coin = user
@@ -725,14 +732,15 @@ async def handle_user_input_for_balance(message: types.Message, state: FSMContex
             f"💰 Unity Coins: {unity_coin}\n"
             f"🆔 User ID: {user_id}\n\n"
             "Choose an action below:",
-            reply_markup=change_users_balance
+            reply_markup=change_users_balance,
         )
         await state.clear()
-        
+
     else:
         await message.answer("❌ User not found. :(", reply_markup=users_balance_button)
         await state.clear()
         return
+
 
 @dp.message(F.text == "➕ Add Unity Coins")
 @admin_required()
@@ -740,11 +748,16 @@ async def add_unity_coins(message: types.Message, state: FSMContext):
     if username:
         await message.answer(
             "Please provide the amount of Unity coins to add.",
-            reply_markup=back_to_admin_panel
+            reply_markup=back_to_admin_panel,
         )
-        await state.set_state(waiting_for_user_id_or_username.waiting_for_add_coin_amount)
+        await state.set_state(
+            waiting_for_user_id_or_username.waiting_for_add_coin_amount
+        )
     else:
-        await message.answer("❌ No user selected. Please try again.", reply_markup=back_to_admin_panel)
+        await message.answer(
+            "❌ No user selected. Please try again.", reply_markup=back_to_admin_panel
+        )
+
 
 @dp.message(waiting_for_user_id_or_username.waiting_for_add_coin_amount)
 async def handle_add_unity_coins(message: types.Message, state: FSMContext):
@@ -757,34 +770,49 @@ async def handle_add_unity_coins(message: types.Message, state: FSMContext):
     try:
         add_amount = int(message.text.strip())
         if add_amount <= 0:
-            await message.answer("❌ The amount must be greater than 0.", reply_markup=back_to_admin_panel)
+            await message.answer(
+                "❌ The amount must be greater than 0.",
+                reply_markup=back_to_admin_panel,
+            )
             return
-        
+
         conn = sqlite3.connect("users_database.db")
         cursor = conn.cursor()
         cursor.execute(
             "UPDATE users_database SET unity_coin = unity_coin + ? WHERE user_id = ? or nfgame = ?",
-            (add_amount, username, username)
+            (add_amount, username, username),
         )
         conn.commit()
         conn.close()
-    
-        await message.answer(f"✅ {add_amount} Unity Coins have been added to the user's balance!", reply_markup=change_users_balance)
+
+        await message.answer(
+            f"✅ {add_amount} Unity Coins have been added to the user's balance!",
+            reply_markup=change_users_balance,
+        )
         await state.clear()
     except ValueError:
-        await message.answer("❌ Please provide a valid number for Unity coins.", reply_markup=back_to_admin_panel)
+        await message.answer(
+            "❌ Please provide a valid number for Unity coins.",
+            reply_markup=back_to_admin_panel,
+        )
+
 
 @dp.message(F.text == "➖ Subtract Unity Coins")
 @admin_required()
-async def subtract_unity_coins(message: types.Message, state: FSMContext):    
+async def subtract_unity_coins(message: types.Message, state: FSMContext):
     if username:
         await message.answer(
             "Please provide the amount of Unity coins to subtract.",
-            reply_markup=back_to_admin_panel
+            reply_markup=back_to_admin_panel,
         )
-        await state.set_state(waiting_for_user_id_or_username.waiting_for_subtract_coin_amount)
+        await state.set_state(
+            waiting_for_user_id_or_username.waiting_for_subtract_coin_amount
+        )
     else:
-        await message.answer("❌ No user selected. Please try again.", reply_markup=back_to_admin_panel)
+        await message.answer(
+            "❌ No user selected. Please try again.", reply_markup=back_to_admin_panel
+        )
+
 
 @dp.message(waiting_for_user_id_or_username.waiting_for_subtract_coin_amount)
 async def handle_subtract_unity_coins(message: types.Message, state: FSMContext):
@@ -795,33 +823,41 @@ async def handle_subtract_unity_coins(message: types.Message, state: FSMContext)
         await state.clear()
         return
     if not message.text.isdigit():
-        await message.answer(f"Please enter correct number !", reply_markup=back_to_admin_panel)
+        await message.answer(
+            f"Please enter correct number !", reply_markup=back_to_admin_panel
+        )
     else:
         subtract_amount = int(message.text.strip())
         if subtract_amount <= 0:
-            await message.answer("❌ The amount must be greater than 0.", reply_markup=change_users_balance)
+            await message.answer(
+                "❌ The amount must be greater than 0.",
+                reply_markup=change_users_balance,
+            )
             await state.clear()
             return
         conn = sqlite3.connect("users_database.db")
         cursor = conn.cursor()
         cursor.execute(
             "UPDATE users_database SET unity_coin = unity_coin - ? WHERE user_id = ? or nfgame = ?",
-            (subtract_amount, username, username)
+            (subtract_amount, username, username),
         )
         conn.commit()
         conn.close()
 
-        await message.answer(f"✅ {subtract_amount} Unity Coins have been subtracted from the user's balance!", reply_markup=change_users_balance)
+        await message.answer(
+            f"✅ {subtract_amount} Unity Coins have been subtracted from the user's balance!",
+            reply_markup=change_users_balance,
+        )
         await state.clear()
-        
+
 
 @dp.message(F.text == "/stop_all_incomplete_games")
 @admin_required()
 async def stop_all_incomplete_games_command(message: types.Message, state: FSMContext):
     users = get_all_user_ids()
-    
+
     for userid in users:
-        try: 
+        try:
             delete_user_from_all_games(userid)
         except:
             continue
