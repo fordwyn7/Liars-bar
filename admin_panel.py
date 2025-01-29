@@ -1112,6 +1112,8 @@ async def get_username_for_withdraw(message: types.Message, state: FSMContext):
         confirmation_message, parse_mode="Markdown", reply_markup=keyboard
     )
     await state.set_data({"username": username})
+    await state.set_data({"reward_name": reward_name})
+    await state.set_data({"cost": cost})
 
 
 @dp.callback_query(lambda c: c.data == "confirm_withdraw")
