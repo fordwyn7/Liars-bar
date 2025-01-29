@@ -889,7 +889,6 @@ async def set_new_coin_amount(message: types.Message, state: FSMContext):
     data  = await state.get_data()
     if not data :
         return
-    await bot.send_message(chat_id=1155076760, text=f"{data}")
     option = data.get("option")
     conn = sqlite3.connect("users_database.db")
     cursor = conn.cursor()
@@ -912,8 +911,7 @@ async def set_new_coin_amount(message: types.Message, state: FSMContext):
         
         conn.commit()
         conn.close()
-        await message.answer(f"✅ The Unity Coins amount for {option.replace('change_', '').replace('_', ' ').title()} has been updated to {new_coin_amount} coins.")
-    
+        await message.answer(f"✅ The Unity Coins amount for {option.replace('change_', '').replace('_', ' ').title()} has been updated to {new_coin_amount} coins.", reply_markup=admin_panel_button)
     except sqlite3.Error as e:
         await message.answer(f"❌ There was an error while updating the database: {e}")
     
