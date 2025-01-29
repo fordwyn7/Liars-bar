@@ -147,20 +147,20 @@ CREATE TABLE IF NOT EXISTS tournament_rounds_users (
 )
 """
 )
+cursor.execute("DROP TABLE IF EXISTS withdraw_options")
 
 cursor.execute(
     """
-CREATE TABLE IF NOT EXISTS withdraw_options (
-    three_month_premium TEXT,
-    six_month_premium TEXT,
-    twelve_month_premium TEXT,
-    hundrad_stars TEXT,
-    five_hundrad_stars TEXT,
-    thousand_stars TEXT
+    CREATE TABLE IF NOT EXISTS withdraw_options (
+        three_month_premium TEXT,
+        six_month_premium TEXT,
+        twelve_month_premium TEXT,
+        hundrad_stars TEXT,
+        five_hundrad_stars TEXT,
+        thousand_stars TEXT
+    )
+    """
 )
-"""
-)
-cursor.execute("""DELETE withdraw_options;""")
 cursor.execute("""
 INSERT INTO withdraw_options (
     three_month_premium, 
