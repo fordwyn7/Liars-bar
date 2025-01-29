@@ -1182,6 +1182,7 @@ async def confirm_withdraw_queer(
     await callback_query.message.answer(
         "✅ Your withdrawal request has been submitted to our admins.\nIt will be processed within 24 hours."
     )
+    await state.clear()
 
 
 @dp.callback_query(lambda c: c.data.startswith("admin_confirm_"))
@@ -1215,3 +1216,4 @@ async def cancel_withdraw_queer(callback_query: types.CallbackQuery, state: FSMC
         message_id=callback_query.message.message_id,
     )
     await callback_query.message.answer(f"You have canceled your order successfully ✅")
+    await state.clear()
