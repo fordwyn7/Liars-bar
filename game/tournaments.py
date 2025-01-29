@@ -677,7 +677,7 @@ def get_game_id_from_mes(user_id):
     finally:
         conn.close()
 
-@dp.message(F.text == "✍️ edit maximum players")
+@dp.message(F.text == "✒️ edit maximum players")
 @admin_required()
 async def edit_maximum_players(message: types.Message, state: FSMContext):
     tournaments = get_upcoming_tournaments()
