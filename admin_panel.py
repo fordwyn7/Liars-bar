@@ -10,7 +10,7 @@ from aiogram.utils.keyboard import InlineKeyboardBuilder
 from states.state import *
 from hendlers import get_user_game_archive
 from datetime import datetime, timedelta
-from aiogram.utils.markdown import mention
+# from aiogram.utils.markdown import mention
 
 def generate_callback(action: str, admin_id: int) -> str:
     return f"{action}:{admin_id}"
