@@ -266,7 +266,7 @@ async def handle_quit_game(callback_query: types.CallbackQuery):
             await delete_user_messages(game_id, user.id)
             delete_user_from_all_games(user.id)
             winner = get_alive_number(game_id)
-            if winner != 0:
+            if winner != 0  and is_game_started(game_id):
                 await bot.send_message(
                     chat_id=winner,
                     text=f"Game has finished. \nYou are winner. 🥳🥳🥳🥳🥳\nConguratulation on winning in the game. \n🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉",
@@ -405,7 +405,7 @@ async def exclude_player_querriy(callback_query: types.CallbackQuery):
         conn.commit()
         update_game_details(game_id, player_to_remove, None)
         winner = get_alive_number(game_id)
-        if winner != 0:
+        if winner != 0 and is_game_started(game_id):
             await bot.send_message(
                 chat_id=winner,
                 text=f"Game has finished. \nYou are winner. 🥳🥳🥳🥳🥳\nConguratulation on winning in the game. \n🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉",
@@ -467,11 +467,11 @@ def get_join_tournament_button(tournament_id: str):
 
 user_tournaments_keyboard = InlineKeyboardMarkup(
     inline_keyboard=[
-        # [
-        #     InlineKeyboardButton(
-        #         text="⚡️ Ongoing Tournaments", callback_data="view_ongoing"
-        #     )
-        # ],
+        [
+            InlineKeyboardButton(
+                text="⚡️ Ongoing Tournaments", callback_data="view_ongoing"
+            )
+        ],
         [
             InlineKeyboardButton(
                 text="🌟 Upcoming Tournaments", callback_data="view_upcoming"
@@ -509,7 +509,7 @@ async def show_ongoing_tournaments(callback_query: types.CallbackQuery):
         return
     response = "⚡️ *Ongoing Tournaments:*\n\n"
     for tournament in tournaments:
-        response += f"🏆 {tournament['name']} (Ends: {tournament['end_time']})\n"
+        response += f"🏆 {tournament['id']} (Ends: {tournament['end_time']})\n"
     await callback_query.message.answer(response, parse_mode="Markdown")
 
 
