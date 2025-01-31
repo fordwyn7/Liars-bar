@@ -467,11 +467,11 @@ def get_join_tournament_button(tournament_id: str):
 
 user_tournaments_keyboard = InlineKeyboardMarkup(
     inline_keyboard=[
-        [
-            InlineKeyboardButton(
-                text="⚡️ Ongoing Tournaments", callback_data="view_ongoing"
-            )
-        ],
+        # [
+        #     InlineKeyboardButton(
+        #         text="⚡️ Ongoing Tournaments", callback_data="view_ongoing"
+        #     )
+        # ],
         [
             InlineKeyboardButton(
                 text="🌟 Upcoming Tournaments", callback_data="view_upcoming"
