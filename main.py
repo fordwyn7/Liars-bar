@@ -202,7 +202,7 @@ async def cmd_start(message: types.Message, state: FSMContext):
                 "- Latin alphabet characters (a-z, A-Z)\n"
                 "- Numbers (0-9)\n"
                 "- Underscores (_)\n"
-                "and you can use up to 20 characters"
+                "and you can use up to 30 characters"
             )
 
             await state.set_state(registration_game.pref1_name)
@@ -305,7 +305,7 @@ async def cmd_start(message: types.Message, state: FSMContext):
                 "- Latin alphabet characters (a-z, A-Z)\n"
                 "- Numbers (0-9)\n"
                 "- Underscores (_)\n"
-                "and you can use up to 20 characters"
+                "and you can use up to 30 characters"
             )
             await state.clear()
             await state.set_state(registration.pref_name)
