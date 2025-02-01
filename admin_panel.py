@@ -124,7 +124,7 @@ def get_user_statistics(user_id):
     try:
         cursor.execute(
             """
-            SELECT username, first_name, last_name, registration_date, nfgame 
+            SELECT username, first_name, last_name, registration_date, nfgame, unity_coin
             FROM users_database WHERE user_id = ?
             """,
             (user_id,),
@@ -132,7 +132,7 @@ def get_user_statistics(user_id):
         user_data = cursor.fetchone()
         if not user_data:
             return "❌ No user found with the given ID."
-        username, first_name, last_name, registration_date, nfgame = user_data
+        username, first_name, last_name, registration_date, nfgame, unity_coin = user_data
         is_admin = "admin 🧑‍💻" if is_user_admin(user_id) else "user 🙍‍♂️"
 
         stats_message = (
@@ -143,6 +143,9 @@ def get_user_statistics(user_id):
             f"📜 **Last Name**: {last_name if last_name else 'N/A'}\n\n"
             f"🗓️ **Registr Date**: {registration_date if registration_date else 'N/A'}\n\n"
             f"🎮 **Username in bot**: {nfgame if nfgame else 'N/A'}\n"
+            f"👥 referrals: {get_number_of_referrals(user_id)}"
+            f"💰 Unity Coins: {unity_coin}"
+            
         )
 
     except sqlite3.Error as e:

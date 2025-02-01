@@ -13,6 +13,8 @@ from db import (
     is_game_started,
     get_game_id_by_user,
     get_total_users,
+    generate_referral_link,
+    get_number_of_referrals
 )
 
 
@@ -294,6 +296,7 @@ async def my_cabinet(message: types.Message):
         f"👤 *Username:* {nfgame}\n"
         f"🗓 *Registration Date:* {registration_date}\n"
         f"🎮 *Games Played:* {games_played}\n"
+        f"👥 referrals: {get_number_of_referrals(message.from_user.id)}"
         f"💰 *Unity Coins:* {unity_coins}\n"
     )
     await message.answer(
@@ -346,3 +349,14 @@ async def process_withdraw_user(callback_query: types.CallbackQuery):
 async def tournaments_users_button(message: types.Message):
     # if message.from_user.id in [6807731973, 5219280507]:
     await message.answer("Choose an option:", reply_markup=user_tournaments_keyboard)
+
+@dp.message(F.text == "❄️ referral")
+async def tournaments_users_button(message: types.Message):
+    referral_link = generate_referral_link(message.from_user.id)
+    u_coins = 10
+    await message.answer(f"Here is your refferal link 👇\nSend this to your friends and get {u_coins} Unity Coins 💰 for each new friend.")
+    await message.answer(
+        f"🎮 *Hey!* Join this bot to play fun games and earn rewards! 🚀\n\n"
+        f"👉 Use this link to get started 👇\n\n{referral_link}\n\n"
+        "Play, earn, and enjoy! 😉"
+    )

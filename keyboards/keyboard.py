@@ -20,6 +20,7 @@ def get_main_menu(user_id: int):
         ],
         [
             KeyboardButton(text="📱 my cabinet"),
+            KeyboardButton(text="❄️ referral"),
             KeyboardButton(text="🤩 tournaments"),
         ],
         [

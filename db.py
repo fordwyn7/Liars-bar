@@ -1052,9 +1052,13 @@ def create_game_record_if_not_exists(game_id: str, user_id: int):
     cursor = conn.cursor()
     try:
         try:
-            start_time = (datetime.now() + timedelta(hours=5)).strftime("%Y-%m-%d %H:%M:%S")
+            start_time = (datetime.now() + timedelta(hours=5)).strftime(
+                "%Y-%m-%d %H:%M:%S"
+            )
         except ValueError:
-            start_time = (datetime.now() + timedelta(hours=5)).strftime("%Y-%m-%d %H:%M")
+            start_time = (datetime.now() + timedelta(hours=5)).strftime(
+                "%Y-%m-%d %H:%M"
+            )
 
         cursor.execute(
             """
@@ -1484,9 +1488,7 @@ async def notify_round_results(tournament_id: str, round_number: str):
             if group_number not in unique_groups:
                 unique_groups.add(group_number)
                 if winner_id:
-                    results_message += (
-                        f"- Winner from Group {group_number}: {get_user_nfgame(winner_id)}(ID: {winner_id})\n"
-                    )
+                    results_message += f"- Winner from Group {group_number}: {get_user_nfgame(winner_id)}(ID: {winner_id})\n"
                 else:
                     results_message += f"- Group {group_number}: No winner yet\n"
 
@@ -1720,7 +1722,8 @@ def get_users_in_round(tournament_id, round_number):
     finally:
         conn.close()
 
-def get_round_results(tournament_id, round_number): 
+
+def get_round_results(tournament_id, round_number):
     conn = sqlite3.connect("users_database.db")
     cursor = conn.cursor()
     try:
@@ -1742,9 +1745,7 @@ def get_round_results(tournament_id, round_number):
             if group_number not in unique_groups:
                 unique_groups.add(group_number)
                 if winner_id:
-                    results_message += (
-                        f"- Winner from Group {group_number}: {get_user_nfgame(winner_id)} (ID: {winner_id})\n"
-                    )
+                    results_message += f"- Winner from Group {group_number}: {get_user_nfgame(winner_id)} (ID: {winner_id})\n"
                 else:
                     results_message += f"- Group {group_number}: No winner yet\n"
         return results_message
@@ -1753,3 +1754,23 @@ def get_round_results(tournament_id, round_number):
         return f"Error fetching round results for tournament {tournament_id}."
     finally:
         conn.close()
+
+
+def get_number_of_referrals(user_id):
+    conn = sqlite3.connect("users_database.db")
+    cursor = conn.cursor()
+    cursor.execute(
+        """
+        SELECT COUNT(*) 
+        FROM users_referral 
+        WHERE referred_by = ?
+        """,
+        (user_id,),
+    )
+
+    result = cursor.fetchone()
+    return result[0] if result else 0
+
+
+def generate_referral_link(user_id):
+    return f"https://t.me/liarsbar_game_robot?start={user_id}"

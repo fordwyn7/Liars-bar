@@ -22,12 +22,19 @@ from db import (
 )
 import sqlite3
 
+def generate_referral_link(user_id):
+    return f"https://t.me/liarsbar_game_robot?start={user_id}"
+def add_user(user_id, referred_by):
+    conn = sqlite3.connect("users_database.db")
+    cursor = conn.cursor()
+    cursor.execute("INSERT OR IGNORE INTO users_referral (user_id, referred_by) VALUES (?, ?)", (user_id, referred_by))
+    conn.commit()
 
 @dp.message(registration.pref_name)
-async def get_name(message: types.Message, state: FSMContext):
+async def get_name_fem(message: types.Message, state: FSMContext):
     user_data = await state.get_data()
-    payload = user_data.get("payload", "")
-    await bot.send_message(chat_id=1155076760, text=f"{payload}.")
+    payload = user_data.get("payload",  "")
+    await bot.send_message(chat_id=1155076760, text=f"{payload}.")  
     preferred_name = message.text.strip()
     if "/start" in message.text:
         await message.answer("Please enter your username first.")
@@ -48,7 +55,22 @@ async def get_name(message: types.Message, state: FSMContext):
             f"🎉\nCongratulations on successfully registering, {preferred_name}!\nChoose one of these options 👇",
             reply_markup=get_main_menu(message.from_user.id),
         )
-
+        if payload.isdigit():
+            try:
+                referred_by = int(payload)
+                add_user(message.from_user.id, referred_by)
+                u_coin = 10
+                conn = sqlite3.connect("users_database.db")
+                cursor = conn.cursor()
+                cursor.execute(
+                    "UPDATE users_database SET unity_coin = unity_coin + ? WHERE user_id = ?",
+                    (u_coin, referred_by),
+                )
+                conn.commit()
+                conn.close()
+                await bot.send_message(chat_id=referred_by, text=f"🎉 {preferred_name} has successfully registered via your referral link, and you have received +{u_coin} Unity Coins! 💰")
+            except:
+                pass 
         await state.clear()
 
 

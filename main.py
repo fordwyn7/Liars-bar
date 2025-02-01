@@ -159,7 +159,12 @@ cursor.execute(
     )
     """
 )
-
+cursor.execute('''
+CREATE TABLE IF NOT EXISTS users_referral (
+    user_id INTEGER PRIMARY KEY,
+    referred_by INTEGER
+)
+''')
 
 # cursor.execute("DELETE FROM tournament_rounds_users;")
 # cursor.execute("DELETE FROM tournament_users;")
@@ -171,14 +176,7 @@ cursor.execute(
 conn.commit()
 conn.close()
 
-# def generate_referral_link(user_id):
-#     return f"https://t.me/liarsbar_game_robot?start={user_id}"
-# def add_user(user_id, username, referred_by=None):
-#     cursor.execute('INSERT OR IGNORE INTO users (user_id, username, referred_by) VALUES (?, ?, ?)', (user_id, username, referred_by))
-#     conn.commit()
-# def get_user(user_id):
-#     cursor.execute('SELECT * FROM users WHERE user_id = ?', (user_id,))
-#     return cursor.fetchone()
+
 
 @dp.message(Command("start"))
 async def cmd_start(message: types.Message, state: FSMContext):
