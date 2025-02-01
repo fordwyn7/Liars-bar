@@ -1240,34 +1240,34 @@ async def watch_results_f(message: types.Message):
 
 
 
-@dp.message("/remove" in F.text)
-@admin_required()
-async def watch_participants_f(message: types.Message):
-    user_id = message.text.split(" ")[1]
-    remove_user_from_tournament(user_id)
-    await message.answer("successfully")
+# @dp.message("/remove" in F.text)
+# @admin_required()
+# async def watch_participants_f(message: types.Message):
+#     user_id = message.text.split(" ")[1]
+#     remove_user_from_tournament(user_id)
+#     await message.answer("successfully")
     
-@dp.message("/remove_game" in F.text)
-@admin_required()
-async def watch_participants_f(message: types.Message):
-    user_id = message.text.split(" ")[1]
-    delete_user_from_all_games(user_id)
-    await message.answer("successfully")
-def remove_user_from_tournament(user_id: str):
-    conn = sqlite3.connect("users_database.db")
-    cursor = conn.cursor()
-    try:
-        cursor.execute(
-            """
-            DELETE FROM tournament_users
-            WHERE user_id = ?
-            """,
-            (user_id,),
-        )
-        conn.commit()
-    except sqlite3.Error as e:
-        print(f"❌ Database error: {e}")
-    finally:
-        conn.close()
+# @dp.message("/remove_game" in F.text)
+# @admin_required()
+# async def watch_participants_f(message: types.Message):
+#     user_id = message.text.split(" ")[1]
+#     remove_user_from_tournament(user_id)
+#     await message.answer("successfully")
+# def remove_user_from_tournament(user_id: str):
+#     conn = sqlite3.connect("users_database.db")
+#     cursor = conn.cursor()
+#     try:
+#         cursor.execute(
+#             """
+#             DELETE FROM tournament_users
+#             WHERE user_id = ?
+#             """,
+#             (user_id,),
+#         )
+#         conn.commit()
+#     except sqlite3.Error as e:
+#         print(f"❌ Database error: {e}")
+#     finally:
+#         conn.close()
 
     
