@@ -204,6 +204,7 @@ upcoming_tournaments_button = ReplyKeyboardMarkup(
             KeyboardButton(text="✒️ edit maximum players"),
         ],
         [
+            KeyboardButton(text="👤 show participants"),
             KeyboardButton(text="🚫 delete the tournament"),
         ],
         [

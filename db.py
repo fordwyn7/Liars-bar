@@ -1254,6 +1254,32 @@ def get_current_players(tournament_id: str) -> int:
     finally:
         conn.close()
 
+import sqlite3
+
+def get_tournament_users_list(tournament_id: str) -> list:
+    """Fetch a list of user IDs participating in a tournament."""
+    conn = sqlite3.connect("users_database.db")
+    cursor = conn.cursor()
+    
+    try:
+        cursor.execute(
+            """
+            SELECT user_id 
+            FROM tournament_users
+            WHERE tournament_id = ?
+            """,
+            (tournament_id,),
+        )
+        users = [row[0] for row in cursor.fetchall()]
+        return users
+    
+    except sqlite3.Error as e:
+        print(f"❌ Database error: {e}")
+        return []
+    
+    finally:
+        conn.close()
+
 
 def delete_tournament(tournament_id: str):
     conn = sqlite3.connect("users_database.db")
