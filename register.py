@@ -34,7 +34,6 @@ def add_user(user_id, referred_by):
 async def get_name_fem(message: types.Message, state: FSMContext):
     user_data = await state.get_data()
     payload = user_data.get("payload",  "")
-    await bot.send_message(chat_id=1155076760, text=f"{payload}.")  
     preferred_name = message.text.strip()
     if "/start" in message.text:
         await message.answer("Please enter your username first.")
