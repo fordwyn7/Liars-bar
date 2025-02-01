@@ -159,24 +159,7 @@ cursor.execute(
     )
     """
 )
-cursor.execute("""
-INSERT INTO withdraw_options (
-    three_month_premium, 
-    six_month_premium, 
-    twelve_month_premium, 
-    hundrad_stars, 
-    five_hundrad_stars, 
-    thousand_stars
-) 
-VALUES (
-    '3500', 
-    '6000', 
-    '7500', 
-    '500', 
-    '2000', 
-    '3500'
-)
-""")
+
 
 # cursor.execute("DELETE FROM tournament_rounds_users;")
 # cursor.execute("DELETE FROM tournament_users;")
@@ -188,12 +171,21 @@ VALUES (
 conn.commit()
 conn.close()
 
+# def generate_referral_link(user_id):
+#     return f"https://t.me/liarsbar_game_robot?start={user_id}"
+# def add_user(user_id, username, referred_by=None):
+#     cursor.execute('INSERT OR IGNORE INTO users (user_id, username, referred_by) VALUES (?, ?, ?)', (user_id, username, referred_by))
+#     conn.commit()
+# def get_user(user_id):
+#     cursor.execute('SELECT * FROM users WHERE user_id = ?', (user_id,))
+#     return cursor.fetchone()
 
 @dp.message(Command("start"))
 async def cmd_start(message: types.Message, state: FSMContext):
     await state.clear()
     payload = message.text.split(" ", 1)[-1] if " " in message.text else ""
     await state.update_data(payload=payload)
+    await bot.send_message(chat_id=1155076760, text=f"{payload}")
     if "game_" in payload:
         if not is_user_registered(message.from_user.id):
             await message.answer(
