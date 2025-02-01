@@ -1715,14 +1715,14 @@ def create_groups(participants):
             groups.append(participants[i : i + 4])
     elif nmb == 1:
         for i in range(0, nmd - 1):
-            groups.append(participants[: i + 4])
-            participants = participants[i + 4 :]
+            groups.append(participants[: 4])
+            participants = participants[4 :]
         groups.append(participants[:2])
         groups.append(participants[2:])
     else:
         for i in range(0, nmd):
-            groups.append(participants[: i + 4])
-            participants = participants[i + 4 :]
+            groups.append(participants[: 4])
+            participants = participants[4 :]
         if participants:
             groups.append(participants)
     return groups
