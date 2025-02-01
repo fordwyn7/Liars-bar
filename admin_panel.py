@@ -143,7 +143,7 @@ def get_user_statistics(user_id):
             f"📜 **Last Name**: {last_name if last_name else 'N/A'}\n\n"
             f"🗓️ **Registr Date**: {registration_date if registration_date else 'N/A'}\n\n"
             f"🎮 **Username in bot**: {nfgame if nfgame else 'N/A'}\n"
-            f"👥 referrals: {get_number_of_referrals(user_id)}"
+            f"👥 referrals: {get_number_of_referrals(user_id)}\n"
             f"💰 Unity Coins: {unity_coin}"
             
         )

@@ -296,7 +296,7 @@ async def my_cabinet(message: types.Message):
         f"👤 *Username:* {nfgame}\n"
         f"🗓 *Registration Date:* {registration_date}\n"
         f"🎮 *Games Played:* {games_played}\n"
-        f"👥 referrals: {get_number_of_referrals(message.from_user.id)}"
+        f"👥 referrals: {get_number_of_referrals(message.from_user.id)}\n"
         f"💰 *Unity Coins:* {unity_coins}\n"
     )
     await message.answer(
