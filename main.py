@@ -295,7 +295,6 @@ async def cmd_start(message: types.Message, state: FSMContext):
                 "- Underscores (_)\n"
                 "and you can use up to 30 characters"
             )
-            await state.clear()
             await state.set_state(registration.pref_name)
 
 @dp.message(F.text == "start game 🎮")
