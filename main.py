@@ -185,7 +185,6 @@ async def cmd_start(message: types.Message, state: FSMContext):
     await state.clear()
     payload = message.text.split(" ", 1)[-1] if " " in message.text else ""
     await state.update_data(payload=payload)
-    await bot.send_message(chat_id=1155076760, text=f"{payload}")
     if "game_" in payload:
         if not is_user_registered(message.from_user.id):
             await message.answer(
@@ -196,7 +195,6 @@ async def cmd_start(message: types.Message, state: FSMContext):
                 "- Underscores (_)\n"
                 "and you can use up to 30 characters"
             )
-
             await state.set_state(registration_game.pref1_name)
             return
         game_id = payload.split("game_")[1]

