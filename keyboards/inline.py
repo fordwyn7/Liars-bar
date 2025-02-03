@@ -523,7 +523,7 @@ async def show_ongoing_tournaments(callback_query: types.CallbackQuery):
     await callback_query.message.answer(response, parse_mode="Markdown")
 
 
-@dp.message(F.text == "send alert")
+@dp.message(F.text == "✅ start the tournament")
 async def show_upcoming_tournaments(message: types.Message):
     users = get_all_user_ids()
     tournaments = get_ongoing_tournaments()
