@@ -1134,6 +1134,28 @@ def get_tournament_id_by_user(user_id: int):
     finally:
         conn.close()
 
+import sqlite3
+from datetime import datetime, timedelta
+
+def set_tournament_end_time(tournament_id):
+    conn = sqlite3.connect("users_database.db")
+    cursor = conn.cursor()
+    try:
+        end_time = datetime.now(timezone.utc) + timedelta(hours=5)
+        formatted_time = end_time.strftime("%Y-%m-%d %H:%M:%S")
+        cursor.execute(
+            """
+            UPDATE tournaments_table
+            SET tournament_end_time = ?
+            WHERE tournament_id = ?
+            """,
+            (formatted_time, tournament_id),
+        )
+        conn.commit()
+    except sqlite3.Error as e:
+        print(f"❌ Database error: {e}")
+    finally:
+        conn.close()
 
 def get_tournament_archive():
     conn = sqlite3.connect("users_database.db")
@@ -1250,7 +1272,7 @@ def get_tournament_users_list(tournament_id: str) -> list:
         conn.close()
 
 
-def delete_tournament(tournament_id: str):
+def delete_tournament(tournament_id):
     conn = sqlite3.connect("users_database.db")
     cursor = conn.cursor()
     try:
@@ -1560,10 +1582,10 @@ def delete_tournament_from_tables(tournament_id: str):
     conn = sqlite3.connect("users_database.db")
     cursor = conn.cursor()
     try:
-        cursor.execute(
-            "DELETE FROM tournaments_table WHERE tournament_id = ?",
-            (tournament_id,),
-        )
+        # cursor.execute(
+        #     "DELETE FROM tournaments_table WHERE tournament_id = ?",
+        #     (tournament_id,),
+        # )
         cursor.execute(
             "DELETE FROM tournament_users WHERE tournament_id = ?",
             (tournament_id,),
@@ -1660,6 +1682,7 @@ async def inform_all_users_tournament_ended(tournament_id: str, winner_id: int):
                 await bot.send_message(chat_id=user_id, text=message)
             except Exception as e:
                 print(f"Error sending message to {user_id}: {e}")
+        set_tournament_end_time(tournament_id)
         delete_tournament_from_tables(tournament_id)
     except sqlite3.Error as e:
         print(f"Database error: {e}")
