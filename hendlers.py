@@ -357,6 +357,7 @@ async def show_tournaments_menu(message: types.Message):
         return
     for tournament in tournaments:
         response = (
+            f"🎮 *Upcoming Tournament:*"
             f"🌟 *Tournament ID:* {tournament['id']}\n"
             f"🗓 *Starts:* {tournament['start_time']}\n"
             f"🏁 *Ends:* {tournament['end_time']}\n"
@@ -367,7 +368,7 @@ async def show_tournaments_menu(message: types.Message):
         )
 
     await message.answer(
-        "🎮 *Upcoming Tournament:*",
+        response,
         reply_markup=archive_tournamnets,
         parse_mode="Markdown",
     )
