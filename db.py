@@ -1298,7 +1298,6 @@ def get_ongoing_tournaments():
                 "prize": row[2],
                 "start_time": row[3],
                 "end_time": row[4],
-                "current_players": row[6],
             }
             for row in cursor.fetchall()
         ]
