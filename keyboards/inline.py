@@ -532,11 +532,7 @@ async def show_upcoming_tournaments(callback_query: types.CallbackQuery):
                 f"🌟 Tournament ID: {tournament['id']}\n"
                 f"🗓 Starts: {tournament['start_time']}\n"
                 f"🏁 Ends: {tournament['end_time']}\n\n"
-                f"🗓 Registration starts: {tournament['register_start']}\n"
-                f"🏁 Registration ends: {tournament['register_end']}\n\n"
-                f"👥 Registered Players: {nop}/{tournament['maximum_players']}\n\n"
                 f"🏆 Prize: \n\n{tournament['prize']}\n\n"
-                f"You are participating in this tournament ⚡️⚡️⚡️"
             )
             await callback_query.message.answer(response, parse_mode="Markdown")
             return
@@ -544,9 +540,6 @@ async def show_upcoming_tournaments(callback_query: types.CallbackQuery):
             f"🌟 Tournament ID: {tournament['id']}\n"
             f"🗓 Starts: {tournament['start_time']}\n"
             f"🏁 Ends: {tournament['end_time']}\n\n"
-            f"🗓 Registration starts: {tournament['register_start']}\n"
-            f"🏁 Registration ends: {tournament['register_end']}\n\n"
-            f"👥 Registered Players: {nop}/{tournament['maximum_players']}\n\n"
             f"🏆 Prize: \n\n{tournament['prize']}\n\n"
             f"⚠️Once you register for the tournament, you can't quit it ❗️\n"
             f"🔗 Join using the button below:"
@@ -595,38 +588,10 @@ async def join_tournament(callback_query: types.CallbackQuery):
         )
         return
     tournament = tournament[0]
-    try:
-        register_start = datetime.strptime(
-            tournament["register_start"], "%Y-%m-%d %H:%M:%S"
-        ).replace(tzinfo=timezone.utc)
-    except ValueError:
-        register_start = datetime.strptime(
-            tournament["register_start"], "%Y-%m-%d %H:%M"
-        ).replace(tzinfo=timezone.utc)
-
-    try:
-        register_end = datetime.strptime(
-            tournament["register_end"], "%Y-%m-%d %H:%M:%S"
-        ).replace(tzinfo=timezone.utc)
-    except ValueError:
-        register_end = datetime.strptime(
-            tournament["register_end"], "%Y-%m-%d %H:%M"
-        ).replace(tzinfo=timezone.utc)
-    if not (register_start <= current_time <= register_end):
-        await callback_query.answer(
-            f"❌ Registration is only open between {register_start.strftime('%Y-%m-%d %H:%M')} and {register_end.strftime('%Y-%m-%d %H:%M')}.",
-            show_alert=True,
-        )
-        return
     if is_user_in_tournament(tournament_id, user_id):
         await callback_query.answer(
             "❕ You are already registered for this tournament.", show_alert=True
         )
-        return
-    nop = get_current_players(tournament["name"])
-    max_num = tournament["maximum_players"]
-    if nop == max_num:
-        await callback_query.answer("No free spots available 😔", show_alert=True)
         return
     try:
         add_user_to_tournament(tournament_id, user_id)
@@ -640,11 +605,7 @@ async def join_tournament(callback_query: types.CallbackQuery):
             f"🌟 Tournament ID: {tournament['id']}\n"
             f"🗓 Starts: {tournament['start_time']}\n"
             f"🏁 Ends: {tournament['end_time']}\n\n"
-            f"🗓 Registration starts: {tournament['register_start']}\n"
-            f"🏁 Registration ends: {tournament['register_end']}\n\n"
-            f"👥 Registered Players: {updated_nop}/{tournament['maximum_players']}\n\n"
             f"🏆 Prize: \n\n{tournament['prize']}\n\n"
-            f"You are participating in this tournament ⚡️⚡️⚡️"
         )
         await bot.edit_message_text(
             chat_id=chat_id, message_id=message_id, text=response, parse_mode="Markdown"
