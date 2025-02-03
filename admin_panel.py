@@ -469,7 +469,6 @@ async def info_users(message: types.Message, state: FSMContext):
     )
     await state.set_state(UserInformations.userid_state)
 
-
 @dp.message(UserInformations.userid_state)
 @admin_required()
 async def state_info_users(message: types.Message, state: FSMContext):
@@ -481,19 +480,19 @@ async def state_info_users(message: types.Message, state: FSMContext):
             )
     else:
         user_id = int(message.text)
-        if not is_user_registered(int(user_id)):
-            await message.answer(
-                f"No user found from given ID ☹️",
-                reply_markup=admin_panel_button,
-            )
-        else:
-            user_id = int(user_id)
-            await message.answer(
-                get_user_statistics(user_id),
-                parse_mode="Markdown",
-                reply_markup=admin_panel_button,
-            )
-        await state.clear()
+    if not is_user_registered(int(user_id)):
+        await message.answer(
+            f"No user found from given ID ☹️",
+            reply_markup=admin_panel_button,
+        )
+    else:
+        user_id = int(user_id)
+        await message.answer(
+            get_user_statistics(user_id),
+            parse_mode="Markdown",
+            reply_markup=admin_panel_button,
+        )
+    await state.clear()
 
 
 @dp.message(F.text == "🎯 Game archive")
