@@ -523,24 +523,20 @@ async def show_upcoming_tournaments(callback_query: types.CallbackQuery):
         )
         return
     for tournament in tournaments:
-        if "_" in tournament["name"]:
-            nop = get_current_players(tournament["name"].split("_")[1])
-        else:
-            nop = get_current_players(tournament["name"])
         if is_user_in_tournament(tournament["name"], callback_query.from_user.id):
             response = (
                 f"🌟 Tournament ID: {tournament['id']}\n"
                 f"🗓 Starts: {tournament['start_time']}\n"
-                f"🏁 Ends: {tournament['end_time']}\n\n"
-                f"🏆 Prize: \n\n{tournament['prize']}\n\n"
+                f"🏁 Ends: {tournament['end_time']}\n"
+                f"🏆 Prize: \n{tournament['prize']}\n"
             )
             await callback_query.message.answer(response, parse_mode="Markdown")
             return
         response = (
             f"🌟 Tournament ID: {tournament['id']}\n"
             f"🗓 Starts: {tournament['start_time']}\n"
-            f"🏁 Ends: {tournament['end_time']}\n\n"
-            f"🏆 Prize: \n\n{tournament['prize']}\n\n"
+            f"🏁 Ends: {tournament['end_time']}\n"
+            f"🏆 Prize: \n{tournament['prize']}\n"
             f"⚠️Once you register for the tournament, you can't quit it ❗️\n"
             f"🔗 Join using the button below:"
         )
