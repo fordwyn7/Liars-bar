@@ -582,7 +582,7 @@ async def delete_tournament_handler(message: types.Message):
             f"🏁 Ends: {tournament['end_time']}\n\n"
             f"🗓 Registration starts: {tournament['register_start']}\n"
             f"🏁 Registration ends: {tournament['register_end']}\n\n"
-            f"👥 Registered Players: {nop}/{tournament['maximum_players']}\n"
+            f"👥 Registered Players: {nop}\n"
             f"🏆 Prize: \n\n{tournament['prize']}\n\n"
         )
         keyboard = InlineKeyboardMarkup(

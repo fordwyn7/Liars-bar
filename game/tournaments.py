@@ -7,7 +7,9 @@ from aiogram.fsm.context import FSMContext
 from config import *
 from keyboards.keyboard import *
 from middlewares.registered import admin_required
-from keyboards.inline import get_join_tournament_button, user_tournaments_keyboard
+from keyboards.inline import (
+    archive_tournamnets,
+)
 from db import *
 from states.state import (
     AddTournaments,
@@ -40,7 +42,7 @@ async def deleteeee_tourinit(message: types.Message, state: FSMContext):
             f"🌟 Tournament ID: {tournament['id']}\n\n"
             f"🗓 Started: {tournament['start_time']}\n"
             f"🏁 Ends: {tournament['end_time']}\n\n"
-            f"👥 Registered Players: {nop}/{tournament['maximum_players']}\n"
+            f"👥 Registered Players: {nop}\n"
             f"🏆 Prize: \n\n{tournament['prize']}\n\n"
         )
         keyboard = InlineKeyboardMarkup(
@@ -78,31 +80,10 @@ async def ongoing_tournaments_sekshn(message: types.Message):
             reply_markup=tournaments_admin_panel_button,
         )
         return
-    start_button = InlineKeyboardMarkup(
-        inline_keyboard=[
-            [
-                InlineKeyboardButton(
-                    text="▶ Start Tournament",
-                    callback_data=f"start_tournament_k",
-                )
-            ]
-        ]
-    )
-    response = "⚡️ *Ongoing Tournaments:*\n\n"
-    for tournament in ongoing_tournaments:
-        response += (
-            f"🌟 *{tournament['id']}*\n\n"
-            f"🗓 Started: {tournament['start_time']}\n"
-            f"🏁 Ends: {tournament['end_time']}\n\n"
-            f"👥 Registered Players: {tournament['current_players']}/{tournament['maximum_players']}\n\n"
-            f"🏆 Prize: \n{tournament['prize']}\n\n"
-        )
     await message.answer(
-        response,
-        reply_markup=start_button if get_current_round_number(tournament["name"]) == "0" else ongoing_tournaments_button,
-        parse_mode="Markdown",
+        f"Here what you can do with ongoing tournaments.",
+        reply_markup=ongoing_tournaments_button,
     )
-    await message.answer(f"Here what you can do with ongoing tournaments.", reply_markup=ongoing_tournaments_button)
 
 
 @dp.message(F.text == "⏳ Upcoming")
@@ -169,6 +150,8 @@ async def create_a_new_truine(message: types.Message, state: FSMContext):
         reply_markup=back_to_tournaments_button,
     )
     await state.set_state(AddTournaments.turnir_start_date)
+
+
 @dp.message(AddTournaments.turnir_start_date)
 async def set_tournament_start_date(message: types.Message, state: FSMContext):
     if message.text == "back to tournaments panel 🔙":
@@ -273,7 +256,39 @@ def save_tournament_to_db(data, tournamnet_link):
 @dp.message(F.text == "🤩 tournaments")
 @admin_required()
 async def show_tournaments_menu(message: types.Message):
-    await message.answer("Choose an option:", reply_markup=user_tournaments_keyboard)
+    get_o = get_ongoing_tournaments()
+    if get_o:
+        await message.answer(
+            "⚡ There is an ongoing tournament! 🎮\n"
+            "You can participate if it's still open. 🔥",
+            reply_markup=archive_tournamnets,
+        )
+        return
+    tournaments = get_upcoming_tournaments()
+    if not tournaments:
+        await message.answer(
+            "No upcoming tournaments are scheduled. 🏆\n"
+            "But you can explore the archive of past tournaments. 📜",
+            reply_markup=archive_tournamnets,
+        )
+        return
+    for tournament in tournaments:
+        response = (
+            f"🌟 *Tournament ID:* {tournament['id']}\n"
+            f"🗓 *Starts:* {tournament['start_time']}\n"
+            f"🏁 *Ends:* {tournament['end_time']}\n"
+            f"🏆 *Prize:* {tournament['prize']}\n"
+            f"⚠️ *Once registered, you cannot quit!*\n\n"
+            f"📢 *Before the tournament begins, everyone will receive a notification to join.*\n"
+            f"⏳ *You will have only 5 minutes to register!*"
+        )
+
+    await message.answer(
+        "🎮 *Upcoming Tournament:*",
+        reply_markup=archive_tournamnets,
+        parse_mode="Markdown",
+    )
+
 
 @dp.message(F.text == "📝 edit starting")
 @admin_required()
@@ -380,7 +395,7 @@ def update_start_and_end_dates(tournament_id: str, start_date: str, end_date: st
 
 
 @dp.callback_query(lambda c: c.data == "start_tournament_k")
-async def start_turninr(callback_query: types.CallbackQuery, state: FSMContext):
+async def start_turninr(callback_query: types.CallbackQuery):
     await bot.delete_message(
         chat_id=callback_query.from_user.id,
         message_id=callback_query.message.message_id,
@@ -496,84 +511,3 @@ def get_game_id_from_mes(user_id):
     finally:
         conn.close()
 
-
-@dp.message(F.text == "✒️ edit maximum players")
-@admin_required()
-async def edit_maximum_players(message: types.Message, state: FSMContext):
-    tournaments = get_upcoming_tournaments()
-    if not tournaments:
-        await message.answer(
-            "No upcoming tournaments available to edit.",
-            reply_markup=tournaments_admin_panel_button,
-        )
-        await state.clear()
-        return
-    await state.clear()
-    tournament = tournaments[0]
-    await state.update_data(tournament_id=tournament["name"])
-    await message.answer(
-        f"Editing the MAXIMUM players for tournament\n"
-        f"👥 Current Maximum Players: {tournament['maximum_players']}\n\n"
-        "Please enter the new *maximum players* count:",
-        parse_mode="Markdown",
-        reply_markup=back_to_tournaments_button,
-    )
-    await state.set_state(EditMaxPlayers.new_max_players)
-
-
-@dp.message(EditMaxPlayers.new_max_players)
-async def set_new_max_players(message: types.Message, state: FSMContext):
-    if message.text == "back to tournaments panel 🖙":
-        await message.answer(
-            f"You are in tournaments section.",
-            reply_markup=tournaments_admin_panel_button,
-        )
-        await state.clear()
-        return
-    try:
-        new_max_players = int(message.text.strip())
-        if new_max_players <= 0:
-            raise ValueError
-    except ValueError:
-        await message.answer(
-            "❌ Invalid input. Please enter a positive number.",
-            reply_markup=back_to_tournaments_button,
-        )
-        return
-
-    data = await state.get_data()
-    tournament_id = data["tournament_id"]
-    nop = get_current_players(tournament_id)
-    if new_max_players < nop:
-        await message.answer(
-            "The new maximum number of players MUST not be less than registrated players ❌",
-            reply_markup=tournaments_admin_panel_button,
-        )
-        await state.clear()
-        return
-    update_maximum_players(tournament_id, new_max_players)
-    await message.answer(
-        f"✅ Maximum players updated successfully!\n\n"
-        f"👥 New Maximum Players: {new_max_players}",
-        reply_markup=tournaments_admin_panel_button,
-    )
-    await state.clear()
-
-
-def update_maximum_players(tournament_id: str, max_players: int):
-    conn = sqlite3.connect("users_database.db")
-    cursor = conn.cursor()
-    try:
-        cursor.execute(
-            """
-            UPDATE tournaments_table
-            SET maximum_players = ?
-            WHERE tournament_id = ?
-            """,
-            (max_players, tournament_id),
-        )
-        conn.commit()
-    except sqlite3.Error as e:
-        print(f"❌ Database error: {e}")
-    finally:
-        conn.close()

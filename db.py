@@ -1089,7 +1089,7 @@ def get_upcoming_tournaments():
     try:
         cursor.execute(
             """
-            SELECT id, tournament_id, tournament_prize, tournament_start_time, maximum_players, tournament_end_time 
+            SELECT id, tournament_id, tournament_prize, tournament_start_time, tournament_end_time 
             FROM tournaments_table
             WHERE tournament_start_time > datetime('now',  '+5 hours')
             """
@@ -1100,8 +1100,7 @@ def get_upcoming_tournaments():
                 "name": row[1],
                 "prize": row[2],
                 "start_time": row[3],
-                "maximum_players": row[4],
-                "end_time": row[5]
+                "end_time": row[4]
             }
             for row in cursor.fetchall()
         ]
@@ -1286,7 +1285,6 @@ def get_ongoing_tournaments():
         cursor.execute(
             """
             SELECT t.id, t.tournament_id, t.tournament_prize, t.tournament_start_time, t.tournament_end_time, 
-                   t.maximum_players, 
                    (SELECT COUNT(*) FROM tournament_users tu WHERE tu.tournament_id = t.tournament_id) AS current_players
             FROM tournaments_table t
             WHERE t.tournament_start_time <= datetime('now', '+5 hours') 
@@ -1301,7 +1299,6 @@ def get_ongoing_tournaments():
                 "start_time": row[3],
                 "end_time": row[4],
                 "current_players": row[6],
-                "maximum_players": row[5],
             }
             for row in cursor.fetchall()
         ]

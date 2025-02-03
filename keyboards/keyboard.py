@@ -212,12 +212,7 @@ tournaments_admin_panel_button = ReplyKeyboardMarkup(
 upcoming_tournaments_button = ReplyKeyboardMarkup(
     keyboard=[
         [
-            KeyboardButton(text="✏️ edit registration"),
             KeyboardButton(text="📝 edit starting"),
-            KeyboardButton(text="✒️ edit maximum players"),
-        ],
-        [
-            KeyboardButton(text="👤 show participants"),
             KeyboardButton(text="🚫 delete the tournament"),
         ],
         [
@@ -230,6 +225,7 @@ upcoming_tournaments_button = ReplyKeyboardMarkup(
 ongoing_tournaments_button = ReplyKeyboardMarkup(
     keyboard=[
         [
+            KeyboardButton(text="✅ start the tournament"),
             KeyboardButton(text="👀 watch results"),
             KeyboardButton(text="🚫 delete this tournament"),
         ],

@@ -266,7 +266,7 @@ async def handle_quit_game(callback_query: types.CallbackQuery):
             await delete_user_messages(game_id, user.id)
             delete_user_from_all_games(user.id)
             winner = get_alive_number(game_id)
-            if winner != 0  and is_game_started(game_id):
+            if winner != 0 and is_game_started(game_id):
                 await bot.send_message(
                     chat_id=winner,
                     text=f"Game has finished. \nYou are winner. 🥳🥳🥳🥳🥳\nConguratulation on winning in the game. \n🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉",
@@ -465,18 +465,28 @@ def get_join_tournament_button(tournament_id: str):
     return inline_keyboard
 
 
-user_tournaments_keyboard = InlineKeyboardMarkup(
+# user_tournaments_keyboard = InlineKeyboardMarkup(
+#     inline_keyboard=[
+#         [
+#             InlineKeyboardButton(
+#                 text="⚡️ Ongoing Tournaments", callback_data="view_ongoing"
+#             )
+#         ],
+#         [
+#             InlineKeyboardButton(
+#                 text="🌟 Upcoming Tournaments", callback_data="view_upcoming"
+#             )
+#         ],
+#         [
+#             InlineKeyboardButton(
+#                 text="📑 Tournament Archive", callback_data="view_archive"
+#             )
+#         ],
+#     ]
+# )
+
+archive_tournamnets = InlineKeyboardMarkup(
     inline_keyboard=[
-        [
-            InlineKeyboardButton(
-                text="⚡️ Ongoing Tournaments", callback_data="view_ongoing"
-            )
-        ],
-        [
-            InlineKeyboardButton(
-                text="🌟 Upcoming Tournaments", callback_data="view_upcoming"
-            )
-        ],
         [
             InlineKeyboardButton(
                 text="📑 Tournament Archive", callback_data="view_archive"
@@ -513,47 +523,67 @@ async def show_ongoing_tournaments(callback_query: types.CallbackQuery):
     await callback_query.message.answer(response, parse_mode="Markdown")
 
 
-async def show_upcoming_tournaments(callback_query: types.CallbackQuery):
-    tournaments = get_upcoming_tournaments()
+@dp.message(F.text == "send alert")
+async def show_upcoming_tournaments(message: types.Message):
+    users = get_all_user_ids()
+    tournaments = get_ongoing_tournaments()
     if not tournaments:
-        await callback_query.answer(
-            "No upcoming tournaments scheduled 🤷‍♂️",
-            show_alert=True,
-            reply_markup=get_main_menu(callback_query.from_user.id),
-        )
         return
-    for tournament in tournaments:
-        if is_user_in_tournament(tournament["name"], callback_query.from_user.id):
-            response = (
-                f"🌟 Tournament ID: {tournament['id']}\n"
-                f"🗓 Starts: {tournament['start_time']}\n"
-                f"🏁 Ends: {tournament['end_time']}\n"
-                f"🏆 Prize: \n{tournament['prize']}\n"
-            )
-            await callback_query.message.answer(response, parse_mode="Markdown")
-            return
-        response = (
-            f"🌟 Tournament ID: {tournament['id']}\n"
-            f"🗓 Starts: {tournament['start_time']}\n"
-            f"🏁 Ends: {tournament['end_time']}\n"
-            f"🏆 Prize: \n{tournament['prize']}\n"
-            f"⚠️Once you register for the tournament, you can't quit it ❗️\n"
-            f"🔗 Join using the button below:"
-        )
-        keyboard = InlineKeyboardMarkup(
-            inline_keyboard=[
-                [
-                    InlineKeyboardButton(
-                        text="🔥 Join the Tournament 🔥",
-                        callback_data=f"join_tournament:{tournament['name']}",
-                    )
-                ]
+    tournament = tournaments[0]
+    response = (
+        "🌟 The tournament is about to begin!\n"
+        "⏳ You have *5 minutes* to join and the tournament will begin.\n\n"
+        "⚠️ Once registered, you cannot quit!\n"
+        "🚨 If you remain inactive during the game, you will be *eliminated* and receive a *penalty*!\n"
+        "🔗 Press the button below to participate!"
+    )
+    keyboard = InlineKeyboardMarkup(
+        inline_keyboard=[
+            [
+                InlineKeyboardButton(
+                    text="🔥 Join the Tournament 🔥",
+                    callback_data=f"join_tournament:{tournament['name']}",
+                )
             ]
-        )
-
-        await callback_query.message.answer(
-            response, reply_markup=keyboard, parse_mode="Markdown"
-        )
+        ]
+    )
+    cnt = 0
+    for user_id in users:
+        if user_id == message.from_user.id:
+            continue
+        try:
+            await bot.send_message(
+                chat_id=user_id, text=response, parse_mode="Markdown"
+            )
+        except Exception:
+            cnt += 1
+            continue
+    await message.answer(
+        f"{cnt} players are given invitation link to the tournament ✅\n You will get the button to start the tournamnet in 5 minutes. ⏰"
+    )
+    await asyncio.sleep(5 * 60)
+    start_button = InlineKeyboardMarkup(
+        inline_keyboard=[
+            [
+                InlineKeyboardButton(
+                    text="▶ Start Tournament",
+                    callback_data=f"start_tournament_k",
+                )
+            ]
+        ]
+    )
+    response += (
+        f"🌟 *{tournament['id']}*\n\n"
+        f"🗓 Started: {tournament['start_time']}\n"
+        f"🏁 Ends: {tournament['end_time']}\n\n"
+        f"👥 Registered Players: {tournament['current_players']}\n\n"
+        f"🏆 Prize: \n{tournament['prize']}\n\n"
+    )
+    await message.answer(
+        response,
+        reply_markup=start_button,
+        parse_mode="Markdown",
+    )
 
 
 async def show_archive_tournaments(callback_query: types.CallbackQuery):
@@ -576,8 +606,7 @@ async def show_archive_tournaments(callback_query: types.CallbackQuery):
 async def join_tournament(callback_query: types.CallbackQuery):
     tournament_id = callback_query.data.split(":")[1]
     user_id = callback_query.from_user.id
-    current_time = datetime.now(timezone.utc) + timedelta(hours=5)
-    tournament = get_upcoming_tournaments()
+    tournament = get_ongoing_tournaments()
     if not tournament:
         await callback_query.answer(
             f"Tournament not found or already started/finished 😕", show_alert=True
@@ -591,17 +620,14 @@ async def join_tournament(callback_query: types.CallbackQuery):
         return
     try:
         add_user_to_tournament(tournament_id, user_id)
-        await callback_query.answer(
-            "✅ You have successfully joined the tournament!", show_alert=True
-        )
+        await callback_query.answer("✅ You have successfully joined the tournament!")
         updated_nop = get_current_players(tournament["name"])
         message_id = callback_query.message.message_id
         chat_id = callback_query.message.chat.id
         response = (
-            f"🌟 Tournament ID: {tournament['id']}\n"
-            f"🗓 Starts: {tournament['start_time']}\n"
-            f"🏁 Ends: {tournament['end_time']}\n\n"
-            f"🏆 Prize: \n\n{tournament['prize']}\n\n"
+            "✅ *You have successfully joined the tournament!* 🎉\n\n"
+            "🏆 Get ready to compete!\n"
+            "⏳ The tournament will start in a few minutes. Be online and ready for the tournament!"
         )
         await bot.edit_message_text(
             chat_id=chat_id, message_id=message_id, text=response, parse_mode="Markdown"
