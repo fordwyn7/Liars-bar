@@ -167,7 +167,7 @@ CREATE TABLE IF NOT EXISTS users_referral (
 ''')
 cursor.execute('''
 CREATE TABLE IF NOT EXISTS unity_coin_referral (
-    unity_coin_refferal INTEGER,
+    unity_coin_refferal INTEGER
 )
 ''')
 cursor.execute("SELECT COUNT(*) FROM unity_coin_referral")
