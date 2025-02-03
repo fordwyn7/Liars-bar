@@ -253,41 +253,7 @@ def save_tournament_to_db(data, tournamnet_link):
         conn.close()
 
 
-@dp.message(F.text == "🤩 tournaments")
-@admin_required()
-async def show_tournaments_menu(message: types.Message):
-    get_o = get_ongoing_tournaments()
-    if get_o:
-        await message.answer(
-            "⚡ There is an ongoing tournament! 🎮\n"
-            "You can participate if it's still open. 🔥",
-            reply_markup=archive_tournamnets,
-        )
-        return
-    tournaments = get_upcoming_tournaments()
-    if not tournaments:
-        await message.answer(
-            "No upcoming tournaments are scheduled. 🏆\n"
-            "But you can explore the archive of past tournaments. 📜",
-            reply_markup=archive_tournamnets,
-        )
-        return
-    for tournament in tournaments:
-        response = (
-            f"🌟 *Tournament ID:* {tournament['id']}\n"
-            f"🗓 *Starts:* {tournament['start_time']}\n"
-            f"🏁 *Ends:* {tournament['end_time']}\n"
-            f"🏆 *Prize:* {tournament['prize']}\n"
-            f"⚠️ *Once registered, you cannot quit!*\n\n"
-            f"📢 *Before the tournament begins, everyone will receive a notification to join.*\n"
-            f"⏳ *You will have only 5 minutes to register!*"
-        )
 
-    await message.answer(
-        "🎮 *Upcoming Tournament:*",
-        reply_markup=archive_tournamnets,
-        parse_mode="Markdown",
-    )
 
 
 @dp.message(F.text == "📝 edit starting")

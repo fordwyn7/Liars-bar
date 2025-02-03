@@ -2,21 +2,12 @@ import sqlite3
 from config import dp, F, bot
 from aiogram import types
 from aiogram.fsm.context import FSMContext
-from keyboards.keyboard import change_name, get_main_menu, cancel_button
-from keyboards.inline import user_tournaments_keyboard
+from keyboards.keyboard import *
+from keyboards.inline import *
 from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 
 from states.state import NewGameState, MessagetoAdmin, awaiting_game_number
-from db import (
-    get_user_nfgame,
-    is_name_valid,
-    is_game_started,
-    get_game_id_by_user,
-    get_total_users,
-    generate_referral_link,
-    get_number_of_referrals,
-    get_unity_coin_referral
-)
+from db import *
 
 
 @dp.message(F.text == "settings ⚙️")
@@ -347,8 +338,39 @@ async def process_withdraw_user(callback_query: types.CallbackQuery):
 
 
 @dp.message(F.text == "🤩 tournaments")
-async def tournaments_users_button(message: types.Message):
-    await message.answer("Choose an option:", reply_markup=user_tournaments_keyboard)
+async def show_tournaments_menu(message: types.Message):
+    get_o = get_ongoing_tournaments()
+    if get_o:
+        await message.answer(
+            "⚡ There is an ongoing tournament! 🎮\n"
+            "You can participate if it's still open. 🔥",
+            reply_markup=archive_tournamnets,
+        )
+        return
+    tournaments = get_upcoming_tournaments()
+    if not tournaments:
+        await message.answer(
+            "No upcoming tournaments are scheduled. 🏆\n"
+            "But you can explore the archive of past tournaments. 📜",
+            reply_markup=archive_tournamnets,
+        )
+        return
+    for tournament in tournaments:
+        response = (
+            f"🌟 *Tournament ID:* {tournament['id']}\n"
+            f"🗓 *Starts:* {tournament['start_time']}\n"
+            f"🏁 *Ends:* {tournament['end_time']}\n"
+            f"🏆 *Prize:* {tournament['prize']}\n"
+            f"⚠️ *Once registered, you cannot quit!*\n\n"
+            f"📢 *Before the tournament begins, everyone will receive a notification to join.*\n"
+            f"⏳ *You will have only 5 minutes to register!*"
+        )
+
+    await message.answer(
+        "🎮 *Upcoming Tournament:*",
+        reply_markup=archive_tournamnets,
+        parse_mode="Markdown",
+    )
 
 @dp.message(F.text == "❄️ referral")
 async def tournaments_users_button(message: types.Message):
