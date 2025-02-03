@@ -257,7 +257,7 @@ def save_tournament_to_db(data, tournamnet_link):
             VALUES (?, ?, ?, ?)
             """,
             (
-                data["registration_start"],
+                data["tournament_start"],
                 data["tournament_end"],
                 data["prize"],
                 tournamnet_link,
