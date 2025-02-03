@@ -510,10 +510,10 @@ async def show_upcoming_tournaments(message: types.Message):
         #     continue
         try:
             await bot.send_message(
-                chat_id=user_id, text=response, parse_mode="Markdown"
+                chat_id=user_id, text=response, parse_mode="Markdown", reply_markup=keyboard
             )
+            cnt +=1
         except Exception:
-            cnt += 1
             continue
     await message.answer(
         f"{cnt} players are given invitation link to the tournament ✅\n You will get the button to start the tournamnet in 5 minutes. ⏰"

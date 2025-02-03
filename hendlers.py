@@ -360,8 +360,8 @@ async def show_tournaments_menu(message: types.Message):
             f"🌟 *Tournament ID:* {tournament['id']}\n"
             f"🗓 *Starts:* {tournament['start_time']}\n"
             f"🏁 *Ends:* {tournament['end_time']}\n"
-            f"🏆 *Prize:* \n{tournament['prize']}\n"
-            f"⚠️ *Once registered, you cannot quit!*\n\n"
+            f"🏆 *Prize:* \n{tournament['prize']}\n\n"
+            f"⚠️ *Once registered, you cannot quit!*\n"
             f"📢 *Before the tournament begins, everyone will receive a notification to join.*\n"
         )
 
