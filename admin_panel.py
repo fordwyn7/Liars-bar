@@ -132,7 +132,9 @@ def get_user_statistics(user_id):
         user_data = cursor.fetchone()
         if not user_data:
             return "❌ No user found with the given ID."
-        username, first_name, last_name, registration_date, nfgame, unity_coin = user_data
+        username, first_name, last_name, registration_date, nfgame, unity_coin = (
+            user_data
+        )
         is_admin = "admin 🧑‍💻" if is_user_admin(user_id) else "user 🙍‍♂️"
 
         stats_message = (
@@ -145,7 +147,6 @@ def get_user_statistics(user_id):
             f"🎮 **Username in bot**: {nfgame if nfgame else 'N/A'}\n\n"
             f"👥 referrals: {get_number_of_referrals(user_id)}\n\n"
             f"💰 Unity Coins: {unity_coin}"
-            
         )
 
     except sqlite3.Error as e:
@@ -495,7 +496,7 @@ async def state_info_users(message: types.Message, state: FSMContext):
 @admin_required()
 async def admin_game_archive(message: types.Message, state: FSMContext):
     await message.answer(
-        "Please send me the user ID to view their game archive 📋.",
+        "Please send me the user ID or username to view their game archive 📋.",
         reply_markup=back_to_admin_panel,
     )
     await state.set_state(awaiting_user_id.await_id)
@@ -503,12 +504,15 @@ async def admin_game_archive(message: types.Message, state: FSMContext):
 
 @dp.message(awaiting_user_id.await_id)
 async def get_user_archive_by_id(message: types.Message, state: FSMContext):
-    if not message.text.isdigit():
-        await message.answer(
-            "❌ Please send a valid user ID.", reply_markup=back_to_admin_panel
-        )
 
-    user_id = int(message.text)
+    if not message.text.isdigit():
+        user_id = get_id_by_nfgame(message.text)
+        if not user_id:
+            await message.answer(
+                "❌ Please send a valid user ID or username", reply_markup=back_to_admin_panel
+            )
+    else:
+        user_id = int(message.text)
     games = get_user_game_archive(user_id)
     if not games:
         await message.answer(
@@ -1220,7 +1224,7 @@ async def cancel_withdraw_queer(callback_query: types.CallbackQuery, state: FSMC
     )
     await callback_query.message.answer(f"You have canceled your order successfully ✅")
     await state.clear()
-    
+
 
 @dp.message(F.text == "👀 watch results")
 @admin_required()
@@ -1234,42 +1238,66 @@ async def watch_results_f(message: types.Message):
             result += get_round_results(tournament_id, i) + "\n"
         await message.answer(result)
     else:
-        await message.answer(f"Tournament has already finished. You can see the results in an archive 📈", reply_markup=tournaments_admin_panel_button)
+        await message.answer(
+            f"Tournament has already finished. You can see the results in an archive 📈",
+            reply_markup=tournaments_admin_panel_button,
+        )
 
 
 @dp.message(F.text == "👨‍👩‍👦‍👦 refferals")
 @admin_required()
 async def referrals_section(message: types.Message):
-    await message.answer(f"You are in referrals section 👇", reply_markup=referrals_section_buttons)
+    await message.answer(
+        f"You are in referrals section 👇", reply_markup=referrals_section_buttons
+    )
+
 
 @dp.message(F.text == "🔝 Top referrals")
 @admin_required()
 async def referrals_top_referrals(message: types.Message):
-    await message.answer(f"{get_top_referrals()}", reply_markup=referrals_section_buttons)
+    await message.answer(
+        f"{get_top_referrals()}", reply_markup=referrals_section_buttons
+    )
+
 
 @dp.message(F.text == "🔄 change referral amount")
 @admin_required()
 async def change_referrals_t(message: types.Message, state: FSMContext):
-    await message.answer(f"Current referral amount is {get_unity_coin_referral()} Unity Coins 💰\nWrite the new amount for referral ✍️:", reply_markup=back_to_admin_panel)
+    await message.answer(
+        f"Current referral amount is {get_unity_coin_referral()} Unity Coins 💰\nWrite the new amount for referral ✍️:",
+        reply_markup=back_to_admin_panel,
+    )
     await state.set_state(waitforreferralamount.amount)
-    
+
+
 @dp.message(waitforreferralamount.amount)
 async def change_referrals_state(message: types.Message, state: FSMContext):
     new_amount = message.text
     if not new_amount.isdigit():
-        await message.answer(f"You entered wrong amount ‼️. Please, enter a valid number.", reply_markup=back_to_admin_panel)
-    elif int(new_amount)<0:
-        await message.answer(f"You can't enter negative numbers ‼️. Please, enter a valid intager.", reply_markup=back_to_admin_panel)
+        await message.answer(
+            f"You entered wrong amount ‼️. Please, enter a valid number.",
+            reply_markup=back_to_admin_panel,
+        )
+    elif int(new_amount) < 0:
+        await message.answer(
+            f"You can't enter negative numbers ‼️. Please, enter a valid intager.",
+            reply_markup=back_to_admin_panel,
+        )
     else:
         update_unity_coin_referral(int(new_amount))
-        await message.answer(f"New referral amount is successfully set ✅", reply_markup=referrals_section_buttons)
+        await message.answer(
+            f"New referral amount is successfully set ✅",
+            reply_markup=referrals_section_buttons,
+        )
+
+
 # @dp.message("/remove" in F.text)
 # @admin_required()
 # async def watch_participants_f(message: types.Message):
 #     user_id = message.text.split(" ")[1]
 #     remove_user_from_tournament(user_id)
 #     await message.answer("successfully")
-    
+
 # @dp.message("/remove_game" in F.text)
 # @admin_required()
 # async def watch_participants_f(message: types.Message):
@@ -1292,5 +1320,3 @@ async def change_referrals_state(message: types.Message, state: FSMContext):
 #         print(f"❌ Database error: {e}")
 #     finally:
 #         conn.close()
-
-    
