@@ -489,7 +489,7 @@ archive_tournamnets = InlineKeyboardMarkup(
     inline_keyboard=[
         [
             InlineKeyboardButton(
-                text="📑 Tournament Archive", callback_data="view_archive"
+                text="📑 Tournaments Archive", callback_data="view_archive"
             )
         ],
     ]
