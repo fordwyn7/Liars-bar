@@ -514,7 +514,7 @@ async def show_upcoming_tournaments(message: types.Message):
     await message.answer(
         f"{cnt} players are given invitation link to the tournament ✅\n You will get the button to start the tournamnet in 5 minutes. ⏰"
     )
-    await asyncio.sleep(1 * 60)
+    await asyncio.sleep(0.5 * 60)
     start_button = InlineKeyboardMarkup(
         inline_keyboard=[
             [
@@ -525,7 +525,7 @@ async def show_upcoming_tournaments(message: types.Message):
             ]
         ]
     )
-    response += (
+    response = (
         f"🌟 *{tournament['id']}*\n\n"
         f"🗓 Started: {tournament['start_time']}\n"
         f"🏁 Ends: {tournament['end_time']}\n\n"
