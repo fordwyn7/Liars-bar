@@ -78,3 +78,7 @@ class changeWithdraw(StatesGroup):
     
 class waiting_for_username_withdraw(StatesGroup):
     username_withdraw = State()
+    
+class waitforreferralamount(StatesGroup):
+    amount = State()
+    

@@ -165,7 +165,15 @@ CREATE TABLE IF NOT EXISTS users_referral (
     referred_by INTEGER
 )
 ''')
-
+cursor.execute('''
+CREATE TABLE IF NOT EXISTS unity_coin_referral (
+    unity_coin_refferal INTEGER,
+)
+''')
+cursor.execute("SELECT COUNT(*) FROM unity_coin_referral")
+count = cursor.fetchone()[0]
+if count == 0:
+    cursor.execute("INSERT INTO unity_coin_referral (unity_coin_refferal) VALUES (10)")
 # cursor.execute("DELETE FROM tournament_rounds_users;")
 # cursor.execute("DELETE FROM tournament_users;")
 # cursor.execute("DELETE FROM tournaments_table;")

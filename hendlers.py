@@ -14,7 +14,8 @@ from db import (
     get_game_id_by_user,
     get_total_users,
     generate_referral_link,
-    get_number_of_referrals
+    get_number_of_referrals,
+    get_unity_coin_referral
 )
 
 
@@ -347,13 +348,12 @@ async def process_withdraw_user(callback_query: types.CallbackQuery):
 
 @dp.message(F.text == "🤩 tournaments")
 async def tournaments_users_button(message: types.Message):
-    # if message.from_user.id in [6807731973, 5219280507]:
     await message.answer("Choose an option:", reply_markup=user_tournaments_keyboard)
 
 @dp.message(F.text == "❄️ referral")
 async def tournaments_users_button(message: types.Message):
     referral_link = generate_referral_link(message.from_user.id)
-    u_coins = 10
+    u_coins = get_unity_coin_referral()
     await message.answer(f"Here is your refferal link 👇\nSend this to your friends and get {u_coins} Unity Coins 💰 for each new friend.")
     await message.answer(
         f"🎮 *Hey!* Join this bot to play fun games and earn rewards! 🚀\n\n"

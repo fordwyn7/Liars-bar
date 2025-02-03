@@ -1015,34 +1015,6 @@ def get_all_user_ids():
     return user_ids
 
 
-def get_user_statistics(user_id: int) -> str:
-    conn = sqlite3.connect("users_database.db")
-    cursor = conn.cursor()
-
-    try:
-        cursor.execute(
-            """
-            SELECT username, first_name, last_name, registration_date, nfgame 
-            FROM users_database WHERE user_id = ?
-            """,
-            (user_id,),
-        )
-        user_data = cursor.fetchone()
-        if not user_data:
-            return "❌ No user found with the given ID."
-        username, first_name, last_name, registration_date, nfgame = user_data
-        stats_message = (
-            f"📊 **User Statistics** 📊\n"
-            f"👤 **Username**: @{username if username else 'N/A'}\n"
-            f"📛 **First Name**: {first_name if first_name else 'N/A'}\n"
-            f"📜 **Last Name**: {last_name if last_name else 'N/A'}\n"
-            f"🗓️ **Registration Date**: {registration_date if registration_date else 'N/A'}\n"
-            f"🎮 **Username in bot**: {nfgame if nfgame else 'N/A'}\n"
-        )
-    except sqlite3.Error as e:
-        stats_message = f"❌ Database error occurred: {e}"
-    finally:
-        conn.close()
 
     return stats_message
 
@@ -1800,3 +1772,61 @@ def get_number_of_referrals(user_id):
 
 def generate_referral_link(user_id):
     return f"https://t.me/liarsbar_game_robot?start={user_id}"
+
+def get_top_referrals():
+    conn = sqlite3.connect("users_database.db")
+    cursor = conn.cursor()
+    try:
+        cursor.execute('''
+            SELECT referred_by, COUNT(*) AS referral_count
+            FROM users_referral
+            WHERE referred_by IS NOT NULL
+            GROUP BY referred_by
+            ORDER BY referral_count DESC
+            LIMIT 10
+        ''')
+        top_referrals = cursor.fetchall()
+        st = f""
+        if not top_referrals:
+            st += f"No referrals found."
+            return st
+        st += f"📌 Top {min(10, len(top_referrals))} Users with Most Referrals:\n"
+        for rank, (user_id, count) in enumerate(top_referrals, start=1):
+            st += f"{rank}. {get_user_nfgame(user_id)} - Referrals: {count}"
+        return st
+    except sqlite3.Error as e:
+        print(f"❌ Database error: {e}")
+    finally:
+        conn.close()
+
+def update_unity_coin_referral(new_value):
+    conn = sqlite3.connect("users_database.db")
+    cursor = conn.cursor()
+    try:
+        cursor.execute("UPDATE unity_coin_referral SET unity_coin_refferal = ?", (new_value,))
+        if cursor.rowcount == 0:
+            cursor.execute("INSERT INTO unity_coin_referral (unity_coin_refferal) VALUES (?)", (new_value,))
+        conn.commit()
+    except sqlite3.Error as e:
+        print(f"❌ Database error: {e}")
+    
+    finally:
+        conn.close()
+
+def get_unity_coin_referral():
+    conn = sqlite3.connect("users_database.db")
+    cursor = conn.cursor()
+    try:
+        cursor.execute("SELECT unity_coin_refferal FROM unity_coin_referral LIMIT 1")
+        result = cursor.fetchone()
+        if result:
+            return result[0]
+        else:
+            return None 
+    
+    except sqlite3.Error as e:
+        print(f"❌ Database error: {e}")
+        return None
+    
+    finally:
+        conn.close()

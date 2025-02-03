@@ -19,6 +19,7 @@ from db import (
     get_game_id_by_user,
     get_game_inviter_id,
     is_name_valid,
+    get_unity_coin_referral,
 )
 import sqlite3
 
@@ -58,7 +59,7 @@ async def get_name_fem(message: types.Message, state: FSMContext):
             try:
                 referred_by = int(payload)
                 add_user(message.from_user.id, referred_by)
-                u_coin = 10
+                u_coin = get_unity_coin_referral()
                 conn = sqlite3.connect("users_database.db")
                 cursor = conn.cursor()
                 cursor.execute(

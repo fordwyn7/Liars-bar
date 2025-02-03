@@ -1237,9 +1237,32 @@ async def watch_results_f(message: types.Message):
         await message.answer(f"Tournament has already finished. You can see the results in an archive 📈", reply_markup=tournaments_admin_panel_button)
 
 
+@dp.message(F.text == "👨‍👩‍👦‍👦 refferals")
+@admin_required()
+async def referrals_section(message: types.Message):
+    await message.answer(f"You are in referrals section 👇", reply_markup=referrals_section_buttons)
 
+@dp.message(F.text == "🔝 Top referrals")
+@admin_required()
+async def referrals_top_referrals(message: types.Message):
+    await message.answer(f"{get_top_referrals()}", reply_markup=referrals_section_buttons)
 
-
+@dp.message(F.text == "🔄 change referral amount")
+@admin_required()
+async def change_referrals_t(message: types.Message, state: FSMContext):
+    await message.answer(f"Current referral amount is {get_unity_coin_referral()} Unity Coins 💰\nWrite the new amount for referral ✍️:", reply_markup=back_to_admin_panel)
+    await state.set_state(waitforreferralamount.amount)
+    
+@dp.message(waitforreferralamount.amount)
+async def change_referrals_state(message: types.Message, state: FSMContext):
+    new_amount = message.text
+    if not new_amount.isdigit():
+        await message.answer(f"You entered wrong amount ‼️. Please, enter a valid number.", reply_markup=back_to_admin_panel)
+    elif new_amount<0:
+        await message.answer(f"You can't enter negative numbers ‼️. Please, enter a valid intager.", reply_markup=back_to_admin_panel)
+    else:
+        update_unity_coin_referral(new_amount)
+        await message.answer(f"New referral amount is successfully set ✅", reply_markup=referrals_section_buttons)
 # @dp.message("/remove" in F.text)
 # @admin_required()
 # async def watch_participants_f(message: types.Message):

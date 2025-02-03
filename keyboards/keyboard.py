@@ -87,12 +87,25 @@ admin_panel_button = ReplyKeyboardMarkup(
             KeyboardButton(text="🧑‍🎓 users"),
         ],
         [
+            KeyboardButton(text="👨‍👩‍👦‍👦 refferals"),
             KeyboardButton(text="🔙 main menu"),
         ],
     ],
     resize_keyboard=True,
 )
 
+referrals_section_buttons = ReplyKeyboardMarkup(
+    keyboard=[
+        [
+            KeyboardButton(text="🔝 Top referrals"),
+            KeyboardButton(text="🔄 change referral amount"),
+        ],
+        [
+            KeyboardButton(text="back to admin panel 🔙"),
+        ],
+    ],
+    resize_keyboard=True,
+)
 
 users_balance_button = ReplyKeyboardMarkup(
     keyboard=[
