@@ -464,7 +464,7 @@ async def paginate_users(callback_query: types.CallbackQuery):
 @admin_required()
 async def info_users(message: types.Message, state: FSMContext):
     await message.answer(
-        f"Enter the ID of user that you want to get information",
+        f"Enter the ID or username of the user that you want to get information",
         reply_markup=back_button,
     )
     await state.set_state(UserInformations.userid_state)
@@ -473,10 +473,14 @@ async def info_users(message: types.Message, state: FSMContext):
 @dp.message(UserInformations.userid_state)
 @admin_required()
 async def state_info_users(message: types.Message, state: FSMContext):
-    user_id = message.text
-    if not user_id.isdigit():
-        await message.answer("You entered wrong information! Please try again.")
+    if not message.text.isdigit():
+        user_id = get_id_by_nfgame(message.text)
+        if not user_id:
+            await message.answer(
+                "❌ Please send a valid user ID or username", reply_markup=back_to_admin_panel
+            )
     else:
+        user_id = int(message.text)
         if not is_user_registered(int(user_id)):
             await message.answer(
                 f"No user found from given ID ☹️",
