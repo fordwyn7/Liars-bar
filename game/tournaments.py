@@ -100,10 +100,6 @@ async def upcoming_tournaments_sekshn(message: types.Message):
 
     response = "🌟 *Upcoming Tournaments:*\n\n"
     for tournament in turnir:
-        if "_" in tournament["name"]:
-            nop = get_current_players(tournament["name"].split("_")[1])
-        else:
-            nop = get_current_players(tournament["name"])
         response += (
             f"🌟 Tournament ID: *{tournament['id']}*\n"
             f"🗓 Starts: {tournament['start_time']}\n"
@@ -518,7 +514,7 @@ async def show_upcoming_tournaments(message: types.Message):
     await message.answer(
         f"{cnt} players are given invitation link to the tournament ✅\n You will get the button to start the tournamnet in 5 minutes. ⏰"
     )
-    await asyncio.sleep(5 * 60)
+    await asyncio.sleep(1 * 60)
     start_button = InlineKeyboardMarkup(
         inline_keyboard=[
             [
@@ -533,7 +529,7 @@ async def show_upcoming_tournaments(message: types.Message):
         f"🌟 *{tournament['id']}*\n\n"
         f"🗓 Started: {tournament['start_time']}\n"
         f"🏁 Ends: {tournament['end_time']}\n\n"
-        f"👥 Registered Players: {tournament['current_players']}\n\n"
+        f"👥 Registered Players: {get_current_players(tournament["name"])}\n\n"
         f"🏆 Prize: \n{tournament['prize']}\n\n"
     )
     await message.answer(
