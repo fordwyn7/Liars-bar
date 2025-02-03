@@ -1258,10 +1258,10 @@ async def change_referrals_state(message: types.Message, state: FSMContext):
     new_amount = message.text
     if not new_amount.isdigit():
         await message.answer(f"You entered wrong amount ‼️. Please, enter a valid number.", reply_markup=back_to_admin_panel)
-    elif new_amount<0:
+    elif int(new_amount)<0:
         await message.answer(f"You can't enter negative numbers ‼️. Please, enter a valid intager.", reply_markup=back_to_admin_panel)
     else:
-        update_unity_coin_referral(new_amount)
+        update_unity_coin_referral(int(new_amount))
         await message.answer(f"New referral amount is successfully set ✅", reply_markup=referrals_section_buttons)
 # @dp.message("/remove" in F.text)
 # @admin_required()
