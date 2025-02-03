@@ -501,13 +501,15 @@ async def show_upcoming_tournaments(message: types.Message):
         ]
     )
     cnt = 0
+    message_list = []
     for user_id in [1155076760, 5606480208, 6807731973]:
         # if user_id == message.from_user.id:
         #     continue
         try:
-            await bot.send_message(
+            msg = await bot.send_message(
                 chat_id=user_id, text=response, parse_mode="Markdown", reply_markup=keyboard
             )
+            message_list.append([user_id, msg.message_id])
             cnt +=1
         except Exception:
             continue
@@ -515,6 +517,11 @@ async def show_upcoming_tournaments(message: types.Message):
         f"{cnt} players are given invitation link to the tournament ✅\n You will get the button to start the tournamnet in 5 minutes. ⏰"
     )
     await asyncio.sleep(0.5 * 60)
+    for mid in message_list:
+        try:
+            await bot.delete_message(chat_id=mid[0], message_id=mid[1])
+        except:
+            continue
     start_button = InlineKeyboardMarkup(
         inline_keyboard=[
             [

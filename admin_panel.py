@@ -1231,6 +1231,9 @@ async def cancel_withdraw_queer(callback_query: types.CallbackQuery, state: FSMC
 async def watch_results_f(message: types.Message):
     result = ""
     tournament = get_ongoing_tournaments()
+    if not tournament:
+        await message.answer(f"Tournamnet has already been finished.", reply_markup=tournaments_admin_panel_button)
+        return
     tournament_id = tournament[0]["name"]
     current_round = int(get_current_round_number(tournament_id))
     if current_round == 0:
