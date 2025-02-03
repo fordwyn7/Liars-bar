@@ -233,7 +233,7 @@ async def set_tournament_prize(message: types.Message, state: FSMContext):
     save_tournament_to_db(data, unique_id)
     await message.answer(
         f"✅ Tournament created successfully:\n\n"
-        f"🕹 Start: {data['tournament_start']}"
+        f"🕹 Start: {data['tournament_start']}\n"
         f"🔚 End: {data['tournament_end']}\n\n"
         f"🏆 Prize: \n{data['prize']}\n\n"
         f"🔗 tournament id: {unique_id}",
