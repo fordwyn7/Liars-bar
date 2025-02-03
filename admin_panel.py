@@ -1236,6 +1236,8 @@ async def watch_results_f(message: types.Message):
     if current_round == 0:
         for i in range(1, current_round + 1):
             result += get_round_results(tournament_id, i) + "\n"
+        if not result:
+            result = "No results yet."
         await message.answer(result)
     else:
         await message.answer(
