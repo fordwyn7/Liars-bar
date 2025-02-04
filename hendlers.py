@@ -246,7 +246,7 @@ def format_weekly_leaderboard(leaderboard):
             emoji = "🥉"
         else:
             emoji = "🔹"
-        username = user_id.split(' - ')[0]
+        username = get_user_nfgame(user_id)
         leaderboard_text += f"{emoji} {username:<20} {total_games:<15} {games_won:<10}\n"
     
     return leaderboard_text
