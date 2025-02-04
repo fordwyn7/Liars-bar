@@ -12,22 +12,22 @@ from collections import Counter
 @dp.callback_query(lambda c: c.data.startswith("confirm_remove_"))
 async def remove_player_confirm(callback: types.CallbackQuery):
     player_id = int(callback.data.split("_")[2])
-    remove_player(player_id)
     game_id = get_game_id_by_user(player_id)
-    conn = sqlite3.connect("users_database.db")
-    cursor = conn.cursor()
-    cursor.execute(
-                """
-                UPDATE game_state
-                SET life_status = 'dead'
-                WHERE game_id = ? AND player_id = ?
-                """,
-                (game_id, player_id),
-            )
-    conn.commit()
     await bot.send_message(chat_id=player_id, text="You are elimitanated from the tournament because of breaking the rules 🤕")
     if game_id and is_user_turn(player_id, game_id):
         update_current_turn(game_id)
+        remove_player(player_id)
+        conn = sqlite3.connect("users_database.db")
+        cursor = conn.cursor()
+        cursor.execute(
+                    """
+                    UPDATE game_state
+                    SET life_status = 'dead'
+                    WHERE game_id = ? AND player_id = ?
+                    """,
+                    (game_id, player_id),
+                )
+        conn.commit()
         delete_user_from_all_games(player_id)
         winner = get_alive_number(game_id)
         if winner != 0:
@@ -89,6 +89,18 @@ async def remove_player_confirm(callback: types.CallbackQuery):
                 await save_message(play, game_id, mss.message_id)
         await reset_game_for_all_players(game_id)
     else:
+        remove_player(player_id)
+        conn = sqlite3.connect("users_database.db")
+        cursor = conn.cursor()
+        cursor.execute(
+                    """
+                    UPDATE game_state
+                    SET life_status = 'dead'
+                    WHERE game_id = ? AND player_id = ?
+                    """,
+                    (game_id, player_id),
+                )
+        conn.commit()
         delete_user_from_all_games(player_id)
         players = get_all_players_in_game(game_id)
         for play in players:
