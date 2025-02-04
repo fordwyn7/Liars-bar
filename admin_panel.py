@@ -1317,11 +1317,11 @@ async def players_in_tournament(message: types.Message):
         await message.answer("No players have joined the tournament yet.")
         return
     keyboard = InlineKeyboardMarkup(inline_keyboard=[])
-    for player_id, user_id in players:
+    for player_id in players:
         keyboard.inline_keyboard.append(
             [
                 InlineKeyboardButton(
-                    f"🧑 Player {user_id}", callback_data=f"remove_{player_id}"
+                    f"🧑 Player {get_user_nfgame(player_id)}", callback_data=f"remove_{player_id}"
                 )
             ]
         )
