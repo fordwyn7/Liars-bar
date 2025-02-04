@@ -142,32 +142,27 @@ async def statistics_a(message: types.Message, state: FSMContext):
 async def how_to_play(message: types.Message, state: FSMContext):
     await state.clear()
     await message.answer(
-        "📔 Simple Game Rules with Card Suits 📔\n\n"
-        "🔴 Players:\n"
-        "You need 2 to 4 players.\n"
-        "Each player starts with 5 cards.\n\n"
-        "🔴 How to Play:\n"
-        "At the start of the game, one card is placed on the table. This is the Table Card.\n\n"
-        "The suit of this card (like Hearts ❤️, Diamonds ♦️, Clubs ♣️, or Spades ♠️) is what matters.\n"
-        "On your turn, you can play 1, 2, or 3 cards from your hand.\n\n"
-        "Your all cards must match the same suit as the Table Card.\n"
-        "If you don’t have matching cards, you can use a Universal Card 🎴, which matches any suit.\n"
-        "After you play, the next player has two choices:\n\n"
-        "1️⃣ Continue: They accept your move and take their turn.\n"
-        "2️⃣ Press LIAR: They check your cards to see if they match the suit.\n\n"
-        "🔴 What Happens if Someone Presses LIAR?\n"
-        "If your cards don’t match the suit, you’re a Liar and must “shoot yourself.”\n"
-        "If your cards do match, the person who pressed LIAR shoots themselves instead!\n\n"
-        "🔴 Special Cards:\n"
-        "🎴 Universal Card: Matches any suit—it’s always correct.\n"
-        "🃏 Joker Card:\n"
-        "If you play this card alone and someone opens it, everyone except you “shoots themselves”!\n\n"
-        "🔵 Other Rules:\n"
-        "If you run out of cards, you skip your turn until you get new ones.\n"
-        "Every time LIAR is pressed, all cards are reshuffled and dealt again.\n"
-        "The gun has 6 bullets, but only 1 is real—no one knows which!\n\n"
-        "🔴 Winning the Game:\n"
-        "The game ends when only one player is left standing."
+        "📚 *Game Rules* 📚\n\n"
+        "👥 *Players:* 2-4 people.\n"
+        "🃏 *Cards:* Each player starts with 5 cards.\n\n"
+        "🔄 *How to Play:*\n"
+        "A card is placed on the table to set the suit (❤️ ♦️ ♣️ ♠️).\n"
+        "On your turn, you can play 1-3 cards that match the suit.\n"
+        "If you have no matching cards, use the *Universal Card* 🎴.\n"
+        "After playing, the next player can either:\n"
+        "1️⃣ *Continue* - Accept the move and play their turn.\n"
+        "2️⃣ *Call LIAR!* - Challenge the played cards.\n\n"
+        "❗ *If LIAR is called:*\n"
+        "✔️ *Truth?* The challenger gets “shot.”\n"
+        "❌ *Lie?* You get “shot.”\n\n"
+        "🌟 *Special Cards:*\n"
+        "🎴 *Universal Card* - Matches any suit.\n"
+        "🃏 *Joker* - Play it alone. If someone challenges, *everyone else gets shot!*\n\n"
+        "⚙️ *Other Rules:*\n"
+        "🔹 If you run out of cards, you skip your turn.\n"
+        "🔹 The gun has 6 spots, but only 1 real bullet.\n\n"
+        "🏆 *Winning Condition:*\n"
+        "The last player left standing wins!"
     )
 
 
@@ -278,7 +273,9 @@ async def my_cabinet(message: types.Message):
     keyboard = InlineKeyboardMarkup(
         inline_keyboard=[
             [
-                InlineKeyboardButton(text="💸 Withdraw Unity coins", callback_data="withdraw"),
+                InlineKeyboardButton(
+                    text="💸 Withdraw Unity coins", callback_data="withdraw"
+                ),
             ],
         ]
     )
@@ -306,28 +303,43 @@ async def process_withdraw_user(callback_query: types.CallbackQuery):
         await callback_query.answer("❌ No withdrawal options found.")
         conn.close()
         return
-    three_month_premium, six_month_premium, twelve_month_premium, hundrad_stars, five_hundrad_stars, thousand_stars = withdraw_options
+    (
+        three_month_premium,
+        six_month_premium,
+        twelve_month_premium,
+        hundrad_stars,
+        five_hundrad_stars,
+        thousand_stars,
+    ) = withdraw_options
     cursor.execute(
         "SELECT unity_coin FROM users_database WHERE user_id = ?",
         (callback_query.from_user.id,),
     )
     unity_coin = cursor.fetchone()[0]
     conn.close()
-    keyboard = InlineKeyboardMarkup(inline_keyboard=[
-        [
-            InlineKeyboardButton(text=f"❄️ 3 Months", callback_data="get_3_month"),
-            InlineKeyboardButton(text=f"⭐ 100 Stars", callback_data="get_100_stars"),
-        ],
-        [
-            InlineKeyboardButton(text=f"❄️ 6 Months", callback_data="get_6_month"),
-            InlineKeyboardButton(text=f"⭐ 500 Stars", callback_data="get_500_stars"),
-        ],
-        [
-            InlineKeyboardButton(text=f"❄️ 12 Months", callback_data="get_12_month"),
-            InlineKeyboardButton(text=f"⭐ 1,000 Stars", callback_data="get_1000_stars"),
-        ],
-    ])
-    
+    keyboard = InlineKeyboardMarkup(
+        inline_keyboard=[
+            [
+                InlineKeyboardButton(text=f"❄️ 3 Months", callback_data="get_3_month"),
+                InlineKeyboardButton(
+                    text=f"⭐ 100 Stars", callback_data="get_100_stars"
+                ),
+            ],
+            [
+                InlineKeyboardButton(text=f"❄️ 6 Months", callback_data="get_6_month"),
+                InlineKeyboardButton(
+                    text=f"⭐ 500 Stars", callback_data="get_500_stars"
+                ),
+            ],
+            [
+                InlineKeyboardButton(text=f"❄️ 12 Months", callback_data="get_12_month"),
+                InlineKeyboardButton(
+                    text=f"⭐ 1,000 Stars", callback_data="get_1000_stars"
+                ),
+            ],
+        ]
+    )
+
     withdraw_message = (
         f"💳 Your current balance: {unity_coin} Unity Coins 💰\n\n"
         "💰 *Withdrawal options.*\n"
@@ -341,7 +353,9 @@ async def process_withdraw_user(callback_query: types.CallbackQuery):
         f"✨ *1,000 Stars*: {thousand_stars} Unity Coins 💰\n\n"
         "Choose a button to get 👇"
     )
-    await callback_query.message.answer(withdraw_message, parse_mode="Markdown", reply_markup=keyboard)
+    await callback_query.message.answer(
+        withdraw_message, parse_mode="Markdown", reply_markup=keyboard
+    )
 
 
 @dp.message(F.text == "🤩 tournaments")
@@ -377,11 +391,14 @@ async def show_tournaments_menu(message: types.Message):
         parse_mode="Markdown",
     )
 
+
 @dp.message(F.text == "❄️ referral")
 async def tournaments_users_button(message: types.Message):
     referral_link = generate_referral_link(message.from_user.id)
     u_coins = get_unity_coin_referral()
-    await message.answer(f"Here is your refferal link 👇\nSend this to your friends and get {u_coins} Unity Coins 💰 for each new friend.")
+    await message.answer(
+        f"Here is your refferal link 👇\nSend this to your friends and get {u_coins} Unity Coins 💰 for each new friend."
+    )
     await message.answer(
         f"🎮 *Hey!* Join this bot to play fun games and earn rewards! 🚀\n\n"
         f"👉 Use this link to get started 👇\n\n{referral_link}\n\n"
