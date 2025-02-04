@@ -1853,9 +1853,9 @@ def set_tournament_status(tournament_id: str, is_begin: bool):
     cursor = conn.cursor()
     try:
         cursor.execute('''
-            INSERT INTO tournament_begin (tournament_id, is_begug)
+            INSERT INTO tournament_begin (tournament_id, is_begun)
             VALUES (?, ?)
-            ON CONFLICT(tournament_id) DO UPDATE SET is_begug = excluded.is_begug
+            ON CONFLICT(tournament_id) DO UPDATE SET is_begun = excluded.is_begun
         ''', (tournament_id, int(is_begin)))
         conn.commit()
     except sqlite3.Error as e:
@@ -1864,12 +1864,11 @@ def set_tournament_status(tournament_id: str, is_begin: bool):
         conn.close()
 
 def get_tournament_status(tournament_id: str) -> bool:
-    """Get the current status of a tournament (True if started, False otherwise)."""
     conn = sqlite3.connect("users_database.db")
     cursor = conn.cursor()
     try:
         cursor.execute('''
-            SELECT is_begug FROM tournament_begin WHERE tournament_id = ?
+            SELECT is_begun FROM tournament_begin WHERE tournament_id = ?
         ''', (tournament_id,))
         result = cursor.fetchone()
         return bool(result[0]) if result else False
