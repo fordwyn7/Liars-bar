@@ -486,7 +486,9 @@ async def show_upcoming_tournaments(message: types.Message):
     if get_tournament_status(tournament["name"]):
         await message.answer(f"You have already begun the tournamnet ❗️")
         return
+    await message.answer(f"{get_tournament_status(tournament["name"])}")
     set_tournament_status(tournament["name"], True)
+    await message.answer(f"{get_tournament_status(tournament["name"])}")
     response = (
         "🌟 The tournament is about to begin!\n"
         "⏳ You have *5 minutes* to join and the tournament will begin.\n\n"
