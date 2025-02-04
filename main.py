@@ -180,9 +180,9 @@ CREATE TABLE IF NOT EXISTS tournament_begin (
     is_begun BOOL
 )
 ''')
-cursor.execute("DELETE FROM tournament_rounds_users;")
-cursor.execute("DELETE FROM tournament_users;")
-cursor.execute("DELETE FROM tournaments_table;")
+# cursor.execute("DELETE FROM tournament_rounds_users;")
+# cursor.execute("DELETE FROM tournament_users;")
+# cursor.execute("DELETE FROM tournaments_table;")
 conn.commit()
 conn.close()
 
