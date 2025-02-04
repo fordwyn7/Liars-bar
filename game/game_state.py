@@ -188,20 +188,12 @@ def get_player_cards(game_id, player_id):
 
 async def send_random_cards_to_players(game_id):
     players = get_all_players_in_game(game_id)
-    current_turn_user_id = None
-    if is_game_started(game_id):
-        current_turn_user_id = get_current_turn_user_id(game_id)
-    else:
-        await send_message_to_all_players(
-            game_id, f"Something went wrong. Restart the game."
-        )
-        return
     for player_id in players:
         if not player_id or is_player_dead(game_id, player_id):
             continue
         pc = get_player_cards(game_id, player_id)
         player_cards = pc[0].split(",")
-        is_turn = current_turn_user_id == player_id
+        is_turn = is_user_turn(player_id, game_id)
         if is_turn:
             addition_keyboard = InlineKeyboardButton(
                 text="Send Cards 🟣",
