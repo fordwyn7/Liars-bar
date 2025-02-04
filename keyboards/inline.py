@@ -572,7 +572,7 @@ async def join_tournament(callback_query: types.CallbackQuery):
         )
 
 
-@dp.callback_query(F.data.startswith("remove_"))
+@dp.callback_query(lambda c: c.data.startswith("remove_"))
 async def confirm_remove_player(callback: types.CallbackQuery):
     player_id = callback.data.split("_")[1]
 

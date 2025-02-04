@@ -9,7 +9,7 @@ from db import *
 from collections import Counter
 
 
-@dp.callback_query(F.data.startswith("confirm_remove_"))
+@dp.callback_query(lambda c: c.data.startswith("confirm_remove_"))
 async def remove_player_confirm(callback: types.CallbackQuery):
     player_id = int(callback.data.split("_")[2])
     remove_player(player_id)
