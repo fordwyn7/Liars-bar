@@ -162,7 +162,8 @@ async def how_to_play(message: types.Message, state: FSMContext):
         "🔹 If you run out of cards, you skip your turn.\n"
         "🔹 The gun has 6 spots, but only 1 real bullet.\n\n"
         "🏆 *Winning Condition:*\n"
-        "The last player left standing wins!"
+        "The last player left standing wins!",
+        parse_mode="Markdown"
     )
 
 
