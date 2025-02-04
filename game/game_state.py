@@ -27,8 +27,56 @@ async def remove_player_confirm(callback: types.CallbackQuery):
     conn.commit()
     await bot.send_message(chat_id=player_id, text="You are elimitanated from the tournament because of breaking the rules 🤕")
     if game_id and is_user_turn(player_id, game_id):
-        delete_user_from_all_games(player_id)
         update_current_turn(game_id)
+        delete_user_from_all_games(player_id)
+        winner = get_alive_number(game_id)
+        if winner != 0:
+            await bot.send_message(
+                chat_id=winner,
+                text=f"Game has finished. \nYou are winner. 🥳🥳🥳🥳🥳\nConguratulation on winning in the game. \n🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉",
+                reply_markup=get_main_menu(winner),
+            )
+            update_game_details(
+                game_id, winner, get_user_nfgame(winner) + " - " + str(winner)
+            )
+            conn = sqlite3.connect("users_database.db")
+            cursor = conn.cursor()
+            cursor.execute(
+                """
+                SELECT user_id
+                FROM user_game_messages
+                WHERE game_id = ?
+                """,
+                (game_id,),
+            )
+            user_ids = cursor.fetchall()
+            user_ids = list(set([user for user in user_ids]))
+            for users in user_ids:
+                users = users[0]
+                if users and is_player_dead(game_id, users):
+                    update_game_details(
+                        game_id, users, get_user_nfgame(winner) + " - " + str(winner)
+                    )
+                    await bot.send_message(
+                        chat_id=users,
+                        text=f"The game in which you died has ended ⭐️\nWinner: {get_user_nfgame(winner)} (ID: {winner}) 🏆",
+                    )
+            tournament_id = get_tournament_id_by_user(winner)
+            if tournament_id and is_user_in_tournament(tournament_id, winner):
+                cur_round = int(get_current_round_number(tournament_id))
+                await save_round_winner(tournament_id, str(winner), str(winner))
+                nopir = int(get_number_of_groups_in_round(tournament_id, cur_round))
+                # await bot.send_message(chat_id=1155076760, text=f"number of groups: {nopir}\nNumber of winners: {int(get_number_of_winners(tournament_id, cur_round))}\ncurrent round: {cur_round}")
+                if int(get_number_of_winners(tournament_id, cur_round)) == nopir:
+                    await notify_round_results(tournament_id, cur_round)
+                    await asyncio.sleep(5)
+                if int(get_number_of_winners(tournament_id, cur_round)) > 1:
+                    await start_next_round(tournament_id, cur_round + 1)
+                await update_tournament_winner_if_round_finished(tournament_id, int(get_current_round_number(tournament_id)))
+                
+            delete_game(game_id)
+            await delete_all_game_messages(game_id)
+            return
         ms = f"Game has restarted! ♻️ \nYou all receive full cards again ✅ \nNow {get_user_nfgame(get_current_turn_user_id(game_id))}'s turn."
         players = get_all_players_in_game(game_id)
         for play in players:
@@ -47,6 +95,54 @@ async def remove_player_confirm(callback: types.CallbackQuery):
             if not is_player_dead(game_id, play):
                 mss = await bot.send_message(chat_id=play, text=f"Player {get_user_nfgame(player_id)} excluded from game by admins for breaking the tournament rules 🚷\n")
                 await save_message(play, game_id, mss.message_id)
+        winner = get_alive_number(game_id)
+        if winner != 0:
+            await bot.send_message(
+                chat_id=winner,
+                text=f"Game has finished. \nYou are winner. 🥳🥳🥳🥳🥳\nConguratulation on winning in the game. \n🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉",
+                reply_markup=get_main_menu(winner),
+            )
+            update_game_details(
+                game_id, winner, get_user_nfgame(winner) + " - " + str(winner)
+            )
+            conn = sqlite3.connect("users_database.db")
+            cursor = conn.cursor()
+            cursor.execute(
+                """
+                SELECT user_id
+                FROM user_game_messages
+                WHERE game_id = ?
+                """,
+                (game_id,),
+            )
+            user_ids = cursor.fetchall()
+            user_ids = list(set([user for user in user_ids]))
+            for users in user_ids:
+                users = users[0]
+                if users and is_player_dead(game_id, users):
+                    update_game_details(
+                        game_id, users, get_user_nfgame(winner) + " - " + str(winner)
+                    )
+                    await bot.send_message(
+                        chat_id=users,
+                        text=f"The game in which you died has ended ⭐️\nWinner: {get_user_nfgame(winner)} (ID: {winner}) 🏆",
+                    )
+            tournament_id = get_tournament_id_by_user(winner)
+            if tournament_id and is_user_in_tournament(tournament_id, winner):
+                cur_round = int(get_current_round_number(tournament_id))
+                await save_round_winner(tournament_id, str(winner), str(winner))
+                nopir = int(get_number_of_groups_in_round(tournament_id, cur_round))
+                # await bot.send_message(chat_id=1155076760, text=f"number of groups: {nopir}\nNumber of winners: {int(get_number_of_winners(tournament_id, cur_round))}\ncurrent round: {cur_round}")
+                if int(get_number_of_winners(tournament_id, cur_round)) == nopir:
+                    await notify_round_results(tournament_id, cur_round)
+                    await asyncio.sleep(5)
+                if int(get_number_of_winners(tournament_id, cur_round)) > 1:
+                    await start_next_round(tournament_id, cur_round + 1)
+                await update_tournament_winner_if_round_finished(tournament_id, int(get_current_round_number(tournament_id)))
+                
+            delete_game(game_id)
+            await delete_all_game_messages(game_id)
+            return
     await callback.message.edit_text("✅ Player removed successfully.")
     await callback.answer()
 
