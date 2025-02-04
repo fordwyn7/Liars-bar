@@ -608,11 +608,10 @@ async def delete_tournament_handler(message: types.Message):
 
 @dp.callback_query(F.data == "cancel_delete")
 async def cancel_delete_tournament(callback_query: types.CallbackQuery):
-    await callback_query.message.delete()
     await asyncio.sleep(1)
     await callback_query.message.answer(
         "Tournament deletion has been canceled.",
-        reply_markup=upcoming_tournaments_button,
+        reply_markup=ongoing_tournaments_button,
     )
     await callback_query.message.delete()
 
