@@ -1308,7 +1308,12 @@ async def change_referrals_state(message: types.Message, state: FSMContext):
 @dp.message(F.text == "⛹️ players")
 @admin_required()
 async def players_in_tournament(message: types.Message):
-    players = get_tournament_users_list()
+    tournament = get_ongoing_tournaments()
+    if not tournament:
+        await message.answer(f"No ongoing tournaments found or has already been finished.", reply_markup=tournaments_admin_panel_button)
+        return
+    tournament_id = tournament[0]["name"]
+    players = get_tournament_users_list(tournament_id)
     if not players:
         await message.answer("No players have joined the tournament yet.")
         return
