@@ -307,6 +307,11 @@ async def process_withdraw_user(callback_query: types.CallbackQuery):
         conn.close()
         return
     three_month_premium, six_month_premium, twelve_month_premium, hundrad_stars, five_hundrad_stars, thousand_stars = withdraw_options
+    cursor.execute(
+        "SELECT unity_coin FROM users_database WHERE user_id = ?",
+        (callback_query.from_user.id,),
+    )
+    unity_coin = cursor.fetchone()[0]
     conn.close()
     keyboard = InlineKeyboardMarkup(inline_keyboard=[
         [
@@ -322,8 +327,10 @@ async def process_withdraw_user(callback_query: types.CallbackQuery):
             InlineKeyboardButton(text=f"⭐ 1,000 Stars", callback_data="get_1000_stars"),
         ],
     ])
+    
     withdraw_message = (
-        "💰 *Withdrawal options.*\n\n"
+        f"Your current balance: {unity_coin}\n\n"
+        "💰 *Withdrawal options.*\n"
         f"🚀 *Telegram Premium*\n"
         f"❄️ *3 Months*: {three_month_premium} Unity Coins 💰\n"
         f"❄️ *6 Months*: {six_month_premium} Unity Coins 💰\n"
