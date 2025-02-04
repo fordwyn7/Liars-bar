@@ -1856,7 +1856,7 @@ def set_tournament_status(tournament_id: str, is_begin: bool):
             INSERT INTO tournament_begin (tournament_id, is_begun)
             VALUES (?, ?)
             ON CONFLICT(tournament_id) DO UPDATE SET is_begun = excluded.is_begun
-        ''', (tournament_id, int(is_begin)))
+        ''', (tournament_id, is_begin))
         conn.commit()
     except sqlite3.Error as e:
         print(f"❌ Database error: {e}")
