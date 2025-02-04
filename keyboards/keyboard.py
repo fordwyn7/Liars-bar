@@ -16,10 +16,11 @@ def get_main_menu(user_id: int):
     keyboard = [
         [
             KeyboardButton(text="start game 🎮"),
+            KeyboardButton(text="🏅 Leaderboard"),
             KeyboardButton(text="game status 🌟"),
         ],
         [
-            KeyboardButton(text="📱 my cabinet"),
+            KeyboardButton(text="📱 cabinet"),
             KeyboardButton(text="❄️ referral"),
             KeyboardButton(text="🤩 tournaments"),
         ],
