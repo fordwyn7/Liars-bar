@@ -205,21 +205,17 @@ async def show_game_archive(message: types.Message, state: FSMContext):
     await state.set_state(awaiting_game_number.waiting)
 
 def get_start_of_week():
-    """Get the timestamp for Monday of the current week (00:00 UTC)."""
     today = datetime.now(timezone.utc) 
     start_of_week = today - timedelta(days=today.weekday()) 
     return start_of_week.replace(hour=0, minute=0, second=0, microsecond=0).strftime("%Y-%m-%d 00:00:00")
-
 def get_weekly_leaderboard():
-    """Fetch leaderboard data from Monday of this week to today."""
     conn = sqlite3.connect("users_database.db")
     cursor = conn.cursor()
     
     start_of_week = get_start_of_week()
-    
     cursor.execute('''
         SELECT user_id, COUNT(*) as total_games, 
-               SUM(CASE WHEN user_id = game_winner THEN 1 ELSE 0 END) as games_won
+               SUM(CASE WHEN SUBSTR(game_winner, INSTR(game_winner, '-') + 2) = CAST(user_id AS TEXT) THEN 1 ELSE 0 END) as games_won
         FROM game_archive
         WHERE game_end_time >= ?
         GROUP BY user_id
@@ -249,7 +245,7 @@ def format_weekly_leaderboard():
 @dp.message(F.text == "🏅 Leaderboard")
 async def show_weekly_leaderboard(message: types.Message):
     leaderboard_text = format_weekly_leaderboard()
-    await message.answer(leaderboard_text)
+    await message.answer(leaderboard_text, parse_mode="Markdown")
 
 @dp.message(awaiting_game_number.waiting)
 async def send_game_statistics(message: types.Message, state: FSMContext):
