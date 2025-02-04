@@ -570,3 +570,28 @@ async def join_tournament(callback_query: types.CallbackQuery):
         await callback_query.answer(
             "❌ Failed to join the tournament. Please try again later.", show_alert=True
         )
+
+
+@dp.callback_query(F.data.startswith("remove_"))
+async def confirm_remove_player(callback: types.CallbackQuery):
+    player_id = callback.data.split("_")[1]
+
+    keyboard = InlineKeyboardMarkup(
+        inline_keyboard=[
+            InlineKeyboardButton("✅ Yes", callback_data=f"confirm_remove_{player_id}"),
+            InlineKeyboardButton("❌ No", callback_data="cancel_remove"),
+        ]
+    )
+
+    await callback.message.edit_text(
+        f"Do you want to remove {get_user_nfgame(player_id)} from the tournament?", reply_markup=keyboard
+    )
+
+
+
+
+
+@dp.callback_query(F.data == "cancel_remove")
+async def cancel_remove(callback: types.CallbackQuery):
+    await callback.message.edit_text("Player removal canceled ❌")
+    await callback.answer()

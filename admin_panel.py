@@ -469,6 +469,7 @@ async def info_users(message: types.Message, state: FSMContext):
     )
     await state.set_state(UserInformations.userid_state)
 
+
 @dp.message(UserInformations.userid_state)
 @admin_required()
 async def state_info_users(message: types.Message, state: FSMContext):
@@ -476,7 +477,8 @@ async def state_info_users(message: types.Message, state: FSMContext):
         user_id = get_id_by_nfgame(message.text)
         if not user_id:
             await message.answer(
-                "❌ Please send a valid user ID or username", reply_markup=back_to_admin_panel
+                "❌ Please send a valid user ID or username",
+                reply_markup=back_to_admin_panel,
             )
     else:
         user_id = int(message.text)
@@ -512,7 +514,8 @@ async def get_user_archive_by_id(message: types.Message, state: FSMContext):
         user_id = get_id_by_nfgame(message.text)
         if not user_id:
             await message.answer(
-                "❌ Please send a valid user ID or username", reply_markup=back_to_admin_panel
+                "❌ Please send a valid user ID or username",
+                reply_markup=back_to_admin_panel,
             )
     else:
         user_id = int(message.text)
@@ -1235,7 +1238,10 @@ async def watch_results_f(message: types.Message):
     result = ""
     tournament = get_ongoing_tournaments()
     if not tournament:
-        await message.answer(f"Tournamnet has already been finished.", reply_markup=tournaments_admin_panel_button)
+        await message.answer(
+            f"Tournamnet has already been finished.",
+            reply_markup=tournaments_admin_panel_button,
+        )
         return
     tournament_id = tournament[0]["name"]
     current_round = int(get_current_round_number(tournament_id))
@@ -1299,32 +1305,24 @@ async def change_referrals_state(message: types.Message, state: FSMContext):
         )
 
 
-# @dp.message("/remove" in F.text)
-# @admin_required()
-# async def watch_participants_f(message: types.Message):
-#     user_id = message.text.split(" ")[1]
-#     remove_user_from_tournament(user_id)
-#     await message.answer("successfully")
+@dp.message(F.text == "⛹️ players")
+@admin_required()
+async def players_in_tournament(message: types.Message):
+    players = get_tournament_users_list()
+    if not players:
+        await message.answer("No players have joined the tournament yet.")
+        return
+    keyboard = InlineKeyboardMarkup(inline_keyboard=[])
+    for player_id, user_id in players:
+        keyboard.inline_keyboard.append(
+            [
+                InlineKeyboardButton(
+                    f"🧑 Player {user_id}", callback_data=f"remove_{player_id}"
+                )
+            ]
+        )
 
-# @dp.message("/remove_game" in F.text)
-# @admin_required()
-# async def watch_participants_f(message: types.Message):
-#     user_id = message.text.split(" ")[1]
-#     remove_user_from_tournament(user_id)
-#     await message.answer("successfully")
-# def remove_user_from_tournament(user_id: str):
-#     conn = sqlite3.connect("users_database.db")
-#     cursor = conn.cursor()
-#     try:
-#         cursor.execute(
-#             """
-#             DELETE FROM tournament_users
-#             WHERE user_id = ?
-#             """,
-#             (user_id,),
-#         )
-#         conn.commit()
-#     except sqlite3.Error as e:
-#         print(f"❌ Database error: {e}")
-#     finally:
-#         conn.close()
+    await message.answer(
+        "Here is the list of players in the tournament:", reply_markup=keyboard
+    )
+

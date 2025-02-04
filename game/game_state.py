@@ -1,12 +1,43 @@
 import sqlite3
 import asyncio
 import random
-from config import bot, dp
+from config import bot, dp, F
 from aiogram import types
 from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 from keyboards.keyboard import *
 from db import *
 from collections import Counter
+
+
+@dp.callback_query(F.data.startswith("confirm_remove_"))
+async def remove_player_confirm(callback: types.CallbackQuery):
+    player_id = int(callback.data.split("_")[2])
+    remove_player(player_id)
+    game_id = get_game_id_by_user(player_id)
+    await bot.send_message(chat_id=player_id, text="You are elimitanated from the tournament because of breaking the rules 🤕")
+    if game_id and is_user_turn(player_id, game_id):
+        delete_user_from_all_games(player_id)
+        update_current_turn(game_id)
+        ms = f"Game has restarted! ♻️ \nYou all receive full cards again ✅ \nNow {get_user_nfgame(get_current_turn_user_id(game_id))}'s turn."
+        players = get_all_players_in_game(game_id)
+        for play in players:
+            if not is_player_dead(game_id, play):
+                mss = await bot.send_message(chat_id=play, text=f"Player {get_user_nfgame(player_id)} excluded from game by admins for breaking the tournament rules 🚷\n")
+                await save_message(play, game_id, mss.message_id)
+        for play in players:
+            if not is_player_dead(game_id, play):
+                mss = await bot.send_message(chat_id=play, text=ms)
+                await save_message(play, game_id, mss.message_id)
+        await reset_game_for_all_players(game_id)
+    else:
+        delete_user_from_all_games(player_id)
+        players = get_all_players_in_game(game_id)
+        for play in players:
+            if not is_player_dead(game_id, play):
+                mss = await bot.send_message(chat_id=play, text=f"Player {get_user_nfgame(player_id)} excluded from game by admins for breaking the tournament rules 🚷\n")
+                await save_message(play, game_id, mss.message_id)
+    await callback.message.edit_text("✅ Player removed successfully.")
+    await callback.answer()
 
 
 def get_current_turn_user_id(game_id):
@@ -634,7 +665,6 @@ def get_next_player_id(game_id, current_player_id):
 async def reset_game_for_all_players(game_id):
     save_player_cards(game_id)
     await send_random_cards_to_players(game_id)
-
 
 
 async def send_cards_update_to_players(game_id, player_id, num_cards_sent):

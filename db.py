@@ -1248,7 +1248,6 @@ def get_current_players(tournament_id: str) -> int:
 import sqlite3
 
 def get_tournament_users_list(tournament_id: str) -> list:
-    """Fetch a list of user IDs participating in a tournament."""
     conn = sqlite3.connect("users_database.db")
     cursor = conn.cursor()
     
@@ -1886,3 +1885,16 @@ def get_tournament_status(tournament_id) -> bool:
         return False
     finally:
         conn.close()
+
+def remove_player(player_id: int):
+    """Removes a player from the tournament by ID."""
+    conn = sqlite3.connect("users_database.db")
+    cursor = conn.cursor()
+    try:
+        cursor.execute("DELETE FROM tournament_users WHERE id = ?", (player_id,))
+        conn.commit()
+    except sqlite3.Error as e:
+        print(f"❌ Database error: {e}")
+    finally:
+        conn.close()
+        
