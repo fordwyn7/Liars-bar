@@ -329,7 +329,7 @@ async def process_withdraw_user(callback_query: types.CallbackQuery):
     ])
     
     withdraw_message = (
-        f"Your current balance: {unity_coin}\n\n"
+        f"💳 Your current balance: {unity_coin} Unity Coins 💰\n\n"
         "💰 *Withdrawal options.*\n"
         f"🚀 *Telegram Premium*\n"
         f"❄️ *3 Months*: {three_month_premium} Unity Coins 💰\n"
