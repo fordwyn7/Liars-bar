@@ -364,6 +364,9 @@ async def start_turninr(callback_query: types.CallbackQuery):
     )
     turnir = get_ongoing_tournaments()[0]
     tournament_id = turnir["name"]
+    if get_current_round_number(tournament_id) != "0":
+        await callback_query.answer(f"Tournamnet has already been begun ❗️", show_alert=True)
+        return
     conn = sqlite3.connect("users_database.db")
     cursor = conn.cursor()
     cursor.execute(

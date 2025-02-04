@@ -1502,9 +1502,9 @@ async def notify_round_results(tournament_id: str, round_number: str):
             if group_number not in unique_groups:
                 unique_groups.add(group_number)
                 if winner_id:
-                    results_message += f"- Winner from Group {group_number}: {get_user_nfgame(winner_id)} (ID: {winner_id})\n"
+                    results_message += f"| - Winner from Group {group_number}: {get_user_nfgame(winner_id)} (ID: {winner_id})\n"
                 else:
-                    results_message += f"- Group {group_number}: No winner yet\n"
+                    results_message += f"| - Group {group_number}: No winner yet\n"
 
         cursor.execute(
             """
@@ -1760,9 +1760,9 @@ def get_round_results(tournament_id, round_number):
             if group_number not in unique_groups:
                 unique_groups.add(group_number)
                 if winner_id:
-                    results_message += f"- Winner from Group {group_number}: {get_user_nfgame(winner_id)} (ID: {winner_id})\n"
+                    results_message += f"| - Winner from Group {group_number}: {get_user_nfgame(winner_id)} (ID: {winner_id})\n"
                 else:
-                    results_message += f"- Group {group_number}: No winner yet\n"
+                    results_message += f"| - Group {group_number}: No winner yet\n"
         return results_message
     except sqlite3.Error as e:
         print(f"Database error: {e}")
