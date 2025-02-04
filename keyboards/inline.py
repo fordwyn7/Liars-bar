@@ -578,8 +578,8 @@ async def confirm_remove_player(callback: types.CallbackQuery):
 
     keyboard = InlineKeyboardMarkup(
         inline_keyboard=[
-            InlineKeyboardButton("✅ Yes", callback_data=f"confirm_remove_{player_id}"),
-            InlineKeyboardButton("❌ No", callback_data="cancel_remove"),
+            InlineKeyboardButton(text = "✅ Yes", callback_data=f"confirm_remove_{player_id}"),
+            InlineKeyboardButton(text = "❌ No", callback_data="cancel_remove"),
         ]
     )
 

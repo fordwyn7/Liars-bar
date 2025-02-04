@@ -1321,7 +1321,7 @@ async def players_in_tournament(message: types.Message):
         keyboard.inline_keyboard.append(
             [
                 InlineKeyboardButton(
-                    text = f"🧑 Player {get_user_nfgame(player_id)}", callback_data=f"remove_{player_id}"
+                    text = f"🚫 Player {get_user_nfgame(player_id)}", callback_data=f"remove_{player_id}"
                 )
             ]
         )
