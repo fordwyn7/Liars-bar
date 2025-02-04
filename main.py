@@ -177,7 +177,7 @@ if count == 0:
 cursor.execute('''
 CREATE TABLE IF NOT EXISTS tournament_begin (
     tournament_id TEXT,
-    is_begun BOOL
+    is_begun INTEGER
 )
 ''')
 # cursor.execute("DELETE FROM tournament_rounds_users;")
