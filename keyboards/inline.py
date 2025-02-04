@@ -66,6 +66,7 @@ async def start_game(callback_query: types.CallbackQuery):
         for player in players:
             if player is None:
                 continue
+            reset_exclusion_count(game_id, player)
             create_game_record_if_not_exists(game_id, player)
             tasks.append(send_game_start_messages(player, ms1, ms2, len(players)))
         create_game_record_if_not_exists(game_id, cr_id)
@@ -165,6 +166,7 @@ async def can_game(callback_query: types.CallbackQuery):
     with sqlite3.connect("users_database.db") as conn:
         cursor = conn.cursor()
         game_id = get_game_id_by_user(user.id)
+        increase_exclusion_count(game_id, user.id)
         if not game_id:
             await callback_query.answer(
                 "You are not currently the creator of any game."
@@ -239,6 +241,7 @@ async def handle_quit_game(callback_query: types.CallbackQuery):
     with sqlite3.connect("users_database.db") as conn:
         cursor = conn.cursor()
         game_id = get_game_id_by_user(user.id)
+        increase_exclusion_count(game_id, user.id)
         if not game_id:
             await callback_query.answer("You are not currently in any game.")
             return
@@ -382,6 +385,8 @@ async def exclude_player_querriy(callback_query: types.CallbackQuery):
     player_to_remove = int(data[1])
 
     game_id = get_game_id_by_user(user.id)
+    increase_exclusion_count(game_id, user.id)
+    
     with sqlite3.connect("users_database.db") as conn:
         cursor = conn.cursor()
         cursor.execute(

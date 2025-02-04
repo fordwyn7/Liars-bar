@@ -789,7 +789,6 @@ async def handle_add_unity_coins(message: types.Message, state: FSMContext):
                 reply_markup=back_to_admin_panel,
             )
             return
-
         conn = sqlite3.connect("users_database.db")
         cursor = conn.cursor()
         cursor.execute(

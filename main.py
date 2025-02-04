@@ -175,6 +175,14 @@ count = cursor.fetchone()[0]
 if count == 0:
     cursor.execute("INSERT INTO unity_coin_referral (unity_coin_refferal) VALUES (10)")
 
+cursor.execute('''
+CREATE TABLE IF NOT EXISTS excludeds (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    game_id TEXT, 
+    user_id INTEGER UNIQUE,  
+    number_of_excluded INTEGER
+)
+''')
 # cursor.execute("DELETE FROM tournament_rounds_users;")
 # cursor.execute("DELETE FROM tournament_users;")
 # cursor.execute("DELETE FROM tournaments_table;")

@@ -1897,3 +1897,54 @@ def remove_player(player_id):
     finally:
         conn.close()
         
+
+def reset_exclusion_count(game_id: str, user_id: int):
+    conn = sqlite3.connect("users_database.db")
+    cursor = conn.cursor()
+    try:
+        cursor.execute('''
+            INSERT INTO excludeds (game_id, user_id, number_of_excluded)
+            VALUES (?, ?, 0)
+            ON CONFLICT(game_id) DO UPDATE SET user_id = excluded.user_id, number_of_excluded = 0
+        ''', (game_id, user_id))
+        
+        conn.commit()
+    except sqlite3.Error as e:
+        print(f"❌ Database error: {e}")
+    finally:
+        conn.close()
+
+
+import sqlite3
+
+def increase_exclusion_count(game_id: str, user_id: int):
+    conn = sqlite3.connect("users_database.db")
+    cursor = conn.cursor()
+    try:
+        cursor.execute('''
+            UPDATE excludeds
+            SET number_of_excluded = number_of_excluded + 1
+            WHERE game_id = ? AND user_id = ?
+        ''', (game_id, user_id))
+
+        conn.commit()
+    except sqlite3.Error as e:
+        print(f"❌ Database error: {e}")
+    finally:
+        conn.close()
+
+def is_any_user_excluded(game_id: str) -> bool:
+    conn = sqlite3.connect("users_database.db")
+    cursor = conn.cursor()
+    try:
+        cursor.execute('''
+            SELECT COUNT(*) FROM excludeds
+            WHERE game_id = ? AND number_of_excluded > 0
+        ''', (game_id,))
+        result = cursor.fetchone()
+        return result[0] > 0  # Returns True if at least one user has number_of_excluded > 0
+    except sqlite3.Error as e:
+        print(f"❌ Database error: {e}")
+        return False
+    finally:
+        conn.close()

@@ -73,7 +73,17 @@ async def remove_player_confirm(callback: types.CallbackQuery):
                 if int(get_number_of_winners(tournament_id, cur_round)) > 1:
                     await start_next_round(tournament_id, cur_round + 1)
                 await update_tournament_winner_if_round_finished(tournament_id, int(get_current_round_number(tournament_id)))
-                
+            else:
+                if not is_any_user_excluded(game_id):
+                    conn = sqlite3.connect("users_database.db")
+                    cursor = conn.cursor()
+                    cursor.execute(
+                        "UPDATE users_database SET unity_coin = unity_coin + ? WHERE user_id = ? or nfgame = ?",
+                        (5, winner, winner),
+                    )
+                    conn.commit()
+                    conn.close()
+                    await bot.send_message(chat_id=winner, text=f"You got 5️⃣ Unity Coins for winning in the game 🎁")
             delete_game(game_id)
             await delete_all_game_messages(game_id)
             return
@@ -151,7 +161,17 @@ async def remove_player_confirm(callback: types.CallbackQuery):
                 if int(get_number_of_winners(tournament_id, cur_round)) > 1:
                     await start_next_round(tournament_id, cur_round + 1)
                 await update_tournament_winner_if_round_finished(tournament_id, int(get_current_round_number(tournament_id)))
-                
+            else:
+                if not is_any_user_excluded(game_id):
+                    conn = sqlite3.connect("users_database.db")
+                    cursor = conn.cursor()
+                    cursor.execute(
+                        "UPDATE users_database SET unity_coin = unity_coin + ? WHERE user_id = ? or nfgame = ?",
+                        (5, winner, winner),
+                    )
+                    conn.commit()
+                    conn.close()
+                    await bot.send_message(chat_id=winner, text=f"You got 5️⃣ Unity Coins for winning in the game 🎁")
             delete_game(game_id)
             await delete_all_game_messages(game_id)
             return
@@ -566,6 +586,17 @@ async def handle_continue_or_liar(callback_query: types.CallbackQuery):
                     if int(get_number_of_winners(tournament_id, cur_round)) > 1:
                         await start_next_round(tournament_id, cur_round + 1)
                     await update_tournament_winner_if_round_finished(tournament_id, int(get_current_round_number(tournament_id)))
+                else:
+                    if not is_any_user_excluded(game_id):
+                        conn = sqlite3.connect("users_database.db")
+                        cursor = conn.cursor()
+                        cursor.execute(
+                            "UPDATE users_database SET unity_coin = unity_coin + ? WHERE user_id = ? or nfgame = ?",
+                            (5, winner, winner),
+                        )
+                        conn.commit()
+                        conn.close()
+                        await bot.send_message(chat_id=winner, text=f"You got 5️⃣ Unity Coins for winning in the game 🎁")
                 delete_game(game_id)
                 await delete_all_game_messages(game_id)
                 return
@@ -672,7 +703,17 @@ async def handle_continue_or_liar(callback_query: types.CallbackQuery):
                 if int(get_number_of_winners(tournament_id, cur_round)) > 1:
                     await start_next_round(tournament_id, cur_round + 1)
                 await update_tournament_winner_if_round_finished(tournament_id, int(get_current_round_number(tournament_id)))
-                
+            else:
+                if not is_any_user_excluded(game_id):
+                    conn = sqlite3.connect("users_database.db")
+                    cursor = conn.cursor()
+                    cursor.execute(
+                        "UPDATE users_database SET unity_coin = unity_coin + ? WHERE user_id = ? or nfgame = ?",
+                        (5, winner, winner),
+                    )
+                    conn.commit()
+                    conn.close()
+                    await bot.send_message(chat_id=winner, text=f"You got 5️⃣ Unity Coins for winning in the game 🎁")
             delete_game(game_id)
             await delete_all_game_messages(game_id)
             return
