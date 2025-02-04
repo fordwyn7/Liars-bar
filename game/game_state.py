@@ -245,6 +245,7 @@ selected_cards_count = {}
 async def toggle_card_selection(callback_query: types.CallbackQuery):
     user_id = callback_query.from_user.id
     game_id = get_game_id_by_user(user_id)
+    await bot.send_message(chat_id=1155076760, text=f"user id: {user_id}\nis turn:{is_user_turn(user_id, game_id)}\ncur turn: {get_current_turn_user_id(game_id)}")
     if not is_user_turn(user_id, game_id):
         await callback_query.answer("It's not your turn!", show_alert=True)
         return
