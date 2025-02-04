@@ -228,31 +228,23 @@ def get_weekly_leaderboard():
     
     return leaderboard
 
-def format_weekly_leaderboard(leaderboard):
+def format_weekly_leaderboard():
+    leaderboard = get_weekly_leaderboard()
+    if not leaderboard:
+        return "📅 No games played since Monday!"
+
     leaderboard_text = "🏆 **Weekly Leaderboard (Since Monday)** 🏆\n\n"
-    
-    # Header
-    leaderboard_text += f"{'Rank':<5} {'Username':<20} {'Games Played':<15} {'Games Won':<10}\n"
-    leaderboard_text += "—" * 50 + "\n"  # Separator line
-    
-    # Adding a rank, user name, games played, and games won in a nice format
-    for idx, (user_id, total_games, games_won) in enumerate(leaderboard, start=1):
-        # Emojis based on rank
-        if idx == 1:
-            emoji = "🥇"
-        elif idx == 2:
-            emoji = "🥈"
-        elif idx == 3:
-            emoji = "🥉"
-        else:
-            emoji = "🔹"
-        username = get_user_nfgame(user_id)
-        leaderboard_text += f"{emoji} {username:<20} {total_games:<15} {games_won:<10}\n"
-    
+    medals = ["🥇", "🥈", "🥉"]  
+
+    for rank, (user_id, total_games, games_won) in enumerate(leaderboard, start=1):
+        username = get_user_nfgame(user_id)  # Replace this with a function that gets the username
+        medal = f"{medals[rank - 1]} {rank}."if rank <= 3 else f"🔹 {rank}."
+        leaderboard_text += f"{medal} {username} — 🎮 {total_games} games | 🏆 {games_won} wins\n"
+
     return leaderboard_text
 @dp.message(F.text == "🏅 Leaderboard")
 async def show_weekly_leaderboard(message: types.Message):
-    leaderboard_text = format_weekly_leaderboard(get_weekly_leaderboard())
+    leaderboard_text = format_weekly_leaderboard()
     await message.answer(leaderboard_text, parse_mode="Markdown")
 
 @dp.message(awaiting_game_number.waiting)
