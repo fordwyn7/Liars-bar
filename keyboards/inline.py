@@ -584,7 +584,7 @@ async def confirm_remove_player(callback: types.CallbackQuery):
     )
 
     await callback.message.edit_text(
-        f"Do you want to remove {get_user_nfgame(player_id)} from the tournament?", reply_markup=keyboard
+        f"Do you want to remove {get_user_nfgame(int(player_id))} from the tournament?", reply_markup=keyboard
     )
 
 

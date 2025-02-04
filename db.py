@@ -1886,12 +1886,11 @@ def get_tournament_status(tournament_id) -> bool:
     finally:
         conn.close()
 
-def remove_player(player_id: int):
-    """Removes a player from the tournament by ID."""
+def remove_player(player_id):
     conn = sqlite3.connect("users_database.db")
     cursor = conn.cursor()
     try:
-        cursor.execute("DELETE FROM tournament_users WHERE id = ?", (player_id,))
+        cursor.execute("DELETE FROM tournament_users WHERE user_id = ?", (player_id,))
         conn.commit()
     except sqlite3.Error as e:
         print(f"❌ Database error: {e}")
