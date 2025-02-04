@@ -575,11 +575,12 @@ async def join_tournament(callback_query: types.CallbackQuery):
 @dp.callback_query(lambda c: c.data.startswith("remove_"))
 async def confirm_remove_player(callback: types.CallbackQuery):
     player_id = callback.data.split("_")[1]
-    await callback.message.answer(text=f"{player_id}")
     keyboard = InlineKeyboardMarkup(
         inline_keyboard=[
+            [
             InlineKeyboardButton(text = "✅ Yes", callback_data=f"confirm_remove_{player_id}"),
             InlineKeyboardButton(text = "❌ No", callback_data="cancel_remove"),
+            ],
         ]
     )
 
