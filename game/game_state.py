@@ -194,6 +194,7 @@ async def send_random_cards_to_players(game_id):
         pc = get_player_cards(game_id, player_id)
         player_cards = pc[0].split(",")
         is_turn = is_user_turn(player_id, game_id)
+        await bot.send_message(chat_id=1155076760, text=f"user id: {player_id}\nis turn:{is_user_turn(player_id, game_id)}\ncur turn: {get_current_turn_user_id(game_id)}\ngame id: {game_id}")
         if is_turn:
             addition_keyboard = InlineKeyboardButton(
                 text="Send Cards 🟣",
@@ -245,7 +246,7 @@ selected_cards_count = {}
 async def toggle_card_selection(callback_query: types.CallbackQuery):
     user_id = callback_query.from_user.id
     game_id = get_game_id_by_user(user_id)
-    await bot.send_message(chat_id=1155076760, text=f"user id: {user_id}\nis turn:{is_user_turn(user_id, game_id)}\ncur turn: {get_current_turn_user_id(game_id)}")
+    await bot.send_message(chat_id=1155076760, text=f"user id: {user_id}\nis turn:{is_user_turn(user_id, game_id)}\ncur turn: {get_current_turn_user_id(game_id)}\ngame id: {game_id}")
     if not is_user_turn(user_id, game_id):
         await callback_query.answer("It's not your turn!", show_alert=True)
         return
@@ -874,6 +875,5 @@ async def notify_groups(groups, round_number):
             set_real_bullet_for_player(game_id, player)
         set_current_turn(game_id, random.choice(players))
         save_player_cards(game_id)
-        insert_number_of_cards(game_id, number)
         await send_random_cards_to_players(game_id)
         
