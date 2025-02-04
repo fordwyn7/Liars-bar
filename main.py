@@ -174,13 +174,15 @@ cursor.execute("SELECT COUNT(*) FROM unity_coin_referral")
 count = cursor.fetchone()[0]
 if count == 0:
     cursor.execute("INSERT INTO unity_coin_referral (unity_coin_refferal) VALUES (10)")
-# cursor.execute("DELETE FROM tournament_rounds_users;")
-# cursor.execute("DELETE FROM tournament_users;")
-# cursor.execute("DELETE FROM tournaments_table;")
-# cursor.execute("""
-#         ALTER TABLE tournament_users
-#         ADD COLUMN user_status TEXT DEFAULT 'alive'
-#     """)
+cursor.execute('''
+CREATE TABLE IF NOT EXISTS tournament_begin (
+    tournament_id TEXT,
+    is_begun BOOL
+)
+''')
+cursor.execute("DELETE FROM tournament_rounds_users;")
+cursor.execute("DELETE FROM tournament_users;")
+cursor.execute("DELETE FROM tournaments_table;")
 conn.commit()
 conn.close()
 

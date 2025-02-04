@@ -1847,3 +1847,34 @@ def get_unity_coin_referral():
     
     finally:
         conn.close()
+
+def set_tournament_status(tournament_id: str, is_begin: bool):
+    conn = sqlite3.connect("users_database.db")
+    cursor = conn.cursor()
+    try:
+        cursor.execute('''
+            INSERT INTO tournament_begin (tournament_id, is_begug)
+            VALUES (?, ?)
+            ON CONFLICT(tournament_id) DO UPDATE SET is_begug = excluded.is_begug
+        ''', (tournament_id, int(is_begin)))
+        conn.commit()
+    except sqlite3.Error as e:
+        print(f"❌ Database error: {e}")
+    finally:
+        conn.close()
+
+def get_tournament_status(tournament_id: str) -> bool:
+    """Get the current status of a tournament (True if started, False otherwise)."""
+    conn = sqlite3.connect("users_database.db")
+    cursor = conn.cursor()
+    try:
+        cursor.execute('''
+            SELECT is_begug FROM tournament_begin WHERE tournament_id = ?
+        ''', (tournament_id,))
+        result = cursor.fetchone()
+        return bool(result[0]) if result else False
+    except sqlite3.Error as e:
+        print(f"❌ Database error: {e}")
+        return False
+    finally:
+        conn.close()

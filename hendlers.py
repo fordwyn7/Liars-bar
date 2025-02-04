@@ -357,12 +357,11 @@ async def show_tournaments_menu(message: types.Message):
         return
     for tournament in tournaments:
         response = (
-            f"🌟 *Tournament ID:* {tournament['id']}\n"
+            f"🌟 *Tournament ID:* {tournament['id']}\n\n"
             f"🗓 *Starts:* {tournament['start_time']}\n"
-            f"🏁 *Ends:* {tournament['end_time']}\n"
+            f"🏁 *Ends:* {tournament['end_time']}\n\n"
             f"🏆 *Prize:* \n{tournament['prize']}\n\n"
-            f"⚠️ *Once registered, you cannot quit!*\n"
-            f"📢 *Before the tournament begins, everyone will receive a notification to join.*\n"
+            f"📢 *Before the tournament begins, everyone will receive a notification to join. So be online at that time ❗️❗️❗️*\n"
         )
 
     await message.answer(

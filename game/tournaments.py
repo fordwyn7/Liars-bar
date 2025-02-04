@@ -364,9 +364,6 @@ async def start_turninr(callback_query: types.CallbackQuery):
     )
     turnir = get_ongoing_tournaments()[0]
     tournament_id = turnir["name"]
-    if get_current_round_number(tournament_id) != "0":
-        await callback_query.answer(f"Tournamnet has already been begun ❗️", show_alert=True)
-        return
     conn = sqlite3.connect("users_database.db")
     cursor = conn.cursor()
     cursor.execute(
@@ -486,6 +483,10 @@ async def show_upcoming_tournaments(message: types.Message):
     if not tournaments:
         return
     tournament = tournaments[0]
+    if get_tournament_status(tournament["name"]):
+        await message.answer(f"You have already begun the tournamnet ❗️")
+        return
+    set_tournament_status(tournament["name"], True)
     response = (
         "🌟 The tournament is about to begin!\n"
         "⏳ You have *5 minutes* to join and the tournament will begin.\n\n"
