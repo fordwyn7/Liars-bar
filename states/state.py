@@ -82,3 +82,6 @@ class waiting_for_username_withdraw(StatesGroup):
 class waitforreferralamount(StatesGroup):
     amount = State()
     
+class waitforcoinamount(StatesGroup):
+    amount = State()
+    

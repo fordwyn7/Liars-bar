@@ -81,7 +81,7 @@ admin_panel_button = ReplyKeyboardMarkup(
         ],
         [
             KeyboardButton(text="💳 user's balance"),
-            KeyboardButton(text="💰 withdraw change"),
+            KeyboardButton(text="✏️ change amount"),
         ],
         [
             KeyboardButton(text="👤 Admins"),
@@ -100,6 +100,19 @@ referrals_section_buttons = ReplyKeyboardMarkup(
         [
             KeyboardButton(text="🔝 Top referrals"),
             KeyboardButton(text="🔄 change referral amount"),
+        ],
+        [
+            KeyboardButton(text="back to admin panel 🔙"),
+        ],
+    ],
+    resize_keyboard=True,
+)
+
+change_amounts_buttons = ReplyKeyboardMarkup(
+    keyboard=[
+        [
+            KeyboardButton(text="💸 change game coins"),
+            KeyboardButton(text="💰 withdraw change"),
         ],
         [
             KeyboardButton(text="back to admin panel 🔙"),

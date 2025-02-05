@@ -1329,3 +1329,37 @@ async def players_in_tournament(message: types.Message):
         "Here is the list of players in the tournament:", reply_markup=keyboard
     )
 
+
+@dp.message(F.text == "✏️ change amount")
+@admin_required()
+async def change_amounts_t(message: types.Message, state: FSMContext):
+    await message.answer(f"Here you can change some values in the game 👇", reply_markup=change_amounts_buttons)
+@dp.message(F.text == "💸 change game coins")
+@admin_required()
+async def change_game_coin_t(message: types.Message, state: FSMContext):
+    await message.answer(
+        f"Current coin for each game is {get_game_coin()} Unity Coins 💰\nWrite the new amount ✍️:",
+        reply_markup=back_to_admin_panel,
+    )
+    await state.set_state(waitforcoinamount.amount)
+
+
+@dp.message(waitforcoinamount.amount)
+async def change_game_coin_state(message: types.Message, state: FSMContext):
+    new_amount = message.text
+    if not new_amount.isdigit():
+        await message.answer(
+            f"You entered wrong amount ‼️. Please, enter a valid number.",
+            reply_markup=back_to_admin_panel,
+        )
+    elif int(new_amount) < 0:
+        await message.answer(
+            f"You can't enter negative numbers ‼️. Please, enter a valid intager.",
+            reply_markup=back_to_admin_panel,
+        )
+    else:
+        set_game_coin(int(new_amount))
+        await message.answer(
+            f"New game coin amount is successfully set ✅",
+            reply_markup=admin_panel_button,
+        )

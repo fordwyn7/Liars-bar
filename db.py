@@ -1948,3 +1948,34 @@ def is_any_user_excluded(game_id: str) -> bool:
         return False
     finally:
         conn.close()
+def set_game_coin(new_value):
+    conn = sqlite3.connect("users_database.db")
+    cursor = conn.cursor()
+    try:
+        cursor.execute("SELECT COUNT(*) FROM game_coin_table")
+        count = cursor.fetchone()[0]
+
+        if count == 0:
+            cursor.execute("INSERT INTO game_coin_table (game_coin) VALUES (?)", (new_value,))
+        else:
+            cursor.execute("UPDATE game_coin_table SET game_coin = ?", (new_value,))
+        
+        conn.commit()
+    except sqlite3.Error as e:
+        print(f"❌ Database error: {e}")
+    finally:
+        conn.close()
+
+def get_game_coin() -> int:
+    conn = sqlite3.connect("users_database.db")
+    cursor = conn.cursor()
+    
+    try:
+        cursor.execute("SELECT game_coin FROM game_coin_table LIMIT 1")
+        result = cursor.fetchone()
+        return result[0] if result else 5
+    except sqlite3.Error as e:
+        print(f"❌ Database error: {e}")
+        return 5
+    finally:
+        conn.close()

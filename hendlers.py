@@ -233,13 +233,13 @@ def format_weekly_leaderboard():
     if not leaderboard:
         return "📅 No games played since Monday!"
 
-    leaderboard_text = "🏆 **Weekly Leaderboard (Since Monday)** 🏆\n\n"
+    leaderboard_text = "🏆 **Weekly Leaderboard** 🏆\n\n"
     medals = ["🥇", "🥈", "🥉"]  
 
     for rank, (user_id, total_games, games_won) in enumerate(leaderboard, start=1):
-        username = get_user_nfgame(user_id)  # Replace this with a function that gets the username
-        medal = f"{medals[rank - 1]} {rank}."if rank <= 3 else f"🔹 {rank}."
-        leaderboard_text += f"{medal} {username} — 🎮 {total_games} games | 🏆 {games_won} wins\n"
+        username = get_user_nfgame(user_id)
+        medal = f"{medals[rank - 1]}. "if rank <= 3 else f"{rank}."
+        leaderboard_text += f"{medal} {username} — 🎮 {total_games} | 🏆 {games_won}\n"
 
     return leaderboard_text
 @dp.message(F.text == "🏅 Leaderboard")
