@@ -123,7 +123,7 @@ async def statistics_a(message: types.Message, state: FSMContext):
         inline_keyboard=[
             [
                 InlineKeyboardButton(
-                    text="📢 Bot's Channel", url="https://t.me/liars_bar_game_channel"
+                    text="📢 Bot's Channel", url="https://t.me/liars_fortune_channel"
                 ),
             ],
             [
