@@ -503,8 +503,8 @@ async def show_upcoming_tournaments(message: types.Message):
     )
     cnt = 0
     message_list = []
-    for user_id in [1155076760, 5606480208, 6807731973, 6735261466]:
-        # 6561074671, 5219280507, 7412693353
+    for user_id in [1155076760, 5606480208, 6807731973, 6561074671, 5219280507, 7412693353]:
+        # 
         # if user_id == message.from_user.id:
         #     continue
         try:
