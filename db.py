@@ -1638,7 +1638,6 @@ async def update_tournament_winner_if_round_finished(
                     (winner, tournament_id),
                 )
                 conn.commit()
-                # await bot.send_message(chat_id=1155076760, text=f"winner result: {winner_result}")
                 await inform_all_users_tournament_ended(tournament_id, winner)
                 print(f"Winner {winner} has been saved to the tournament.")
                 return 12

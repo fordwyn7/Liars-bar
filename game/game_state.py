@@ -72,7 +72,8 @@ async def remove_player_confirm(callback: types.CallbackQuery):
                     await asyncio.sleep(5)
                 if int(get_number_of_winners(tournament_id, cur_round)) > 1:
                     await start_next_round(tournament_id, cur_round + 1)
-                await update_tournament_winner_if_round_finished(tournament_id, int(get_current_round_number(tournament_id)))
+                elif nopir == 1 and int(get_number_of_winners(tournament_id, cur_round)) == 1:
+                    await update_tournament_winner_if_round_finished(tournament_id, int(get_current_round_number(tournament_id)))
             else:
                 if not is_any_user_excluded(game_id):
                     coin = get_game_coin()
@@ -162,7 +163,8 @@ async def remove_player_confirm(callback: types.CallbackQuery):
                     await asyncio.sleep(5)
                 if int(get_number_of_winners(tournament_id, cur_round)) > 1:
                     await start_next_round(tournament_id, cur_round + 1)
-                await update_tournament_winner_if_round_finished(tournament_id, int(get_current_round_number(tournament_id)))
+                elif nopir == 1 and int(get_number_of_winners(tournament_id, cur_round)) == 1:
+                    await update_tournament_winner_if_round_finished(tournament_id, int(get_current_round_number(tournament_id)))
             else:
                 if not is_any_user_excluded(game_id):
                     coin = get_game_coin()
@@ -588,7 +590,8 @@ async def handle_continue_or_liar(callback_query: types.CallbackQuery):
                         await asyncio.sleep(5)
                     if int(get_number_of_winners(tournament_id, cur_round)) > 1:
                         await start_next_round(tournament_id, cur_round + 1)
-                    await update_tournament_winner_if_round_finished(tournament_id, int(get_current_round_number(tournament_id)))
+                    elif nopir == 1 and int(get_number_of_winners(tournament_id, cur_round)) == 1:
+                        await update_tournament_winner_if_round_finished(tournament_id, int(get_current_round_number(tournament_id)))
                 else:
                     if not is_any_user_excluded(game_id):
                         coin = get_game_coin()
@@ -706,7 +709,8 @@ async def handle_continue_or_liar(callback_query: types.CallbackQuery):
                     await asyncio.sleep(5)
                 if int(get_number_of_winners(tournament_id, cur_round)) > 1:
                     await start_next_round(tournament_id, cur_round + 1)
-                await update_tournament_winner_if_round_finished(tournament_id, int(get_current_round_number(tournament_id)))
+                elif nopir == 1 and int(get_number_of_winners(tournament_id, cur_round)) == 1:
+                    await update_tournament_winner_if_round_finished(tournament_id, int(get_current_round_number(tournament_id)))
             else:
                 if not is_any_user_excluded(game_id):
                     coin = get_game_coin()
