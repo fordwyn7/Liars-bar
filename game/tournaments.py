@@ -7,15 +7,10 @@ from aiogram.fsm.context import FSMContext
 from config import *
 from keyboards.keyboard import *
 from middlewares.registered import admin_required
-from keyboards.inline import (
-    archive_tournamnets,
-)
 from db import *
 from states.state import (
     AddTournaments,
-    EditRegistrationDates,
     EditStartAndEndTimes,
-    EditMaxPlayers,
 )
 from datetime import datetime, timezone, timedelta
 from game.game_state import notify_groups
@@ -523,7 +518,7 @@ async def show_upcoming_tournaments(message: types.Message):
     await message.answer(
         f"{cnt} players are given invitation link to the tournament ✅\n You will get the button to start the tournamnet in 5 minutes. ⏰"
     )
-    await asyncio.sleep(0.5 * 60)
+    await asyncio.sleep(60)
     for mid in message_list:
         try:
             await bot.delete_message(chat_id=mid[0], message_id=mid[1])

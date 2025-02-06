@@ -1359,7 +1359,7 @@ def determine_round_winners(tournament_id, round_number):
 
 
 def save_tournament_round_info(
-    tournament_id: str, round_number: str, round_user_id: str, group_number: str
+    tournament_id, round_number, round_user_id, group_number
 ):
     conn = sqlite3.connect("users_database.db")
     cursor = conn.cursor()

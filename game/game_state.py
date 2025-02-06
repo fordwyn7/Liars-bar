@@ -882,7 +882,6 @@ async def notify_groups(groups, round_number):
         conn.close()
         for us in gn[1:]:
             insert_invitation(gn[0], us, game_id)
-        mark_game_as_started(game_id)
         suits = ["heart ❤️", "diamond ♦️", "spade ♠️", "club ♣️"]
         current_table = random.choice(suits)
         cur_table = set_current_table(game_id, current_table)
@@ -896,7 +895,9 @@ async def notify_groups(groups, round_number):
                 number = 23
             else:
                 number = 27
+            game_id = get_game_id_by_user(player)
             insert_number_of_cards(game_id, number)
+            mark_game_as_started(game_id)
             massiv = players
             s = ""
             rang = ["🔴", "🟠", "🟡", "🟢", "⚪️"]

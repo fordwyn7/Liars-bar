@@ -45,7 +45,7 @@ cancel_g = InlineKeyboardMarkup(
 
 
 @dp.callback_query(lambda c: c.data == "start_game")
-async def start_game(callback_query: types.CallbackQuery):
+async def inline_star_game_inline(callback_query: types.CallbackQuery):
     await bot.delete_message(
         callback_query.from_user.id, callback_query.message.message_id
     )
