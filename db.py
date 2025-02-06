@@ -88,7 +88,7 @@ def is_user_registered(user_id):
     try:
         with connect_db() as conn:
             cursor = conn.cursor()
-            cursor.execute("SELECT * FROM users_database WHERE user_id = ?", (user_id,))
+            cursor.execute("SELECT * FROM users_database WHERE user_id = ? OR nfgame = ?", (user_id, user_id))
             user = cursor.fetchone()
         return user
     except sqlite3.Error as e:

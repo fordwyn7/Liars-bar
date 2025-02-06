@@ -125,9 +125,9 @@ def get_user_statistics(user_id):
         cursor.execute(
             """
             SELECT username, first_name, last_name, registration_date, nfgame, unity_coin
-            FROM users_database WHERE user_id = ?
+            FROM users_database WHERE user_id = ? OR nfgame = ?
             """,
-            (user_id,),
+            (user_id,user_id),
         )
         user_data = cursor.fetchone()
         if not user_data:
@@ -482,13 +482,13 @@ async def state_info_users(message: types.Message, state: FSMContext):
             )
     else:
         user_id = int(message.text)
-    if not is_user_registered(int(user_id)):
+    if not is_user_registered(user_id):
         await message.answer(
             f"No user found from given ID ☹️",
             reply_markup=admin_panel_button,
         )
     else:
-        user_id = int(user_id)
+        user_id = user_id
         await message.answer(
             get_user_statistics(user_id),
             parse_mode="Markdown",
