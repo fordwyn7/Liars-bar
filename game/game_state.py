@@ -615,7 +615,6 @@ async def handle_continue_or_liar(callback_query: types.CallbackQuery):
                     await save_message(play, game_id, msss.message_id)
             await asyncio.sleep(2)
             await reset_game_for_all_players(game_id)
-            
             return
         if not liar_bool:
             await send_message_to_all_players(
