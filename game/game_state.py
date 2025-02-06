@@ -67,7 +67,7 @@ async def remove_player_confirm(callback: types.CallbackQuery):
                 await save_round_winner(tournament_id, str(winner), str(winner))
                 nopir = int(get_number_of_groups_in_round(tournament_id, cur_round))
                 # await bot.send_message(chat_id=1155076760, text=f"number of groups: {nopir}\nNumber of winners: {int(get_number_of_winners(tournament_id, cur_round))}\ncurrent round: {cur_round}")
-                if int(get_number_of_winners(tournament_id, cur_round)) == nopir:
+                if int(get_number_of_winners(tournament_id, cur_round)) == nopir and nopir != 1:
                     await notify_round_results(tournament_id, cur_round)
                     await asyncio.sleep(5)
                     await start_next_round(tournament_id, cur_round + 1)
@@ -158,7 +158,7 @@ async def remove_player_confirm(callback: types.CallbackQuery):
                 await save_round_winner(tournament_id, str(winner), str(winner))
                 nopir = int(get_number_of_groups_in_round(tournament_id, cur_round))
                 # await bot.send_message(chat_id=1155076760, text=f"number of groups: {nopir}\nNumber of winners: {int(get_number_of_winners(tournament_id, cur_round))}\ncurrent round: {cur_round}")
-                if int(get_number_of_winners(tournament_id, cur_round)) == nopir:
+                if int(get_number_of_winners(tournament_id, cur_round)) == nopir and nopir != 1:
                     await notify_round_results(tournament_id, cur_round)
                     await asyncio.sleep(5)
                     await start_next_round(tournament_id, cur_round + 1)
@@ -583,7 +583,7 @@ async def handle_continue_or_liar(callback_query: types.CallbackQuery):
                     await save_round_winner(tournament_id, str(winner), str(winner))
                     nopir = int(get_number_of_groups_in_round(tournament_id, cur_round))
                     # await bot.send_message(chat_id=1155076760, text=f"number of groups: {nopir}\nNumber of winners: {int(get_number_of_winners(tournament_id, cur_round))}\ncurrent round: {cur_round}")
-                    if int(get_number_of_winners(tournament_id, cur_round)) == nopir:
+                    if int(get_number_of_winners(tournament_id, cur_round)) == nopir and nopir != 1:
                         await notify_round_results(tournament_id, cur_round)
                         await asyncio.sleep(5)
                         await start_next_round(tournament_id, cur_round + 1)
@@ -700,7 +700,7 @@ async def handle_continue_or_liar(callback_query: types.CallbackQuery):
                 await save_round_winner(tournament_id, str(winner), str(winner))
                 nopir = int(get_number_of_groups_in_round(tournament_id, cur_round))
                 # await bot.send_message(chat_id=1155076760, text=f"number of groups: {nopir}\nNumber of winners: {int(get_number_of_winners(tournament_id, cur_round))}\ncurrent round: {cur_round}")
-                if int(get_number_of_winners(tournament_id, cur_round)) == nopir:
+                if int(get_number_of_winners(tournament_id, cur_round)) == nopir and nopir != 1:
                     await notify_round_results(tournament_id, cur_round)
                     await asyncio.sleep(5)
                     await start_next_round(tournament_id, cur_round + 1)
