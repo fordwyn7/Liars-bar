@@ -1602,51 +1602,21 @@ def delete_tournament_from_tables(tournament_id: str):
 
 
 async def update_tournament_winner_if_round_finished(
-    tournament_id: str, round_number: str
+    tournament_id: str, winner: str
 ):
     conn = sqlite3.connect("users_database.db")
     cursor = conn.cursor()
     try:
         cursor.execute(
             """
-            SELECT COUNT(DISTINCT group_number)
-            FROM tournament_rounds_users
-            WHERE tournament_id = ? AND round_number = ?
+            UPDATE tournaments_table
+            SET tournament_winner = ?
+            WHERE tournament_id = ?
             """,
-            (tournament_id, round_number),
+            (winner, tournament_id),
         )
-        result = cursor.fetchone()
-        if result and result[0] == 1:
-            cursor.execute(
-                """
-                SELECT round_winner
-                FROM tournament_rounds_users
-                WHERE tournament_id = ? AND round_number = ? AND group_number = '1'
-                LIMIT 1
-                """,
-                (tournament_id, round_number),
-            )
-            winner_result = cursor.fetchone()
-            if winner_result:
-                winner = winner_result[0]
-                cursor.execute(
-                    """
-                    UPDATE tournaments_table
-                    SET tournament_winner = ?
-                    WHERE tournament_id = ?
-                    """,
-                    (winner, tournament_id),
-                )
-                conn.commit()
-                await inform_all_users_tournament_ended(tournament_id, winner)
-                print(f"Winner {winner} has been saved to the tournament.")
-                return 12
-            else:
-                print("No winner found for this round.")
-        else:
-            print(
-                "This round has more than one group, winner cannot be determined yet."
-            )
+        conn.commit()
+        await inform_all_users_tournament_ended(tournament_id, winner)
     except sqlite3.Error as e:
         print(f"Database error: {e}")
     finally:
