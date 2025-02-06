@@ -70,7 +70,6 @@ async def remove_player_confirm(callback: types.CallbackQuery):
                 if int(get_number_of_winners(tournament_id, cur_round)) == nopir:
                     await notify_round_results(tournament_id, cur_round)
                     await asyncio.sleep(5)
-                if int(get_number_of_winners(tournament_id, cur_round)) > 1:
                     await start_next_round(tournament_id, cur_round + 1)
                 elif nopir == 1 and int(get_number_of_winners(tournament_id, cur_round)) == 1:
                     await update_tournament_winner_if_round_finished(tournament_id, int(get_current_round_number(tournament_id)))
@@ -161,7 +160,6 @@ async def remove_player_confirm(callback: types.CallbackQuery):
                 if int(get_number_of_winners(tournament_id, cur_round)) == nopir:
                     await notify_round_results(tournament_id, cur_round)
                     await asyncio.sleep(5)
-                if int(get_number_of_winners(tournament_id, cur_round)) > 1:
                     await start_next_round(tournament_id, cur_round + 1)
                 elif nopir == 1 and int(get_number_of_winners(tournament_id, cur_round)) == 1:
                     await update_tournament_winner_if_round_finished(tournament_id, int(get_current_round_number(tournament_id)))
@@ -587,7 +585,6 @@ async def handle_continue_or_liar(callback_query: types.CallbackQuery):
                     if int(get_number_of_winners(tournament_id, cur_round)) == nopir:
                         await notify_round_results(tournament_id, cur_round)
                         await asyncio.sleep(5)
-                    if int(get_number_of_winners(tournament_id, cur_round)) > 1:
                         await start_next_round(tournament_id, cur_round + 1)
                     elif nopir == 1 and int(get_number_of_winners(tournament_id, cur_round)) == 1:
                         await update_tournament_winner_if_round_finished(tournament_id, int(get_current_round_number(tournament_id)))
@@ -705,7 +702,6 @@ async def handle_continue_or_liar(callback_query: types.CallbackQuery):
                 if int(get_number_of_winners(tournament_id, cur_round)) == nopir:
                     await notify_round_results(tournament_id, cur_round)
                     await asyncio.sleep(5)
-                if int(get_number_of_winners(tournament_id, cur_round)) > 1:
                     await start_next_round(tournament_id, cur_round + 1)
                 elif nopir == 1 and int(get_number_of_winners(tournament_id, cur_round)) == 1:
                     await update_tournament_winner_if_round_finished(tournament_id, int(get_current_round_number(tournament_id)))
