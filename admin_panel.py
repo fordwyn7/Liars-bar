@@ -138,13 +138,13 @@ def get_user_statistics(user_id):
         is_admin = "admin 🧑‍💻" if is_user_admin(user_id) else "user 🙍‍♂️"
 
         stats_message = (
-            f"📊 **User Statistics** 📊\n\n"
-            f"🙇‍♂️ **Role**: {is_admin} \n\n"
-            f"👤 **Username**: {"@" + username if username else 'N/A'}\n\n"
-            f"📛 **First Name**: {first_name if first_name else 'N/A'}\n\n"
-            f"📜 **Last Name**: {last_name if last_name else 'N/A'}\n\n"
-            f"🗓️ **Registr Date**: {registration_date if registration_date else 'N/A'}\n\n"
-            f"🎮 **Username in bot**: {nfgame if nfgame else 'N/A'}\n\n"
+            f"📊 User Statistics 📊\n\n"
+            f"🙇‍♂️ Role: {is_admin} \n\n"
+            f"👤 Username: {"@" + username if username else 'N/A'}\n\n"
+            f"📛 First Name: {first_name if first_name else 'N/A'}\n\n"
+            f"📜 Last Name: {last_name if last_name else 'N/A'}\n\n"
+            f"🗓️ Registr Date: {registration_date if registration_date else 'N/A'}\n\n"
+            f"🎮 Username in bot: {nfgame if nfgame else 'N/A'}\n\n"
             f"👥 referrals: {get_number_of_referrals(user_id)}\n\n"
             f"💰 Unity Coins: {unity_coin}"
         )
@@ -474,17 +474,14 @@ async def info_users(message: types.Message, state: FSMContext):
 @admin_required()
 async def state_info_users(message: types.Message, state: FSMContext):
     if not message.text.isdigit():
-        try:
-            user_id = get_id_by_nfgame(message.text)
-            if not user_id:
-                await message.answer(
-                    "❌ Please send a valid user ID or username",
-                    reply_markup=back_to_admin_panel,
-                )
-        except:
-            await message.answer(f"User not found or something went wrong", reply_markup=users_control_button)
-            await state.clear()
-            return
+        user_id = get_id_by_nfgame(message.text)
+        if not user_id:
+            await message.answer(
+                "❌ Please send a valid user ID or username",
+                reply_markup=back_to_admin_panel,
+            )
+        else:
+            user_id = int(user_id)
     else:
         user_id = int(message.text)
     if not is_user_registered(user_id):
@@ -493,10 +490,8 @@ async def state_info_users(message: types.Message, state: FSMContext):
             reply_markup=admin_panel_button,
         )
     else:
-        user_id = user_id
         await message.answer(
             get_user_statistics(user_id),
-            parse_mode="Markdown",
             reply_markup=admin_panel_button,
         )
     await state.clear()
