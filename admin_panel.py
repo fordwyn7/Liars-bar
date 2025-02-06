@@ -474,12 +474,17 @@ async def info_users(message: types.Message, state: FSMContext):
 @admin_required()
 async def state_info_users(message: types.Message, state: FSMContext):
     if not message.text.isdigit():
-        user_id = get_id_by_nfgame(message.text)
-        if not user_id:
-            await message.answer(
-                "❌ Please send a valid user ID or username",
-                reply_markup=back_to_admin_panel,
-            )
+        try:
+            user_id = get_id_by_nfgame(message.text)
+            if not user_id:
+                await message.answer(
+                    "❌ Please send a valid user ID or username",
+                    reply_markup=back_to_admin_panel,
+                )
+        except:
+            await message.answer(f"User not found or something went wrong", reply_markup=users_control_button)
+            await state.clear()
+            return
     else:
         user_id = int(message.text)
     if not is_user_registered(user_id):
