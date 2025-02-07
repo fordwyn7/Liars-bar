@@ -196,12 +196,12 @@ async def show_game_archive(message: types.Message, state: FSMContext):
     if not games:
         await message.answer("No games found in your archive.")
         return
-    response = "📜 *Your Game Archive:*\n\n"
+    response = "📜 Your Game Archive:\n\n"
     for idx, (_, start_time, _, _) in enumerate(games, start=1):
         response += f"{idx}. game — {start_time.split(' ')[0]} 📅\n"
 
-    response += "\n📋 *Send the game number to view its details.*"
-    await message.answer(response, parse_mode="Markdown", reply_markup=cancel_button)
+    response += "\n📋 Send the game number to view its details."
+    await message.answer(response, reply_markup=cancel_button)
     await state.set_state(awaiting_game_number.waiting)
 
 def get_start_of_week():
@@ -233,7 +233,7 @@ def format_weekly_leaderboard():
     if not leaderboard:
         return "📅 No games played since Monday!"
 
-    leaderboard_text = "🏆 **Weekly Leaderboard** 🏆\n\n"
+    leaderboard_text = "🏆 Weekly Leaderboard 🏆\n\n"
     medals = ["🥇", "🥈", "🥉"]  
 
     for rank, (user_id, total_games, games_won) in enumerate(leaderboard, start=1):
@@ -245,7 +245,7 @@ def format_weekly_leaderboard():
 @dp.message(F.text == "🏅 Leaderboard")
 async def show_weekly_leaderboard(message: types.Message):
     leaderboard_text = format_weekly_leaderboard()
-    await message.answer(leaderboard_text, parse_mode="Markdown")
+    await message.answer(leaderboard_text)
 
 @dp.message(awaiting_game_number.waiting)
 async def send_game_statistics(message: types.Message, state: FSMContext):
@@ -274,7 +274,7 @@ async def send_game_statistics(message: types.Message, state: FSMContext):
         return
     record_id, start_time, end_time, winner = games[game_number - 1]
     game_status = (
-        f"🕹 *Game Details:*\n"
+        f"🕹 Game Details:\n"
         f"🆔 Game ID: {record_id}\n"
         f"⏰ Start Time: {start_time}\n"
         f"🏁 End Time: {end_time if end_time else 'Has not finished'}\n"
@@ -282,7 +282,6 @@ async def send_game_statistics(message: types.Message, state: FSMContext):
     )
     await message.answer(
         game_status,
-        parse_mode="Markdown",
         reply_markup=get_main_menu(message.from_user.id),
     )
     await state.clear()
@@ -324,15 +323,15 @@ async def my_cabinet(message: types.Message):
     )
 
     user_cabinet_message = (
-        f"📱 *Your Cabinet*\n\n"
-        f"👤 *Username:* {nfgame}\n"
-        f"🗓 *Registration Date:* {registration_date}\n"
-        f"🎮 *Games Played:* {games_played}\n"
+        f"📱 Your Cabinet\n\n"
+        f"👤 Username: {nfgame}\n"
+        f"🗓 Registration Date: {registration_date}\n"
+        f"🎮 Games Played: {games_played}\n"
         f"👥 referrals: {get_number_of_referrals(message.from_user.id)}\n"
-        f"💰 *Unity Coins:* {unity_coins}\n"
+        f"💰 Unity Coins: {unity_coins}\n"
     )
     await message.answer(
-        user_cabinet_message, parse_mode="Markdown", reply_markup=keyboard
+        user_cabinet_message, reply_markup=keyboard
     )
 
 
@@ -421,17 +420,16 @@ async def show_tournaments_menu(message: types.Message):
         return
     for tournament in tournaments:
         response = (
-            f"🌟 *Tournament ID:* {tournament['id']}\n\n"
-            f"🗓 *Starts:* {tournament['start_time']}\n"
-            f"🏁 *Ends:* {tournament['end_time']}\n\n"
-            f"🏆 *Prize:* \n{tournament['prize']}\n\n"
-            f"📢 *Before the tournament begins, everyone will receive a notification to join. So be online at that time ❗️❗️❗️*\n"
+            f"🌟 Tournament ID: {tournament['id']}\n\n"
+            f"🗓 Starts: {tournament['start_time']}\n"
+            f"🏁 Ends: {tournament['end_time']}\n\n"
+            f"🏆 Prize: \n{tournament['prize']}\n\n"
+            f"📢 Before the tournament begins, everyone will receive a notification to join. So be online at that time ❗️❗️❗️*\n"
         )
 
     await message.answer(
         response,
         reply_markup=archive_tournamnets,
-        parse_mode="Markdown",
     )
 
 
