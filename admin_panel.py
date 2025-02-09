@@ -1363,3 +1363,4 @@ async def change_game_coin_state(message: types.Message, state: FSMContext):
             f"New game coin amount is successfully set ✅",
             reply_markup=admin_panel_button,
         )
+        await state.clear()
