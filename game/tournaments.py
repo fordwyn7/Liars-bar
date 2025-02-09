@@ -503,10 +503,10 @@ async def show_upcoming_tournaments(message: types.Message):
     )
     cnt = 0
     message_list = []
-    for user_id in [1155076760, 5606480208, 6807731973, 6735261466,6561074671, 5219280507, 7412693353, 7984507370,6047710477, 6596299618]:
-        # 
-        # if user_id == message.from_user.id:
-        #     continue
+    for user_id in users:
+        # [1155076760, 5606480208, 6807731973, 6735261466,6561074671, 5219280507, 7412693353, 7984507370,6047710477, 6596299618]
+        if user_id == message.from_user.id:
+            continue
         try:
             msg = await bot.send_message(
                 chat_id=user_id, text=response, parse_mode="Markdown", reply_markup=keyboard
