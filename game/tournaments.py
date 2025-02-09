@@ -518,7 +518,7 @@ async def show_upcoming_tournaments(message: types.Message):
     await message.answer(
         f"{cnt} players are given invitation link to the tournament ✅\n You will get the button to start the tournamnet in 5 minutes. ⏰"
     )
-    await asyncio.sleep(60)
+    await asyncio.sleep(5*60)
     for mid in message_list:
         try:
             await bot.delete_message(chat_id=mid[0], message_id=mid[1])
