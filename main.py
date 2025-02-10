@@ -81,7 +81,8 @@ cursor.execute(
         current_turn_user_id INTEGER,  
         number_of_cards INTEGER,
         FOREIGN KEY(inviter_id) REFERENCES users_database(user_id),
-        FOREIGN KEY(invitee_id) REFERENCES users_database(user_id)
+        FOREIGN KEY(invitee_id) REFERENCES users_database(user_id),
+        UNIQUE(inviter_id, invitee_id, game_id)
     )
     """
 )
@@ -234,7 +235,7 @@ async def cmd_start(message: types.Message, state: FSMContext):
         if get_needed_players(game_id) <= get_player_count(game_id):
             await message.answer(
                 f"There is no available space for another player or the game has already finished 😞",
-                reply_markup=get_main_menu(user.id),
+                reply_markup=get_main_menu(message.from_user.id),
             )
 
             await state.clear()

@@ -136,6 +136,16 @@ def insert_invitation(inviter_id, invitee_id, game_id):
             cursor = conn.cursor()
             cursor.execute(
                 """
+                SELECT 1 FROM invitations WHERE inviter_id = ? AND invitee_id = ? AND game_id = ?
+                """,
+                (inviter_id, invitee_id, game_id),
+            )
+            if cursor.fetchone():
+                print("Invitation already exists. Skipping insertion.")
+                return
+            
+            cursor.execute(
+                """
                 INSERT INTO invitations (inviter_id, invitee_id, game_id)
                 VALUES (?, ?, ?)
                 """,
@@ -144,6 +154,7 @@ def insert_invitation(inviter_id, invitee_id, game_id):
             conn.commit()
     except sqlite3.Error as e:
         print(f"Error inserting invitation: {e}")
+
 
 
 def get_player_count(game_id):
@@ -1777,7 +1788,7 @@ def get_top_referrals():
             return st
         st += f"📌 Top {min(10, len(top_referrals))} Users with Most Referrals:\n"
         for rank, (user_id, count) in enumerate(top_referrals, start=1):
-            st += f"{rank}. {get_user_nfgame(user_id)} - Referrals: {count}"
+            st += f"{rank}. {get_user_nfgame(user_id)} - Referrals: {count}\n"
         return st
     except sqlite3.Error as e:
         print(f"❌ Database error: {e}")
