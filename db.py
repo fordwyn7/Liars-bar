@@ -1885,7 +1885,7 @@ def reset_exclusion_count(game_id: str, user_id: int):
         cursor.execute('''
             INSERT INTO excludeds (game_id, user_id, number_of_excluded)
             VALUES (?, ?, 0)
-            ON CONFLICT(game_id) DO UPDATE SET user_id = excluded.user_id, number_of_excluded = 0
+            ON CONFLICT(game_id, user_id) DO UPDATE SET number_of_excluded = 0
         ''', (game_id, user_id))
         
         conn.commit()
@@ -1893,6 +1893,7 @@ def reset_exclusion_count(game_id: str, user_id: int):
         print(f"❌ Database error check 3: {e}")
     finally:
         conn.close()
+
 
 
 import sqlite3

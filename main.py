@@ -51,7 +51,7 @@ CREATE TABLE IF NOT EXISTS user_game_messages (
     user_id INTEGER NOT NULL,
     game_id TEXT NOT NULL,
     message_id INTEGER NOT NULL,
-    UNIQUE(user_id, game_id)
+    UNIQUE(user_id, game_id, message_id)
 );
 """
 )
@@ -186,11 +186,11 @@ if count == 0:
 
 cursor.execute('''
 CREATE TABLE IF NOT EXISTS excludeds (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    game_id TEXT, 
-    user_id INTEGER UNIQUE,  
-    number_of_excluded INTEGER
-)
+    game_id TEXT NOT NULL,
+    user_id INTEGER NOT NULL,
+    number_of_excluded INTEGER DEFAULT 0,
+    UNIQUE(game_id, user_id)
+);
 ''')
 # cursor.execute("DELETE FROM tournament_rounds_users;")
 # cursor.execute("DELETE FROM tournament_users;")
