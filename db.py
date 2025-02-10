@@ -378,7 +378,7 @@ async def send_message_to_all_players(game_id, message):
                 continue
             try:
                 msg = await bot.send_message(player_id, message)
-                await save_message(player_id, game_id, msg.message_id)
+                save_message(player_id, game_id, msg.message_id)
             except Exception as e:
                 print(f"Failed to send message to player {player_id}: {e}")
 
@@ -936,7 +936,7 @@ def get_total_users():
         return 0
 
 
-async def save_message(user_id, game_id, message_id):
+def save_message(user_id, game_id, message_id):
     conn = sqlite3.connect("users_database.db")
     cursor = conn.cursor()
     try:
@@ -1873,7 +1873,7 @@ def remove_player(player_id):
         cursor.execute("DELETE FROM tournament_users WHERE user_id = ?", (player_id,))
         conn.commit()
     except sqlite3.Error as e:
-        print(f"❌ Database error: {e}")
+        print(f"❌ Database error check 4: {e}")
     finally:
         conn.close()
         
@@ -1890,7 +1890,7 @@ def reset_exclusion_count(game_id: str, user_id: int):
         
         conn.commit()
     except sqlite3.Error as e:
-        print(f"❌ Database error: {e}")
+        print(f"❌ Database error check 3: {e}")
     finally:
         conn.close()
 
@@ -1909,7 +1909,7 @@ def increase_exclusion_count(game_id: str, user_id: int):
 
         conn.commit()
     except sqlite3.Error as e:
-        print(f"❌ Database error: {e}")
+        print(f"❌ Database error check 2: {e}")
     finally:
         conn.close()
 
@@ -1922,9 +1922,9 @@ def is_any_user_excluded(game_id: str) -> bool:
             WHERE game_id = ? AND number_of_excluded > 0
         ''', (game_id,))
         result = cursor.fetchone()
-        return result[0] > 0  # Returns True if at least one user has number_of_excluded > 0
+        return result[0] > 0
     except sqlite3.Error as e:
-        print(f"❌ Database error: {e}")
+        print(f"❌ Database error check 1: {e}", )
         return False
     finally:
         conn.close()

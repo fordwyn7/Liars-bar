@@ -95,11 +95,11 @@ async def remove_player_confirm(callback: types.CallbackQuery):
         for play in players:
             if not is_player_dead(game_id, play):
                 mss = await bot.send_message(chat_id=play, text=f"Player {get_user_nfgame(player_id)} excluded from game by admins for breaking the tournament rules 🚷\n")
-                await save_message(play, game_id, mss.message_id)
+                save_message(play, game_id, mss.message_id)
         for play in players:
             if not is_player_dead(game_id, play):
                 mss = await bot.send_message(chat_id=play, text=ms)
-                await save_message(play, game_id, mss.message_id)
+                save_message(play, game_id, mss.message_id)
         await reset_game_for_all_players(game_id)
     else:
         remove_player(player_id)
@@ -119,7 +119,7 @@ async def remove_player_confirm(callback: types.CallbackQuery):
         for play in players:
             if not is_player_dead(game_id, play):
                 mss = await bot.send_message(chat_id=play, text=f"Player {get_user_nfgame(player_id)} excluded from game by admins for breaking the tournament rules 🚷\n")
-                await save_message(play, game_id, mss.message_id)
+                save_message(play, game_id, mss.message_id)
         winner = get_alive_number(game_id)
         if winner != 0:
             await bot.send_message(
@@ -246,7 +246,7 @@ async def send_random_cards_to_players(game_id):
                 text="You are dead. You can quit now",
             )
             message_id = message.message_id
-            await save_message(player_id, game_id, message_id)
+            save_message(player_id, game_id, message_id)
             continue
         else:
             await asyncio.sleep(2)
@@ -260,7 +260,7 @@ async def send_random_cards_to_players(game_id):
                 reply_markup=keyboard,
             )
             message_id = message.message_id
-            await save_message(player_id, game_id, message_id)
+            save_message(player_id, game_id, message_id)
 
 
 selected_cards_count = {}
@@ -400,7 +400,7 @@ async def send_cards(callback_query: types.CallbackQuery):
             chat_id=callback_query.from_user.id,
             text=f"You sent the following cards: {', '.join(selected_cards)} ",
         )
-        await save_message(callback_query.from_user.id, game_id, mss.message_id)
+        save_message(callback_query.from_user.id, game_id, mss.message_id)
         with sqlite3.connect("users_database.db") as conn:
             cursor = conn.cursor()
             cursor.execute(
@@ -441,7 +441,7 @@ async def send_cards(callback_query: types.CallbackQuery):
             text="No cards selected! Please choose cards first.",
         )
         message_id = message.message_id
-        await save_message(callback_query.from_user.id, game_id, message_id)
+        save_message(callback_query.from_user.id, game_id, message_id)
         return
 
     players = get_all_players_in_game(game_id)
@@ -456,7 +456,7 @@ async def send_cards(callback_query: types.CallbackQuery):
                 ),
             )
             message_id = message.message_id
-            await save_message(p_id, game_id, message_id)
+            save_message(p_id, game_id, message_id)
     for p_id in players:
         if not p_id:
             continue
@@ -466,7 +466,7 @@ async def send_cards(callback_query: types.CallbackQuery):
                 text=f"Now {get_user_nfgame(get_next_player_id(game_id, user_id))}'s turn. \nPlease wait until your turn ⏰",
             )
             message_id = message.message_id
-            await save_message(p_id, game_id, message_id)
+            save_message(p_id, game_id, message_id)
     next_player_id = get_next_player_id(game_id, user_id)
     keyboard = InlineKeyboardMarkup(
         inline_keyboard=[
@@ -483,7 +483,7 @@ async def send_cards(callback_query: types.CallbackQuery):
         reply_markup=keyboard,
     )
     message_id = message.message_id
-    await save_message(next_player_id, game_id, message_id)
+    save_message(next_player_id, game_id, message_id)
 
 
 @dp.callback_query(lambda c: c.data in ["continue_game", "liar_game"])
@@ -513,7 +513,7 @@ async def handle_continue_or_liar(callback_query: types.CallbackQuery):
                 text=f"Player {get_user_nfgame(user_id)} opened the last sent cards and it was a Joker(🃏) card, so all players will shoot themselves.",
             )
             message_id = message.message_id
-            await save_message(previous_player_id, game_id, message_id)
+            save_message(previous_player_id, game_id, message_id)
             await asyncio.sleep(2)
             for player in players:
                 message = await bot.send_message(
@@ -521,7 +521,7 @@ async def handle_continue_or_liar(callback_query: types.CallbackQuery):
                     text=f"Player {get_user_nfgame(user_id)} opened the last sent cards and it was a Joker(🃏) card, so you all must shoot yourself.",
                 )
                 message_id = message.message_id
-                await save_message(player, game_id, message_id)
+                save_message(player, game_id, message_id)
             await asyncio.sleep(3)
             for player in players:
                 bull = await shoot_self(game_id, player)
@@ -537,7 +537,7 @@ async def handle_continue_or_liar(callback_query: types.CallbackQuery):
                         text="You shot yourself and dead by real bullet 😵\nNow you are eliminated from game. We will inform the winner when the game ends",
                     )
                     delete_user_from_all_games(player)
-                    await save_message(player, game_id, messa.message_id)
+                    save_message(player, game_id, messa.message_id)
                 else:
                     await send_message_to_all_players(
                         game_id,
@@ -610,7 +610,7 @@ async def handle_continue_or_liar(callback_query: types.CallbackQuery):
             for play in players:
                 if not is_player_dead(game_id, play):
                     msss = await bot.send_message(chat_id=play, text=ms)
-                    await save_message(play, game_id, msss.message_id)
+                    save_message(play, game_id, msss.message_id)
             await asyncio.sleep(2)
             await reset_game_for_all_players(game_id)
             return
@@ -634,7 +634,7 @@ async def handle_continue_or_liar(callback_query: types.CallbackQuery):
                 )
                 if is_user_turn(previous_player_id, game_id):
                     update_current_turn(game_id)
-                await save_message(previous_player_id, game_id, mjj.message_id)
+                save_message(previous_player_id, game_id, mjj.message_id)
                 delete_user_from_all_games(previous_player_id)
         else:
             await send_message_to_all_players(
@@ -657,7 +657,7 @@ async def handle_continue_or_liar(callback_query: types.CallbackQuery):
                 if is_user_turn(user_id, game_id):
                     update_current_turn(game_id)
                 delete_user_from_all_games(user_id)
-                await save_message(user_id, game_id, mjj.message_id)
+                save_message(user_id, game_id, mjj.message_id)
         while is_player_dead(game_id, get_current_turn_user_id(game_id)):
             set_current_turn(
                 game_id, get_next_player_id(game_id, get_current_turn_user_id(game_id))
@@ -726,7 +726,7 @@ async def handle_continue_or_liar(callback_query: types.CallbackQuery):
         for play in players:
             if not is_player_dead(game_id, play):
                 mss = await bot.send_message(chat_id=play, text=ms)
-                await save_message(play, game_id, mss.message_id)
+                save_message(play, game_id, mss.message_id)
         await reset_game_for_all_players(game_id)
     elif callback_query.data == "continue_game":
         rm = get_player_cards(game_id, user_id)
@@ -743,12 +743,12 @@ async def handle_continue_or_liar(callback_query: types.CallbackQuery):
                         chat_id=i,
                         text=f"Player {get_user_nfgame(user_id)} has no other cards so he skips his turn.",
                     )
-                    await save_message(i, game_id, mss.message_id)
+                    save_message(i, game_id, mss.message_id)
                     mss2 = await bot.send_message(
                         chat_id=user_id,
                         text=f"You have no other cards. You skipped your turn. ",
                     )
-                    await save_message(user_id, game_id, mss2.message_id)
+                    save_message(user_id, game_id, mss2.message_id)
                     update_current_turn(game_id)
             rm = get_player_cards(game_id, get_current_turn_user_id(game_id))
             user_id = get_current_turn_user_id(game_id)
@@ -760,7 +760,7 @@ async def handle_continue_or_liar(callback_query: types.CallbackQuery):
             for play in players:
                 if not is_player_dead(game_id, play):
                     mss = await bot.send_message(chat_id=play, text=ms)
-                    await save_message(play, game_id, mss.message_id)
+                    save_message(play, game_id, mss.message_id)
             await reset_game_for_all_players(game_id)
             return
         rm = rm[0]
@@ -788,7 +788,7 @@ async def handle_continue_or_liar(callback_query: types.CallbackQuery):
             text=f"Now it's your turn 🫵 \nCurrent table: {get_current_table(game_id)} \nHere are your cards: ",
             reply_markup=keyboard,
         )
-        await save_message(user_id, game_id, mss.message_id)
+        save_message(user_id, game_id, mss.message_id)
 
     await callback_query.answer()
 
@@ -838,7 +838,7 @@ async def send_cards_update_to_players(game_id, player_id, num_cards_sent):
                 else "You sent your cards!"
             ),
         )
-        await save_message(p_id, game_id, mss.message_id)
+        save_message(p_id, game_id, mss.message_id)
 
 async def start_next_round(tournament_id, round_number):
     groups = create_groups(determine_round_winners(tournament_id, round_number - 1))

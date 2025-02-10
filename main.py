@@ -50,7 +50,8 @@ CREATE TABLE IF NOT EXISTS user_game_messages (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     user_id INTEGER NOT NULL,
     game_id TEXT NOT NULL,
-    message_id INTEGER NOT NULL
+    message_id INTEGER NOT NULL,
+    UNIQUE(user_id, game_id)
 );
 """
 )
@@ -63,7 +64,7 @@ CREATE TABLE IF NOT EXISTS game_archive (
     game_id TEXT,
     game_start_time TEXT,
     game_end_time TEXT,
-    game_winner TEXT 
+    game_winner TEXT
 )
 """
 )
@@ -131,7 +132,9 @@ cursor.execute(
 CREATE TABLE IF NOT EXISTS tournament_users (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     tournament_id TEXT,
-    user_id INTEGER
+    user_id INTEGER,
+    UNIQUE(tournament_id, user_id)
+
 )
 """
 )
