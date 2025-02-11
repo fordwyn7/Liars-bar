@@ -17,7 +17,7 @@ def get_main_menu(user_id: int):
         [
             KeyboardButton(text="start game 🎮"),
             KeyboardButton(text="🏅 Leaderboard"),
-            KeyboardButton(text="game status 🌟"),
+            KeyboardButton(text="Prizes 🎁"),
         ],
         [
             KeyboardButton(text="📱 cabinet"),
@@ -26,7 +26,7 @@ def get_main_menu(user_id: int):
         ],
         [
             KeyboardButton(text="🎯 game archive"),
-            KeyboardButton(text="how to play 📝"),
+            KeyboardButton(text="game rules 📜"),
         ],
         [
             KeyboardButton(text="information 📚"),

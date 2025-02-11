@@ -398,25 +398,25 @@ async def get_name(message: types.Message, state: FSMContext):
     await state.clear()
 
 
-@dp.message(F.text == "game status 🌟")
-async def start_game_handler(message: types.Message, state: FSMContext):
-    if is_user_in_tournament_and_active(message.from_user.id):
-        await message.answer(f"You are participating in a tournament and can't use this button until the tournament ends!")
-        return
-    game_id = get_game_id_by_user(message.from_user.id)
-    if not has_incomplete_games(message.from_user.id):
-        await message.answer(
-            f"You are not participating in any game currently.",
-            reply_markup=get_main_menu(message.from_user.id),
-        )
-    else:
-        msg = f"Current game status: active ✅\n"
-        if message.from_user.id == get_game_inviter_id(game_id):
-            msg += f"You are creator of this game 👨‍💻\nNumber of participants: {get_player_count(game_id)}"
-            await message.answer(msg, reply_markup=generate_exclude_keyboard(game_id))
-        else:
-            msg += f"You are participant in this game 👤\nNumber of participants: {get_player_count(game_id)}"
-            await message.answer(msg, reply_markup=cancel_g)
+# @dp.message(F.text == "game status 🌟")
+# async def start_game_handler(message: types.Message, state: FSMContext):
+#     if is_user_in_tournament_and_active(message.from_user.id):
+#         await message.answer(f"You are participating in a tournament and can't use this button until the tournament ends!")
+#         return
+#     game_id = get_game_id_by_user(message.from_user.id)
+#     if not has_incomplete_games(message.from_user.id):
+#         await message.answer(
+#             f"You are not participating in any game currently.",
+#             reply_markup=get_main_menu(message.from_user.id),
+#         )
+#     else:
+#         msg = f"Current game status: active ✅\n"
+#         if message.from_user.id == get_game_inviter_id(game_id):
+#             msg += f"You are creator of this game 👨‍💻\nNumber of participants: {get_player_count(game_id)}"
+#             await message.answer(msg, reply_markup=generate_exclude_keyboard(game_id))
+#         else:
+#             msg += f"You are participant in this game 👤\nNumber of participants: {get_player_count(game_id)}"
+#             await message.answer(msg, reply_markup=cancel_g)
 
 
 @dp.message()

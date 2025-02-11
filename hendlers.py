@@ -138,7 +138,7 @@ async def statistics_a(message: types.Message, state: FSMContext):
     )
 
 
-@dp.message(F.text == "how to play 📝")
+@dp.message(F.text == "game rules 📜")
 async def how_to_play(message: types.Message, state: FSMContext):
     await state.clear()
     await message.answer(
@@ -311,16 +311,15 @@ async def my_cabinet(message: types.Message):
     games_played = cursor.fetchone()[0]
     conn.close()
 
-    # Create the inline keyboard with the withdraw button
-    keyboard = InlineKeyboardMarkup(
-        inline_keyboard=[
-            [
-                InlineKeyboardButton(
-                    text="💸 Withdraw Unity coins", callback_data="withdraw"
-                ),
-            ],
-        ]
-    )
+    # keyboard = InlineKeyboardMarkup(
+    #     inline_keyboard=[
+    #         [
+    #             InlineKeyboardButton(
+    #                 text="💸 Withdraw Unity coins", callback_data="withdraw"
+    #             ),
+    #         ],
+    #     ]
+    # )
 
     user_cabinet_message = (
         f"📱 Your Cabinet\n\n"
@@ -331,18 +330,18 @@ async def my_cabinet(message: types.Message):
         f"💰 Unity Coins: {unity_coins}\n"
     )
     await message.answer(
-        user_cabinet_message, reply_markup=keyboard
+        user_cabinet_message
     )
 
 
-@dp.callback_query(lambda c: c.data == "withdraw")
-async def process_withdraw_user(callback_query: types.CallbackQuery):
+@dp.message(F.text == "Prizes 🎁")
+async def process_withdraw_user(message: types.Message):
     conn = sqlite3.connect("users_database.db")
     cursor = conn.cursor()
     cursor.execute("SELECT * FROM withdraw_options LIMIT 1")
     withdraw_options = cursor.fetchone()
     if not withdraw_options:
-        await callback_query.answer("❌ No withdrawal options found.")
+        await message.answer("❌ No withdrawal options found.")
         conn.close()
         return
     (
@@ -355,7 +354,7 @@ async def process_withdraw_user(callback_query: types.CallbackQuery):
     ) = withdraw_options
     cursor.execute(
         "SELECT unity_coin FROM users_database WHERE user_id = ?",
-        (callback_query.from_user.id,),
+        (message.from_user.id,),
     )
     unity_coin = cursor.fetchone()[0]
     conn.close()
@@ -383,7 +382,7 @@ async def process_withdraw_user(callback_query: types.CallbackQuery):
     )
 
     withdraw_message = (
-        f"💳 Your current balance: {unity_coin} Unity Coins 💰\n\n"
+        f"💳 *Your current balance*: {unity_coin} Unity Coins 💰\n\n"
         "💰 *Withdrawal options.*\n"
         f"🚀 *Telegram Premium*\n"
         f"❄️ *3 Months*: {three_month_premium} Unity Coins 💰\n"
@@ -395,7 +394,7 @@ async def process_withdraw_user(callback_query: types.CallbackQuery):
         f"✨ *1,000 Stars*: {thousand_stars} Unity Coins 💰\n\n"
         "Choose a button to get 👇"
     )
-    await callback_query.message.answer(
+    await message.message.answer(
         withdraw_message, parse_mode="Markdown", reply_markup=keyboard
     )
 
