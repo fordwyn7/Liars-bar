@@ -394,7 +394,7 @@ async def process_withdraw_user(message: types.Message):
         f"✨ *1,000 Stars*: {thousand_stars} Unity Coins 💰\n\n"
         "Choose a button to get 👇"
     )
-    await message.message.answer(
+    await message.answer(
         withdraw_message, parse_mode="Markdown", reply_markup=keyboard
     )
 
