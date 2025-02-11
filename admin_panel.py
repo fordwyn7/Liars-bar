@@ -326,11 +326,19 @@ async def forward_to_all_users(message: types.Message, state: FSMContext):
         if user_id == message.from_user.id:
             continue
         try:
-            await bot.copy_message(
-                chat_id=user_id,
-                from_chat_id=from_chat_id,
-                message_id=message_id,
-            )
+            if message.text == "/start":
+                await bot.copy_message(
+                    chat_id=user_id,
+                    from_chat_id=from_chat_id,
+                    message_id=message_id,
+                    reply_markup=get_main_menu(user_id)
+                )
+            else:
+                await bot.copy_message(
+                    chat_id=user_id,
+                    from_chat_id=from_chat_id,
+                    message_id=message_id
+                )
         except Exception:
             cnt += 1
             continue
