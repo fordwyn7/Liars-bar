@@ -327,13 +327,13 @@ async def forward_to_all_users(message: types.Message, state: FSMContext):
             continue
         try:
             if message.text == "/start":
-                await bot.copy_message(
+                copied_msg  = await bot.copy_message(
                     chat_id=user_id,
                     from_chat_id=from_chat_id,
                     message_id=message_id,
                     reply_markup=get_main_menu(user_id)
                 )
-                await bot.delete_message(chat_id=user_id, message_id=message_id)
+                await bot.delete_message(chat_id=user_id, message_id=copied_msg.message_id)
             else:
                 await bot.copy_message(
                     chat_id=user_id,
