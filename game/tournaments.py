@@ -503,7 +503,7 @@ async def show_upcoming_tournaments(message: types.Message):
     )
     cnt = 0
     message_list = []
-    for user_id in users:
+    for user_id in [5400008760, 7328838785, 6497010884]:
         # [1155076760, 5606480208, 6807731973, 6735261466,6561074671, 5219280507, 7412693353, 7984507370,6047710477, 6596299618]
         if user_id == message.from_user.id:
             continue
@@ -516,9 +516,9 @@ async def show_upcoming_tournaments(message: types.Message):
         except Exception:
             continue
     await message.answer(
-        f"{cnt} players are given invitation link to the tournament ✅\n You will get the button to start the tournamnet in 5 minutes. ⏰"
+        f"{cnt} players are given invitation link to the tournament ✅\n You will get the button to start the tournamnet in 3 minutes. ⏰"
     )
-    await asyncio.sleep(5*60)
+    await asyncio.sleep(3*60)
     for mid in message_list:
         try:
             await bot.delete_message(chat_id=mid[0], message_id=mid[1])
