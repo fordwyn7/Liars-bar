@@ -188,21 +188,60 @@ def get_user_game_archive(user_id: int):
         conn.close()
 
 
-@dp.message(F.text == "🎯 game archive")
-async def show_game_archive(message: types.Message, state: FSMContext):
-    user_id = message.from_user.id
-    games = get_user_game_archive(user_id)
+# @dp.message(F.text == "🎯 game archive")
+# async def show_game_archive(message: types.Message, state: FSMContext):
+#     user_id = message.from_user.id
+#     games = get_user_game_archive(user_id)
 
-    if not games:
-        await message.answer("No games found in your archive.")
-        return
-    response = "📜 Your Game Archive:\n\n"
-    for idx, (_, start_time, _, _) in enumerate(games, start=1):
-        response += f"{idx}. game — {start_time.split(' ')[0]} 📅\n"
+#     if not games:
+#         await message.answer("No games found in your archive.")
+#         return
+#     response = "📜 Your Game Archive:\n\n"
+#     for idx, (_, start_time, _, _) in enumerate(games, start=1):
+#         response += f"{idx}. game — {start_time.split(' ')[0]} 📅\n"
 
-    response += "\n📋 Send the game number to view its details."
-    await message.answer(response, reply_markup=cancel_button)
-    await state.set_state(awaiting_game_number.waiting)
+#     response += "\n📋 Send the game number to view its details."
+#     await message.answer(response, reply_markup=cancel_button)
+#     await state.set_state(awaiting_game_number.waiting)
+
+# @dp.message(awaiting_game_number.waiting)
+# async def send_game_statistics(message: types.Message, state: FSMContext):
+#     if message.text == "back to main menu 🔙":
+#         await state.clear()
+#         await message.answer(
+#             f"You are in main menu.", reply_markup=get_main_menu(message.from_user.id)
+#         )
+#         return
+#     user_id = message.from_user.id
+#     games = get_user_game_archive(user_id)
+
+#     if not message.text.isdigit():
+#         await message.answer(
+#             "❌ Please send a valid game number.", reply_markup=get_main_menu(user_id)
+#         )
+#         await state.clear()
+#         return
+#     game_number = int(message.text)
+#     if game_number < 1 or game_number > len(games):
+#         await message.answer(
+#             "❌ Invalid game number. Please try again.",
+#             reply_markup=get_main_menu(user_id),
+#         )
+#         await state.clear()
+#         return
+#     record_id, start_time, end_time, winner = games[game_number - 1]
+#     game_status = (
+#         f"🕹 Game Details:\n"
+#         f"🆔 Game ID: {record_id}\n"
+#         f"⏰ Start Time: {start_time}\n"
+#         f"🏁 End Time: {end_time if end_time else 'Has not finished'}\n"
+#         f"🏆 Winner: {winner if winner else 'No Winner'}"
+#     )
+#     await message.answer(
+#         game_status,
+#         reply_markup=get_main_menu(message.from_user.id),
+#     )
+#     await state.clear()
 
 def get_start_of_week():
     today = datetime.now(timezone.utc) 
@@ -247,48 +286,8 @@ async def show_weekly_leaderboard(message: types.Message):
     leaderboard_text = format_weekly_leaderboard()
     await message.answer(leaderboard_text)
 
-@dp.message(awaiting_game_number.waiting)
-async def send_game_statistics(message: types.Message, state: FSMContext):
-    if message.text == "back to main menu 🔙":
-        await state.clear()
-        await message.answer(
-            f"You are in main menu.", reply_markup=get_main_menu(message.from_user.id)
-        )
-        return
-    user_id = message.from_user.id
-    games = get_user_game_archive(user_id)
-
-    if not message.text.isdigit():
-        await message.answer(
-            "❌ Please send a valid game number.", reply_markup=get_main_menu(user_id)
-        )
-        await state.clear()
-        return
-    game_number = int(message.text)
-    if game_number < 1 or game_number > len(games):
-        await message.answer(
-            "❌ Invalid game number. Please try again.",
-            reply_markup=get_main_menu(user_id),
-        )
-        await state.clear()
-        return
-    record_id, start_time, end_time, winner = games[game_number - 1]
-    game_status = (
-        f"🕹 Game Details:\n"
-        f"🆔 Game ID: {record_id}\n"
-        f"⏰ Start Time: {start_time}\n"
-        f"🏁 End Time: {end_time if end_time else 'Has not finished'}\n"
-        f"🏆 Winner: {winner if winner else 'No Winner'}"
-    )
-    await message.answer(
-        game_status,
-        reply_markup=get_main_menu(message.from_user.id),
-    )
-    await state.clear()
 
 
-from aiogram import types
-from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 
 
 @dp.message(F.text == "📱 cabinet")

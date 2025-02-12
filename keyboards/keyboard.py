@@ -17,15 +17,14 @@ def get_main_menu(user_id: int):
         [
             KeyboardButton(text="start game 🎮"),
             KeyboardButton(text="🏅 Leaderboard"),
-            KeyboardButton(text="Prizes 🎁"),
         ],
         [
             KeyboardButton(text="📱 cabinet"),
+            KeyboardButton(text="Prizes 🎁"),
             KeyboardButton(text="❄️ referral"),
-            KeyboardButton(text="🤩 tournaments"),
         ],
         [
-            KeyboardButton(text="🎯 game archive"),
+            KeyboardButton(text="🤩 tournaments"),
             KeyboardButton(text="game rules 📜"),
         ],
         [

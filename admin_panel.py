@@ -333,6 +333,7 @@ async def forward_to_all_users(message: types.Message, state: FSMContext):
                     message_id=message_id,
                     reply_markup=get_main_menu(user_id)
                 )
+                await bot.delete_message(chat_id=user_id, message_id=message_id)
             else:
                 await bot.copy_message(
                     chat_id=user_id,
