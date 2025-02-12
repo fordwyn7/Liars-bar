@@ -604,7 +604,7 @@ async def cancel_remove(callback: types.CallbackQuery):
     
 @dp.callback_query(lambda c: c.data.startswith("bonus_cb_"))
 async def claim_bonus(callback: types.CallbackQuery):
-    user_id = callback.data.split(":")[1]
+    user_id = callback.data.split("bonus_cb_")[1]
 
     if not can_claim_bonus(user_id):
         await callback.answer("❌ You've already claimed your bonus today. Come back tomorrow!", show_alert=True)
