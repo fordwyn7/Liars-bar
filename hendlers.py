@@ -203,13 +203,12 @@ async def get_daily_bonus_function(message: types.Message):
     )
 
     await message.answer(
-        "🎁 *Daily Bonus Reward!* 🎁\n\n"
-        "Every day, you can claim a surprise bonus ranging from *1 to 20 Unity Coins*! 💰✨\n"
-        "Tap the button below to receive your reward and boost your balance. 🚀🔥\n\n"
-        "Don't forget to come back tomorrow for another chance to win! 🎉",
-        parse_mode="Markdown",
-        reply_markup=keyboard,
-    )
+    "🎁 *Daily Bonus!* 🎁\n\n"
+    "Claim your reward of *1 to 20 Unity Coins*! 💰 \nTap the button below and get your reward. 🚀\n\n"
+    "Come back tomorrow for more! 🎉",
+    parse_mode="Markdown",
+    reply_markup=keyboard,
+)
 
 
 # @dp.message(F.text == "🎯 game archive")
