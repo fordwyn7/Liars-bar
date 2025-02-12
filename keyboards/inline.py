@@ -601,3 +601,22 @@ async def confirm_remove_player(callback: types.CallbackQuery):
 async def cancel_remove(callback: types.CallbackQuery):
     await callback.message.edit_text("Player removal canceled ❌")
     await callback.answer()
+    
+@dp.callback_query(lambda c: c.data.startswith("bonus_cb_"))
+async def claim_bonus(callback: types.CallbackQuery):
+    user_id = callback.data.split(":")[1]
+
+    if not can_claim_bonus(user_id):
+        await callback.answer("❌ You've already claimed your bonus today. Come back tomorrow!", show_alert=True)
+        return
+    coins = random.randint(1, 20)
+    update_claim_time(user_id)
+    conn = sqlite3.connect("users_database.db")
+    cursor = conn.cursor()
+    cursor.execute(
+        "UPDATE users_database SET unity_coin = unity_coin + ? WHERE user_id = ?",
+        (coins, callback.from_user.id),
+    )
+    conn.commit()
+    conn.close()
+    await callback.answer(f"🎉 You received {coins} coins! Come back tomorrow for more!", show_alert=True)

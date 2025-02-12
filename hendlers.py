@@ -163,7 +163,7 @@ async def how_to_play(message: types.Message, state: FSMContext):
         "🔹 The gun has 6 spots, but only 1 real bullet.\n\n"
         "🏆 *Winning Condition:*\n"
         "The last player left standing wins!",
-        parse_mode="Markdown"
+        parse_mode="Markdown",
     )
 
 
@@ -187,6 +187,24 @@ def get_user_game_archive(user_id: int):
     finally:
         conn.close()
 
+
+@dp.message(F.text == "bonus 🚀")
+async def get_daily_bonus_function(message: types.Message):
+    user_id = message.from_user.id
+
+    keyboard = InlineKeyboardMarkup(
+        inline_keyboard=[
+            [
+                InlineKeyboardButton(
+                    text="Claim Bonus 🎁", callback_data=f"bonus_cb_{user_id}"
+                )
+            ]
+        ]
+    )
+
+    await message.answer(
+        "🚀 *Daily Bonus*: \nYou can get bonus coins everday. Click the button to claim your reward! 👇", parse_mode="Markdown",  reply_markup=keyboard
+    )
 
 # @dp.message(F.text == "🎯 game archive")
 # async def show_game_archive(message: types.Message, state: FSMContext):
@@ -243,16 +261,22 @@ def get_user_game_archive(user_id: int):
 #     )
 #     await state.clear()
 
+
 def get_start_of_week():
-    today = datetime.now(timezone.utc) 
-    start_of_week = today - timedelta(days=today.weekday()) 
-    return start_of_week.replace(hour=0, minute=0, second=0, microsecond=0).strftime("%Y-%m-%d 00:00:00")
+    today = datetime.now(timezone.utc)
+    start_of_week = today - timedelta(days=today.weekday())
+    return start_of_week.replace(hour=0, minute=0, second=0, microsecond=0).strftime(
+        "%Y-%m-%d 00:00:00"
+    )
+
+
 def get_weekly_leaderboard():
     conn = sqlite3.connect("users_database.db")
     cursor = conn.cursor()
-    
+
     start_of_week = get_start_of_week()
-    cursor.execute('''
+    cursor.execute(
+        """
         SELECT user_id, COUNT(*) as total_games, 
                SUM(CASE WHEN SUBSTR(game_winner, INSTR(game_winner, '-') + 2) = CAST(user_id AS TEXT) THEN 1 ELSE 0 END) as games_won
         FROM game_archive
@@ -260,12 +284,15 @@ def get_weekly_leaderboard():
         GROUP BY user_id
         ORDER BY games_won DESC, total_games DESC
         LIMIT 10
-    ''', (start_of_week,))
-    
+    """,
+        (start_of_week,),
+    )
+
     leaderboard = cursor.fetchall()
     conn.close()
-    
+
     return leaderboard
+
 
 def format_weekly_leaderboard():
     leaderboard = get_weekly_leaderboard()
@@ -273,21 +300,20 @@ def format_weekly_leaderboard():
         return "📅 No games played since Monday!"
 
     leaderboard_text = "🏆 Weekly Leaderboard 🏆\n\n"
-    medals = ["🥇", "🥈", "🥉"]  
+    medals = ["🥇", "🥈", "🥉"]
 
     for rank, (user_id, total_games, games_won) in enumerate(leaderboard, start=1):
         username = get_user_nfgame(user_id)
-        medal = f"{medals[rank - 1]}. "if rank <= 3 else f"{rank}."
+        medal = f"{medals[rank - 1]}. " if rank <= 3 else f"{rank}."
         leaderboard_text += f"{medal} {username} — 🎮 {total_games} | 🏆 {games_won}\n"
 
     return leaderboard_text
+
+
 @dp.message(F.text == "🏅 Leaderboard")
 async def show_weekly_leaderboard(message: types.Message):
     leaderboard_text = format_weekly_leaderboard()
     await message.answer(leaderboard_text)
-
-
-
 
 
 @dp.message(F.text == "📱 cabinet")
@@ -328,9 +354,7 @@ async def my_cabinet(message: types.Message):
         f"👥 referrals: {get_number_of_referrals(message.from_user.id)}\n"
         f"💰 Unity Coins: {unity_coins}\n"
     )
-    await message.answer(
-        user_cabinet_message
-    )
+    await message.answer(user_cabinet_message)
 
 
 @dp.message(F.text == "Prizes 🎁")
@@ -393,9 +417,7 @@ async def process_withdraw_user(message: types.Message):
         f"✨ *1,000 Stars*: {thousand_stars} Unity Coins 💰\n\n"
         "Choose a button to get 👇"
     )
-    await message.answer(
-        withdraw_message, parse_mode="Markdown", reply_markup=keyboard
-    )
+    await message.answer(withdraw_message, parse_mode="Markdown", reply_markup=keyboard)
 
 
 @dp.message(F.text == "🤩 tournaments")

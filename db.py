@@ -1960,3 +1960,33 @@ def get_game_coin() -> int:
         return 5
     finally:
         conn.close()
+
+def can_claim_bonus(user_id: int):
+    conn = sqlite3.connect("users_database.db")
+    cursor = conn.cursor()
+
+    cursor.execute("SELECT last_claim FROM daily_bonus WHERE user_id = ?", (user_id,))
+    row = cursor.fetchone()
+    conn.close()
+
+    if row:
+        last_claim = datetime.strptime(row[0], "%Y-%m-%d")
+        if last_claim.date() == datetime.today().date():
+            return False
+
+    return True 
+
+def update_claim_time(user_id: int):
+    conn = sqlite3.connect("users_database.db")
+    cursor = conn.cursor()
+
+    cursor.execute(
+        """
+        INSERT INTO daily_bonus (user_id, last_claim) VALUES (?, ?)
+        ON CONFLICT(user_id) DO UPDATE SET last_claim = excluded.last_claim
+        """,
+        (user_id, datetime.today().strftime("%Y-%m-%d")),
+    )
+    
+    conn.commit()
+    conn.close()

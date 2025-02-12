@@ -16,6 +16,7 @@ from db import *
 from aiogram.types import Update
 import admin_panel
 import game.tournaments
+
 MAIN_ADMIN_ID = 1155076760
 conn = sqlite3.connect("users_database.db")
 cursor = conn.cursor()
@@ -37,7 +38,7 @@ cursor.execute("PRAGMA table_info(users_database);")
 columns = cursor.fetchall()
 column_names = [column[1] for column in columns]
 
-if 'unity_coin' not in column_names:
+if "unity_coin" not in column_names:
     cursor.execute(
         """
         ALTER TABLE users_database
@@ -163,41 +164,56 @@ cursor.execute(
     )
     """
 )
-cursor.execute('''
+cursor.execute(
+    """
 CREATE TABLE IF NOT EXISTS users_referral (
     user_id INTEGER PRIMARY KEY,
     referred_by INTEGER
 )
-''')
-cursor.execute('''
+"""
+)
+cursor.execute(
+    """
 CREATE TABLE IF NOT EXISTS unity_coin_referral (
     unity_coin_refferal INTEGER
 )
-''')
-cursor.execute('''
+"""
+)
+cursor.execute(
+    """
 CREATE TABLE IF NOT EXISTS game_coin_table (
     game_coin INTEGER DEFAULT 5
 )
-''')
+"""
+)
 cursor.execute("SELECT COUNT(*) FROM unity_coin_referral")
 count = cursor.fetchone()[0]
 if count == 0:
     cursor.execute("INSERT INTO unity_coin_referral (unity_coin_refferal) VALUES (10)")
 
-cursor.execute('''
+cursor.execute(
+    """
 CREATE TABLE IF NOT EXISTS excludeds (
     game_id TEXT NOT NULL,
     user_id INTEGER NOT NULL,
     number_of_excluded INTEGER DEFAULT 0,
     UNIQUE(game_id, user_id)
 );
-''')
+"""
+)
+cursor.execute(
+    """
+        CREATE TABLE IF NOT EXISTS daily_bonus (
+            user_id INTEGER PRIMARY KEY,
+            last_claim TEXT
+        )
+        """
+)
 # cursor.execute("DELETE FROM tournament_rounds_users;")
 # cursor.execute("DELETE FROM tournament_users;")
 # cursor.execute("DELETE FROM tournaments_table;")
 conn.commit()
 conn.close()
-
 
 
 @dp.message(Command("start"))
@@ -319,11 +335,14 @@ async def cmd_start(message: types.Message, state: FSMContext):
             )
             await state.set_state(registration.pref_name)
 
+
 @dp.message(F.text == "start game 🎮")
 async def start_game_handler(message: types.Message, state: FSMContext):
     if is_user_in_tournament_and_active(message.from_user.id):
-            await message.answer(f"You are participating in a tournament and can't use this button until the tournament ends!")
-            return
+        await message.answer(
+            f"You are participating in a tournament and can't use this button until the tournament ends!"
+        )
+        return
     if message.chat.type == "private":
         if has_incomplete_games(message.from_user.id):
             await message.answer(
