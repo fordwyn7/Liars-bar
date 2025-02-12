@@ -203,8 +203,14 @@ async def get_daily_bonus_function(message: types.Message):
     )
 
     await message.answer(
-        "🚀 *Daily Bonus*: \nYou can get bonus coins everday. Click the button to claim your reward! 👇", parse_mode="Markdown",  reply_markup=keyboard
+        "🎁 *Daily Bonus Reward!* 🎁\n\n"
+        "Every day, you can claim a surprise bonus ranging from *1 to 20 Unity Coins*! 💰✨\n"
+        "Tap the button below to receive your reward and boost your balance. 🚀🔥\n\n"
+        "Don't forget to come back tomorrow for another chance to win! 🎉",
+        parse_mode="Markdown",
+        reply_markup=keyboard,
     )
+
 
 # @dp.message(F.text == "🎯 game archive")
 # async def show_game_archive(message: types.Message, state: FSMContext):
