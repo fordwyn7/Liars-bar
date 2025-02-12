@@ -88,7 +88,10 @@ def is_user_registered(user_id):
     try:
         with connect_db() as conn:
             cursor = conn.cursor()
-            cursor.execute("SELECT * FROM users_database WHERE user_id = ? OR nfgame = ?", (user_id, user_id))
+            cursor.execute(
+                "SELECT * FROM users_database WHERE user_id = ? OR nfgame = ?",
+                (user_id, user_id),
+            )
             user = cursor.fetchone()
         return user
     except sqlite3.Error as e:
@@ -143,7 +146,7 @@ def insert_invitation(inviter_id, invitee_id, game_id):
             if cursor.fetchone():
                 print("Invitation already exists. Skipping insertion.")
                 return
-            
+
             cursor.execute(
                 """
                 INSERT INTO invitations (inviter_id, invitee_id, game_id)
@@ -154,7 +157,6 @@ def insert_invitation(inviter_id, invitee_id, game_id):
             conn.commit()
     except sqlite3.Error as e:
         print(f"Error inserting invitation: {e}")
-
 
 
 def get_player_count(game_id):
@@ -1025,8 +1027,6 @@ def get_all_user_ids():
         conn.close()
     return user_ids
 
-
-
     return stats_message
 
 
@@ -1111,7 +1111,7 @@ def get_upcoming_tournaments():
                 "name": row[1],
                 "prize": row[2],
                 "start_time": row[3],
-                "end_time": row[4]
+                "end_time": row[4],
             }
             for row in cursor.fetchall()
         ]
@@ -1145,8 +1145,10 @@ def get_tournament_id_by_user(user_id: int):
     finally:
         conn.close()
 
+
 import sqlite3
 from datetime import datetime, timedelta
+
 
 def set_tournament_end_time(tournament_id):
     conn = sqlite3.connect("users_database.db")
@@ -1167,6 +1169,7 @@ def set_tournament_end_time(tournament_id):
         print(f"❌ Database error: {e}")
     finally:
         conn.close()
+
 
 def get_tournament_archive():
     conn = sqlite3.connect("users_database.db")
@@ -1256,12 +1259,14 @@ def get_current_players(tournament_id: str) -> int:
     finally:
         conn.close()
 
+
 import sqlite3
+
 
 def get_tournament_users_list(tournament_id: str) -> list:
     conn = sqlite3.connect("users_database.db")
     cursor = conn.cursor()
-    
+
     try:
         cursor.execute(
             """
@@ -1273,11 +1278,11 @@ def get_tournament_users_list(tournament_id: str) -> list:
         )
         users = [row[0] for row in cursor.fetchall()]
         return users
-    
+
     except sqlite3.Error as e:
         print(f"❌ Database error: {e}")
         return []
-    
+
     finally:
         conn.close()
 
@@ -1612,9 +1617,7 @@ def delete_tournament_from_tables(tournament_id: str):
         conn.close()
 
 
-async def update_tournament_winner_if_round_finished(
-    tournament_id: str, winner: str
-):
+async def update_tournament_winner_if_round_finished(tournament_id: str, winner: str):
     conn = sqlite3.connect("users_database.db")
     cursor = conn.cursor()
     try:
@@ -1683,14 +1686,14 @@ def create_groups(participants):
             groups.append(participants[i : i + 4])
     elif nmb == 1:
         for i in range(0, nmd - 1):
-            groups.append(participants[: 4])
-            participants = participants[4 :]
+            groups.append(participants[:4])
+            participants = participants[4:]
         groups.append(participants[:2])
         groups.append(participants[2:])
     else:
         for i in range(0, nmd):
-            groups.append(participants[: 4])
-            participants = participants[4 :]
+            groups.append(participants[:4])
+            participants = participants[4:]
         if participants:
             groups.append(participants)
     return groups
@@ -1769,18 +1772,21 @@ def get_number_of_referrals(user_id):
 def generate_referral_link(user_id):
     return f"https://t.me/liarsbar_game_robot?start={user_id}"
 
+
 def get_top_referrals():
     conn = sqlite3.connect("users_database.db")
     cursor = conn.cursor()
     try:
-        cursor.execute('''
+        cursor.execute(
+            """
             SELECT referred_by, COUNT(*) AS referral_count
             FROM users_referral
             WHERE referred_by IS NOT NULL
             GROUP BY referred_by
             ORDER BY referral_count DESC
             LIMIT 10
-        ''')
+        """
+        )
         top_referrals = cursor.fetchall()
         st = f""
         if not top_referrals:
@@ -1795,19 +1801,26 @@ def get_top_referrals():
     finally:
         conn.close()
 
+
 def update_unity_coin_referral(new_value):
     conn = sqlite3.connect("users_database.db")
     cursor = conn.cursor()
     try:
-        cursor.execute("UPDATE unity_coin_referral SET unity_coin_refferal = ?", (new_value,))
+        cursor.execute(
+            "UPDATE unity_coin_referral SET unity_coin_refferal = ?", (new_value,)
+        )
         if cursor.rowcount == 0:
-            cursor.execute("INSERT INTO unity_coin_referral (unity_coin_refferal) VALUES (?)", (new_value,))
+            cursor.execute(
+                "INSERT INTO unity_coin_referral (unity_coin_refferal) VALUES (?)",
+                (new_value,),
+            )
         conn.commit()
     except sqlite3.Error as e:
         print(f"❌ Database error: {e}")
-    
+
     finally:
         conn.close()
+
 
 def get_unity_coin_referral():
     conn = sqlite3.connect("users_database.db")
@@ -1818,12 +1831,12 @@ def get_unity_coin_referral():
         if result:
             return result[0]
         else:
-            return None 
-    
+            return None
+
     except sqlite3.Error as e:
         print(f"❌ Database error: {e}")
         return None
-    
+
     finally:
         conn.close()
 
@@ -1832,32 +1845,41 @@ def set_tournament_status(tournament_id: str, is_begin: bool):
     conn = sqlite3.connect("users_database.db")
     cursor = conn.cursor()
     try:
-        cursor.execute('''
+        cursor.execute(
+            """
             CREATE TABLE IF NOT EXISTS tournament_begun (
                 tournament_id TEXT PRIMARY KEY,
                 is_begun INTEGER
             )
-        ''')
-        
-        cursor.execute('''
+        """
+        )
+
+        cursor.execute(
+            """
             INSERT INTO tournament_begun (tournament_id, is_begun)
             VALUES (?, ?)
             ON CONFLICT(tournament_id) DO UPDATE SET is_begun = excluded.is_begun
-        ''', (tournament_id, int(is_begin))) 
-        
+        """,
+            (tournament_id, int(is_begin)),
+        )
+
         conn.commit()
     except sqlite3.Error as e:
         print(f"❌ Database error: {e}")
     finally:
         conn.close()
 
+
 def get_tournament_status(tournament_id) -> bool:
     conn = sqlite3.connect("users_database.db")
     cursor = conn.cursor()
     try:
-        cursor.execute('''
+        cursor.execute(
+            """
             SELECT CAST(is_begun AS INTEGER) FROM tournament_begun WHERE tournament_id = ?
-        ''', (tournament_id,))
+        """,
+            (tournament_id,),
+        )
         result = cursor.fetchone()
         return bool(result[0]) if result else False
     except sqlite3.Error as e:
@@ -1865,6 +1887,7 @@ def get_tournament_status(tournament_id) -> bool:
         return False
     finally:
         conn.close()
+
 
 def remove_player(player_id):
     conn = sqlite3.connect("users_database.db")
@@ -1876,18 +1899,21 @@ def remove_player(player_id):
         print(f"❌ Database error check 4: {e}")
     finally:
         conn.close()
-        
+
 
 def reset_exclusion_count(game_id: str, user_id: int):
     conn = sqlite3.connect("users_database.db")
     cursor = conn.cursor()
     try:
-        cursor.execute('''
+        cursor.execute(
+            """
             INSERT INTO excludeds (game_id, user_id, number_of_excluded)
             VALUES (?, ?, 0)
             ON CONFLICT(game_id, user_id) DO UPDATE SET number_of_excluded = 0
-        ''', (game_id, user_id))
-        
+        """,
+            (game_id, user_id),
+        )
+
         conn.commit()
     except sqlite3.Error as e:
         print(f"❌ Database error check 3: {e}")
@@ -1895,18 +1921,21 @@ def reset_exclusion_count(game_id: str, user_id: int):
         conn.close()
 
 
-
 import sqlite3
+
 
 def increase_exclusion_count(game_id: str, user_id: int):
     conn = sqlite3.connect("users_database.db")
     cursor = conn.cursor()
     try:
-        cursor.execute('''
+        cursor.execute(
+            """
             UPDATE excludeds
             SET number_of_excluded = number_of_excluded + 1
             WHERE game_id = ? AND user_id = ?
-        ''', (game_id, user_id))
+        """,
+            (game_id, user_id),
+        )
 
         conn.commit()
     except sqlite3.Error as e:
@@ -1914,21 +1943,29 @@ def increase_exclusion_count(game_id: str, user_id: int):
     finally:
         conn.close()
 
+
 def is_any_user_excluded(game_id: str) -> bool:
     conn = sqlite3.connect("users_database.db")
     cursor = conn.cursor()
     try:
-        cursor.execute('''
+        cursor.execute(
+            """
             SELECT COUNT(*) FROM excludeds
             WHERE game_id = ? AND number_of_excluded > 0
-        ''', (game_id,))
+        """,
+            (game_id,),
+        )
         result = cursor.fetchone()
         return result[0] > 0
     except sqlite3.Error as e:
-        print(f"❌ Database error check 1: {e}", )
+        print(
+            f"❌ Database error check 1: {e}",
+        )
         return False
     finally:
         conn.close()
+
+
 def set_game_coin(new_value):
     conn = sqlite3.connect("users_database.db")
     cursor = conn.cursor()
@@ -1937,20 +1974,23 @@ def set_game_coin(new_value):
         count = cursor.fetchone()[0]
 
         if count == 0:
-            cursor.execute("INSERT INTO game_coin_table (game_coin) VALUES (?)", (new_value,))
+            cursor.execute(
+                "INSERT INTO game_coin_table (game_coin) VALUES (?)", (new_value,)
+            )
         else:
             cursor.execute("UPDATE game_coin_table SET game_coin = ?", (new_value,))
-        
+
         conn.commit()
     except sqlite3.Error as e:
         print(f"❌ Database error: {e}")
     finally:
         conn.close()
 
+
 def get_game_coin() -> int:
     conn = sqlite3.connect("users_database.db")
     cursor = conn.cursor()
-    
+
     try:
         cursor.execute("SELECT game_coin FROM game_coin_table LIMIT 1")
         result = cursor.fetchone()
@@ -1961,6 +2001,12 @@ def get_game_coin() -> int:
     finally:
         conn.close()
 
+
+def get_utc_plus_5_date():
+    utc_plus_5 = datetime.now(timezone.utc) + timedelta(hours=5)
+    return utc_plus_5.strftime("%Y-%m-%d")
+
+
 def can_claim_bonus(user_id: int):
     conn = sqlite3.connect("users_database.db")
     cursor = conn.cursor()
@@ -1970,11 +2016,14 @@ def can_claim_bonus(user_id: int):
     conn.close()
 
     if row:
-        last_claim = datetime.strptime(row[0], "%Y-%m-%d")
-        if last_claim.date() == datetime.today().date():
+        last_claim = datetime.strptime(row[0], "%Y-%m-%d").date()
+        current_date = (datetime.now(timezone.utc) + timedelta(hours=5)).date()
+
+        if last_claim == current_date:
             return False
 
-    return True 
+    return True
+
 
 def update_claim_time(user_id: int):
     conn = sqlite3.connect("users_database.db")
@@ -1985,8 +2034,8 @@ def update_claim_time(user_id: int):
         INSERT INTO daily_bonus (user_id, last_claim) VALUES (?, ?)
         ON CONFLICT(user_id) DO UPDATE SET last_claim = excluded.last_claim
         """,
-        (user_id, datetime.today().strftime("%Y-%m-%d")),
+        (user_id, get_utc_plus_5_date()),
     )
-    
+
     conn.commit()
     conn.close()
