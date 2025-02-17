@@ -4,9 +4,6 @@ from aiogram.fsm.context import FSMContext
 from states.state import registration, registration_game
 from keyboards.keyboard import get_main_menu
 from keyboards.inline import (
-    cancel_g,
-    ban_user,
-    generate_exclude_keyboard,
     start_stop_game,
 )
 from db import (
@@ -23,18 +20,25 @@ from db import (
 )
 import sqlite3
 
+
 def generate_referral_link(user_id):
     return f"https://t.me/liarsbar_game_robot?start={user_id}"
+
+
 def add_user(user_id, referred_by):
     conn = sqlite3.connect("users_database.db")
     cursor = conn.cursor()
-    cursor.execute("INSERT OR IGNORE INTO users_referral (user_id, referred_by) VALUES (?, ?)", (user_id, referred_by))
+    cursor.execute(
+        "INSERT OR IGNORE INTO users_referral (user_id, referred_by) VALUES (?, ?)",
+        (user_id, referred_by),
+    )
     conn.commit()
+
 
 @dp.message(registration.pref_name)
 async def get_name_fem(message: types.Message, state: FSMContext):
     user_data = await state.get_data()
-    payload = user_data.get("payload",  "")
+    payload = user_data.get("payload", "")
     preferred_name = message.text.strip()
     if "/start" in message.text:
         await message.answer("Please enter your username first.")
@@ -42,12 +46,15 @@ async def get_name_fem(message: types.Message, state: FSMContext):
     h = is_name_valid(preferred_name)
     if not h:
         await message.answer(
-            "Your data is incorrect! Please enter your username in a given format")
+            "Your data is incorrect! Please enter your username in a given format"
+        )
     elif h == 2:
-        await message.answer("There is already user with this username in the bot. Please enter another username.")
+        await message.answer(
+            "There is already user with this username in the bot. Please enter another username."
+        )
     else:
         user = message.from_user
-        
+
         register_user(
             user.id, user.username, user.first_name, user.last_name, preferred_name
         )
@@ -68,9 +75,12 @@ async def get_name_fem(message: types.Message, state: FSMContext):
                 )
                 conn.commit()
                 conn.close()
-                await bot.send_message(chat_id=referred_by, text=f"🎉 {preferred_name} has successfully registered via your referral link, and you have received +{u_coin} Unity Coins! 💰")
+                await bot.send_message(
+                    chat_id=referred_by,
+                    text=f"🎉 {preferred_name} has successfully registered via your referral link, and you have received +{u_coin} Unity Coins! 💰",
+                )
             except:
-                pass 
+                pass
         await state.clear()
 
 
@@ -111,9 +121,7 @@ async def get_name(message: types.Message, state: FSMContext):
                         reply_markup=get_main_menu(message.from_user.id),
                     )
                 else:
-                    await message.answer(
-                        "You are already in this game! 😇", reply_markup=cancel_g
-                    )
+                    await message.answer("You are already in this game! 😇")
                 return
             if get_player_count(game_id) == 0:
                 await message.answer(
@@ -137,8 +145,7 @@ async def get_name(message: types.Message, state: FSMContext):
                 reply_markup=get_main_menu(message.from_user.id),
             )
             await message.answer(
-                f"You have successfully joined the game! 🤩\nCurrent number of players: {player_count}\nWaiting for everyone to be ready...",
-                reply_markup=cancel_g,
+                f"You have successfully joined the game! 🤩\nCurrent number of players: {player_count}\nWaiting for everyone to be ready..."
             )
 
             await bot.send_message(
