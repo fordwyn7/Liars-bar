@@ -1,13 +1,16 @@
-from aiogram.types import Update
+from aiogram.types import Update, Message, ChatMember
 from aiogram.dispatcher.middlewares.base import BaseMiddleware
+from aiogram.exceptions import TelegramBadRequest   
 from db import is_user_registered
 from functools import wraps
+from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
+from typing import Callable, Dict, Any
 from aiogram import types
-
+from aiogram.types import CallbackQuery
+from aiogram import Bot, Dispatcher, F
 import sqlite3
 
 from aiogram.fsm.context import FSMContext
-
 class RegistrationMiddleware(BaseMiddleware):
     async def __call__(self, handler, event: Update, data: dict):
         user_id = None

@@ -1111,9 +1111,9 @@ async def get_username_for_withdraw(message: types.Message, state: FSMContext):
     cost = state_data["cost"]
     confirmation_message = (
         f"💬 Please confirm your withdrawal details:\n\n"
-        f"🎁 *Item Name*: {reward_name}\n"
-        f"👤 *To Who*: {username}\n"
-        f"💰 *Cost*: {cost} Unity Coins\n\n"
+        f"🎁 Item Name: {reward_name}\n"
+        f"👤 To Who: {username}\n"
+        f"💰 Cost: {cost} Unity Coins\n\n"
         "Do you confirm?"
     )
     await state.clear()
@@ -1129,7 +1129,7 @@ async def get_username_for_withdraw(message: types.Message, state: FSMContext):
     )
 
     await message.answer(
-        confirmation_message, parse_mode="Markdown", reply_markup=keyboard
+        confirmation_message, reply_markup=keyboard
     )
     await state.set_data({"reward_name": reward_name, "cost": cost})
     await state.update_data(username=username)
@@ -1159,12 +1159,12 @@ async def confirm_withdraw_queer(
     cost = state_data.get("cost")
     admin_channel_id = -1002261491678
     admin_message = (
-        f"🛒 *New Withdrawal Request*\n\n"
-        f"🎁 *Item*: {reward_name}\n"
-        f"👤 *To Who*: {username}\n"
-        f"💰 *Cost*: {cost} Unity Coins\n"
-        f"🔢 *User ID*: {user_id}\n"
-        f"💸 *User's balance: {balance} Unity coins 💰 *"
+        f"🛒 New Withdrawal Request\n\n"
+        f"🎁 Item: {reward_name}\n"
+        f"👤 To Who: {username}\n"
+        f"💰 Cost: {cost} Unity Coins\n"
+        f"🔢 User ID: {user_id}\n"
+        f"💸 User's balance: {balance} Unity coins 💰 *"
     )
     conn = sqlite3.connect("users_database.db")
     cursor = conn.cursor()
@@ -1197,7 +1197,6 @@ async def confirm_withdraw_queer(
                 ],
             ]
         ),
-        parse_mode="Markdown",
     )
 
     await callback_query.message.answer(

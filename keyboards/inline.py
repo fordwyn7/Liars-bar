@@ -620,3 +620,4 @@ async def claim_bonus(callback: types.CallbackQuery):
     conn.commit()
     conn.close()
     await callback.answer(f"🎉 You received {coins} coins! Come back tomorrow for more!", show_alert=True)
+ 
