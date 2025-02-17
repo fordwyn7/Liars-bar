@@ -202,18 +202,24 @@ async def admins_button(message: types.Message):
 async def add_admin_command(message: types.Message, state: FSMContext):
     await message.answer(
         f"Enter the ID of the user that you want to make admin",
-        reply_markup=back_button,
+        reply_markup=back_to_admin_panel,
     )
     await state.set_state(Adminid.admin_id)
 
 
 @dp.message(Adminid.admin_id)
 async def add_admin_state(message: types.Message, state: FSMContext):
+    if message.text == "back to admin panel 🔙":
+        await message.answer(
+            "You are in admin panel 👇", reply_markup=admin_panel_button
+        )
+        await state.clear()
+        return
     i_d = message.text.strip()
     if not i_d.isdigit():
         await message.answer(
             f"❌ You entered wrong information. Please try again.",
-            reply_markup=back_button,
+            reply_markup=back_to_admin_panel,
         )
     elif not is_user_registered(i_d):
         await message.answer(
@@ -238,7 +244,7 @@ async def add_admin_state(message: types.Message, state: FSMContext):
         except ValueError:
             await message.answer(
                 "❌ You entered wrong information. Please try again.",
-                reply_markup=back_button,
+                reply_markup=back_to_admin_panel,
             )
         await state.clear()
 
@@ -311,13 +317,19 @@ async def choose_send_option(message: types.Message, state: FSMContext):
 async def send_to_all_anonymously(message: types.Message, state: FSMContext):
     await message.answer(
         "Send me the message or post to forward anonymously to all users 📝",
-        reply_markup=back_button,
+        reply_markup=back_to_admin_panel,
     )
     await state.set_state(msgtoall.sendallanonym)
 
 
 @dp.message(msgtoall.sendallanonym)
 async def forward_to_all_users(message: types.Message, state: FSMContext):
+    if message.text == "back to admin panel 🔙":
+        await message.answer(
+            "You are in admin panel 👇", reply_markup=admin_panel_button
+        )
+        await state.clear()
+        return
     users = get_all_user_ids()
     from_chat_id = message.chat.id
     message_id = message.message_id
@@ -356,13 +368,19 @@ async def forward_to_all_users(message: types.Message, state: FSMContext):
 async def send_to_one_anonymously(message: types.Message, state: FSMContext):
     await message.answer(
         "Enter the ID of the user you want to send the message to 📝",
-        reply_markup=back_button,
+        reply_markup=back_to_admin_panel,
     )
     await state.set_state(msgtoindividual.userid)
 
 
 @dp.message(msgtoindividual.userid)
 async def capture_user_id(message: types.Message, state: FSMContext):
+    if message.text == "back to admin panel 🔙":
+        await message.answer(
+            "You are in admin panel 👇", reply_markup=admin_panel_button
+        )
+        await state.clear()
+        return
     user_id = message.text.strip()
     if not user_id.isdigit():
         await message.answer("❌ You entered an invalid ID. Please try again.")
@@ -475,7 +493,7 @@ async def paginate_users(callback_query: types.CallbackQuery):
 async def info_users(message: types.Message, state: FSMContext):
     await message.answer(
         f"Enter the ID or username of the user that you want to get information",
-        reply_markup=back_button,
+        reply_markup=back_to_admin_panel,
     )
     await state.set_state(UserInformations.userid_state)
 
@@ -483,6 +501,12 @@ async def info_users(message: types.Message, state: FSMContext):
 @dp.message(UserInformations.userid_state)
 @admin_required()
 async def state_info_users(message: types.Message, state: FSMContext):
+    if message.text == "back to admin panel 🔙":
+        await message.answer(
+            "You are in admin panel 👇", reply_markup=admin_panel_button
+        )
+        await state.clear()
+        return
     if not message.text.isdigit():
         user_id = get_id_by_nfgame(message.text)
         if not user_id:
@@ -519,7 +543,12 @@ async def admin_game_archive(message: types.Message, state: FSMContext):
 
 @dp.message(awaiting_user_id.await_id)
 async def get_user_archive_by_id(message: types.Message, state: FSMContext):
-
+    if message.text == "back to admin panel 🔙":
+        await message.answer(
+            "You are in admin panel 👇", reply_markup=admin_panel_button
+        )
+        await state.clear()
+        return
     if not message.text.isdigit():
         user_id = get_id_by_nfgame(message.text)
         if not user_id:
@@ -537,13 +566,13 @@ async def get_user_archive_by_id(message: types.Message, state: FSMContext):
         await state.clear()
         return
 
-    response = f"📜 *Game Archive for User {user_id}:*\n\n"
+    response = f"📜 Game Archive for User {user_id}:*n\n"
     for idx, (_, start_time, _, _) in enumerate(games, start=1):
         response += f"{idx}. game — {start_time.split(' ')[0]} 📅\n"
 
     response += "\n📋 *Send the game number to view its details.*"
     await message.answer(
-        response, parse_mode="Markdown", reply_markup=back_to_admin_panel
+        response, reply_markup=back_to_admin_panel
     )
     await state.update_data(selected_user_id=user_id)
     await state.set_state(awaiting_admin_game_number.selected_user)
@@ -551,6 +580,12 @@ async def get_user_archive_by_id(message: types.Message, state: FSMContext):
 
 @dp.message(awaiting_admin_game_number.selected_user)
 async def send_selected_user_game_statistics(message: types.Message, state: FSMContext):
+    if message.text == "back to admin panel 🔙":
+        await message.answer(
+            "You are in admin panel 👇", reply_markup=admin_panel_button
+        )
+        await state.clear()
+        return
     data = await state.get_data()
     user_id = data.get("selected_user_id")
     games = get_user_game_archive(user_id)
@@ -1355,6 +1390,12 @@ async def change_game_coin_t(message: types.Message, state: FSMContext):
 
 @dp.message(waitforcoinamount.amount)
 async def change_game_coin_state(message: types.Message, state: FSMContext):
+    if message.text == "back to admin panel 🔙":
+        await message.answer(
+            "You are in admin panel 👇", reply_markup=admin_panel_button
+        )
+        await state.clear()
+        return
     new_amount = message.text
     if not new_amount.isdigit():
         await message.answer(
