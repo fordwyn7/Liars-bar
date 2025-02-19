@@ -221,18 +221,20 @@ cursor.execute(
 # cursor.execute("DELETE FROM tournament_rounds_users;")
 # cursor.execute("DELETE FROM tournament_users;")
 # cursor.execute("DELETE FROM tournaments_table;")
-cursor.execute("SELECT user_id FROM users_database")
-users = cursor.fetchall()
 
-for user in users:
-    cursor.execute(
-        """
-        INSERT INTO user_languages (user_id, language) 
-        VALUES (?, ?) 
-        ON CONFLICT(user_id) DO UPDATE SET language = excluded.language
-        """,
-        (user[0], "en"),
-    )
+
+# cursor.execute("SELECT user_id FROM users_database")
+# users = cursor.fetchall()
+
+# for user in users:
+#     cursor.execute(
+#         """
+#         INSERT INTO user_languages (user_id, language) 
+#         VALUES (?, ?) 
+#         ON CONFLICT(user_id) DO UPDATE SET language = excluded.language
+#         """,
+#         (user[0], "en"),
+#     )
 
 conn.commit()
 conn.close()

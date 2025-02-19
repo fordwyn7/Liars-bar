@@ -10,7 +10,7 @@ from states.state import NewGameState, MessagetoAdmin, awaiting_game_number
 from db import *
 
 
-@dp.message(F.text.id_(["settings ⚙️", "sozlamalar ⚙️", "настройки ⚙️"]))
+@dp.message(F.text.in_(["settings ⚙️", "sozlamalar ⚙️", "настройки ⚙️"]))
 async def settingxcyvus(message: types.Message):
     ln = get_user_language(message.from_user.id)
     if ln == "uz":
@@ -550,7 +550,7 @@ async def process_withdraw_user(message: types.Message):
 @dp.message(F.text.in_(["🤩 tournaments", "🤩 turnirlar", "🤩 турниры"]))
 async def show_tournaments_menu(message: types.Message):
     get_o = get_ongoing_tournaments()
-    ln = get_user_language()
+    ln = get_user_language(message.from_user.id)
     if ln == "uz":
         ong = "⚡ Hozirda davom etayotgan turnir mavjud! 🎮\nAgar ro'yhatdan o'tish tugamagan bo'lsa siz hali ham qo'shilishingiz mumkin. 🔥"
         upc = "Hech qanday yangi turnir rejalashtirilmagan 🏆\nAmmo siz pastdagi tugmani bosish orqali o'tmishdagi turnirlar natijalarini ko'rishingiz mumkin. 📜"
