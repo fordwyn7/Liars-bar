@@ -31,10 +31,6 @@ class RegistrationMiddleware(BaseMiddleware):
             if not registered and current_state != "registration:pref_name" and current_state != "registration_game:pref1_name":
                 if event.message:
                     await event.message.answer("Please register first by sending /start.")
-                elif event.callback_query:
-                    await event.callback_query.answer(
-                        "Please register first by sending /start.", show_alert=True
-                    )
                 return
         return await handler(event, data)
 def get_admins():
