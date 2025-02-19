@@ -532,18 +532,21 @@ async def process_withdraw_user(message: types.Message):
             "💰 *Withdrawal options*\n"
         )
         msg2 = "Choose a button to get 👇"
-    withdraw_message = (
-        ms1,
-        f"🚀 *Telegram Premium*\n"
-        f"❄️ *3 Months*: {three_month_premium} Unity Coins 💰\n"
-        f"❄️ *6 Months*: {six_month_premium} Unity Coins 💰\n"
-        f"❄️ *12 Months*: {twelve_month_premium} Unity Coins 💰\n\n"
-        f"⭐️ *Telegram Stars* \n"
-        f"✨ *100 Stars*: {hundrad_stars} Unity Coins 💰\n"
-        f"✨ *500 Stars*: {five_hundrad_stars} Unity Coins 💰\n"
-        f"✨ *1,000 Stars*: {thousand_stars} Unity Coins 💰\n\n",
-        msg2,
+    withdraw_message = "\n".join(
+        [
+            ms1,
+            f"🚀 *Telegram Premium*\n"
+            f"❄️ *3 Months*: {three_month_premium} Unity Coins 💰\n"
+            f"❄️ *6 Months*: {six_month_premium} Unity Coins 💰\n"
+            f"❄️ *12 Months*: {twelve_month_premium} Unity Coins 💰\n\n"
+            f"⭐️ *Telegram Stars* \n"
+            f"✨ *100 Stars*: {hundrad_stars} Unity Coins 💰\n"
+            f"✨ *500 Stars*: {five_hundrad_stars} Unity Coins 💰\n"
+            f"✨ *1,000 Stars*: {thousand_stars} Unity Coins 💰\n\n",
+            msg2,
+        ]
     )
+
     await message.answer(withdraw_message, parse_mode="Markdown", reply_markup=keyboard)
 
 
@@ -628,7 +631,9 @@ async def tournaments_users_button(message: types.Message):
     await message.answer(ref)
 
 
-@dp.message(F.text.in_(["change Language 🇺🇸", "изменить язык 🇷🇺", "Tilni o'zgartirish 🇺🇿"]))
+@dp.message(
+    F.text.in_(["change Language 🇺🇸", "изменить язык 🇷🇺", "Tilni o'zgartirish 🇺🇿"])
+)
 async def change_langguage(message: types.Message):
     ln = get_user_language(message.from_user.id)
     if ln == "uz":
@@ -638,6 +643,8 @@ async def change_langguage(message: types.Message):
     else:
         ms = "🌍 Please select your language: "
     await message.answer(ms, reply_markup=select_language_button_2)
+
+
 # @dp.message(F.text == "🎯 game archive")
 # async def show_game_archive(message: types.Message, state: FSMContext):
 #     user_id = message.from_user.id
