@@ -88,12 +88,19 @@ async def changeee(message: types.Message, state: FSMContext):
     await state.clear()
     ln = get_user_language(message.from_user.id)
     if ln == "ru":
-        ms = f"Ваше текущее имя пользователя 👉 {get_user_nfgame(message.from_user.id)}\nЕсли вы хотите изменить его, введите новое имя пользователя:"
+        ms = f"Ваше текущее имя пользователя 👉 {get_user_nfgame(message.from_user.id)}\n"
+        ms1 = "Если вы хотите изменить его, введите новое имя пользователя:"
+        kb = cancel_button_ru
     elif ln == "uz":
-        ms = f"Sizning hozirgi foydalanuvchi nomingiz 👉 {get_user_nfgame(message.from_user.id)}\nAgar uni o'zgartirishni hohlasangiz, shu yerga yangi usaname kiriting: "
+        ms = f"Sizning hozirgi foydalanuvchi nomingiz 👉 {get_user_nfgame(message.from_user.id)}\n"
+        ms1 = "Agar uni o'zgartirishni hohlasangiz, shu yerga yangi usaname kiriting:"
+        kb = cancel_button_uz
     else:
-        ms = f"Your current username is 👉 {get_user_nfgame(message.from_user.id)}\nIf you'd like to change it, please type your new username:\n"
-    await message.answer(ms, reply_markup=get_username_button(ln))
+        ms = f"Your current username is 👉 {get_user_nfgame(message.from_user.id)}\n"
+        ms1 = "If you'd like to change it, please type your new username:\n"
+        kb = cancel_button
+    await message.answer(ms, reply_markup=kb)
+    await message.answer(ms1, reply_markup=get_username_button(ln))
     await state.set_state(NewGameState.waiting_for_nfgame)
 
 
