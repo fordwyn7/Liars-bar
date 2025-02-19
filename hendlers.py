@@ -325,21 +325,21 @@ async def get_daily_bonus_function(message: types.Message):
         msg = (
             "🎁 *Kunlik Bonus!* 🎁\n\n"
             "Bonus miqdori 1 dan 20 gacha tasodifiy Unity Coin! 💰 \nBonusni olish uchun pastdagi tugmani bosing. 🚀\n\n"
-            "Har kuni bonuslarni olishni unutmang! 😌",
+            "Har kuni bonuslarni olishni unutmang! 😌"
         )
     elif ln == "ru":
         bn = "Получите бонус 🎁"
         msg = (
             "🎁 *Ежедневный бонус!* 🎁\n\n"
             "Бонусная сумма от 1 до 20 случайных Unity Coin! 💰 \nНажмите кнопку ниже, чтобы получить бонус. 🚀\n\n"
-            "Не забывайте получать бонусы каждый день! 😌",
+            "Не забывайте получать бонусы каждый день! 😌"
         )
     else:
         bn = "Claim Bonus 🎁"
         msg = (
             "🎁 *Daily Bonus!* 🎁\n\n"
             "Claim your reward of *1 to 20 Unity Coins*! 💰 \nTap the button below and get your reward. 🚀\n\n"
-            "Come back tomorrow for more! 🎉",
+            "Come back tomorrow for more! 🎉"
         )
     keyboard = InlineKeyboardMarkup(
         inline_keyboard=[
