@@ -9,7 +9,7 @@ from aiogram.filters import Command
 from aiogram.fsm.context import FSMContext
 from aiogram.utils.deep_linking import create_start_link
 from config import *
-from keyboards.keyboard import get_main_menu, count_players
+from keyboards.keyboard import *
 from states.state import registration, registration_game, new_game
 from keyboards.inline import *
 from db import *
@@ -476,20 +476,22 @@ async def start_game_handler(message: types.Message, state: FSMContext):
         ms = "У вас есть незаконченная игра. Пожалуйста, сначала завершите это, прежде чем создавать новое."
         ms1 = "Выберите количество игроков: ⬇️"
         kb = stop_incomplete_games_ru
+        kb1 = count_players_ru
     elif ln == "uz":
         ms = "Sizda hali tugallanmagan o'yin bor. Iltimos, yangi hosil qilishdan oldin avval shuni tugating."
         ms1 = "O'yinchilar sonini kiriting: ⬇️"
         kb = stop_incomplete_games_uz
+        kb1 = count_players_uz
     else:
         ms = f"You have incomplete games. Please finish or stop them before creating a new one."
         ms1 = "Choose the number of players: ⬇️"
         kb = stop_incomplete_games
+        kb1 = count_players
     if message.chat.type == "private":
         if has_incomplete_games(message.from_user.id):
-
             await message.answer(ms, reply_markup=kb)
             return
-        await message.answer(ms1, reply_markup=count_players)
+        await message.answer(ms1, reply_markup=kb1)
         await state.set_state(new_game.number_of_players)
     else:
         await message.answer("Please use this option in a private chat.")
@@ -523,13 +525,14 @@ async def start_game_handler(message: types.Message, state: FSMContext):
 async def get_name(message: types.Message, state: FSMContext):
     ln = get_user_language(message.from_user.id)
     if ln == "ru":
-        ms = (
-            "Вы ввели неверную информацию! Пожалуйста, выберите один из этих номеров: ⬇️"
-        )
+        ms = "Вы ввели неверную информацию! Пожалуйста, выберите один из этих номеров: ⬇️"
+        kb = count_players_ru
     elif ln == "uz":
         ms = "Siz noto'g'ri ma'lumot kiritdingiz! Iltimos, quyidagi raqamlardan birini tanlang: ⬇️"
+        kb = count_players_uz
     else:
         ms = "You have entered wrong information! Please choose one of these numbers: ⬇️"
+        kb = count_players
     cnt = 0
     if message.text == "2️⃣":
         cnt = 2
@@ -540,7 +543,7 @@ async def get_name(message: types.Message, state: FSMContext):
     else:
         await message.answer(
             ms,
-            reply_markup=count_players,
+            reply_markup=kb,
         )
         await state.set_state(new_game.number_of_players)
         return
