@@ -760,53 +760,52 @@ async def handle_continue_or_liar(callback_query: types.CallbackQuery):
                             else:
                                 ms = f"The game in which you died has ended ⭐️\nWinner: {get_user_nfgame(winner)} (ID: {winner}) 🏆"
                             await bot.send_message(chat_id=users, text=ms)
-                tournament_id = get_tournament_id_by_user(winner)
-                if tournament_id and is_user_in_tournament(tournament_id, winner):
-                    cur_round = int(get_current_round_number(tournament_id))
-                    await save_round_winner(tournament_id, str(winner), str(winner))
-                    nopir = int(get_number_of_groups_in_round(tournament_id, cur_round))
-                    if (
-                        int(get_number_of_winners(tournament_id, cur_round)) == nopir
-                        and nopir != 1
-                    ):
-                        await notify_round_results(tournament_id, cur_round)
-                        await asyncio.sleep(5)
-                        await start_next_round(tournament_id, cur_round + 1)
-                    elif (
-                        nopir == 1
-                        and int(get_number_of_winners(tournament_id, cur_round)) == 1
-                    ):
-                        await update_tournament_winner_if_round_finished(
-                            tournament_id, winner
-                        )
-                else:
-                    if not is_any_user_excluded(game_id):
-                        coin = get_game_coin()
-                        conn = sqlite3.connect("users_database.db")
-                        cursor = conn.cursor()
-                        cursor.execute(
-                            "UPDATE users_database SET unity_coin = unity_coin + ? WHERE user_id = ? or nfgame = ?",
-                            (coin, winner, winner),
-                        )
-                        conn.commit()
-                        conn.close()
-                        ln = get_user_language(winner)
-                        if ln == "uz":
-                            ms = f"Oʻyinda gʻalaba qozonganingiz uchun sizga {coin} Unity Coin mukofot berildi 🎁"
-                        elif ln == "ru":
-                            ms = f"Вы получили {coin} Unity coin за победу в игре 🎁"
-                        else:
-                            ms = (
-                                f"You got {coin} Unity Coins for winning in the game 🎁"
+                    tournament_id = get_tournament_id_by_user(winner)
+                    if tournament_id and is_user_in_tournament(tournament_id, winner):
+                        cur_round = int(get_current_round_number(tournament_id))
+                        await save_round_winner(tournament_id, str(winner), str(winner))
+                        nopir = int(get_number_of_groups_in_round(tournament_id, cur_round))
+                        if (
+                            int(get_number_of_winners(tournament_id, cur_round)) == nopir
+                            and nopir != 1
+                        ):
+                            await notify_round_results(tournament_id, cur_round)
+                            await asyncio.sleep(5)
+                            await start_next_round(tournament_id, cur_round + 1)
+                        elif (
+                            nopir == 1
+                            and int(get_number_of_winners(tournament_id, cur_round)) == 1
+                        ):
+                            await update_tournament_winner_if_round_finished(
+                                tournament_id, winner
                             )
-                        await bot.send_message(
-                            chat_id=winner,
-                            text=ms,
-                        )
-                delete_game(game_id)
-                await delete_all_game_messages(game_id)
-                return
-
+                    else:
+                        if not is_any_user_excluded(game_id):
+                            coin = get_game_coin()
+                            conn = sqlite3.connect("users_database.db")
+                            cursor = conn.cursor()
+                            cursor.execute(
+                                "UPDATE users_database SET unity_coin = unity_coin + ? WHERE user_id = ? or nfgame = ?",
+                                (coin, winner, winner),
+                            )
+                            conn.commit()
+                            conn.close()
+                            ln = get_user_language(winner)
+                            if ln == "uz":
+                                ms = f"Oʻyinda gʻalaba qozonganingiz uchun sizga {coin} Unity Coin mukofot berildi 🎁"
+                            elif ln == "ru":
+                                ms = f"Вы получили {coin} Unity coin за победу в игре 🎁"
+                            else:
+                                ms = (
+                                    f"You got {coin} Unity Coins for winning in the game 🎁"
+                                )
+                            await bot.send_message(
+                                chat_id=winner,
+                                text=ms,
+                            )
+                    delete_game(game_id)
+                    await delete_all_game_messages(game_id)
+                    return
             players = get_all_players_in_game(game_id)
             for play in players:
                 ln = get_user_language(play)
