@@ -241,7 +241,7 @@ async def how_to_play(message: types.Message, state: FSMContext):
             "🔹 Если у вас нет карт, вы пропускаете ход.\n"
             "🔹 В револьвере 6 патронов, но только 1 настоящий.\n\n"
             "🏆 *Условие победы:*\n"
-            "Последний оставшийся в живых игрок побеждает!",
+            "Последний оставшийся в живых игрок побеждает!"
         )
     elif ln == "uz":
         msg = (
@@ -266,7 +266,7 @@ async def how_to_play(message: types.Message, state: FSMContext):
             "🔹 Har gal *Yolg'onchi* bosilganda o'yin qaytadan ishga tushadi va hamma yana to'liq kartalarga ega bo'ladi\n"
             "🔹 Qurolda 6 ta o'q bor, lekin faqat 1 tasi haqiqiy.\n\n"
             "🏆 *G'alaba sharti:*\n"
-            "Oxirgi tirik qolgan o'yinchi g'olib bo'ladi!",
+            "Oxirgi tirik qolgan o'yinchi g'olib bo'ladi!"
         )
     else:
         msg = (
