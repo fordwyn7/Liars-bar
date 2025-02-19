@@ -229,8 +229,8 @@ cursor.execute(
 # for user in users:
 #     cursor.execute(
 #         """
-#         INSERT INTO user_languages (user_id, language) 
-#         VALUES (?, ?) 
+#         INSERT INTO user_languages (user_id, language)
+#         VALUES (?, ?)
 #         ON CONFLICT(user_id) DO UPDATE SET language = excluded.language
 #         """,
 #         (user[0], "en"),
@@ -238,7 +238,6 @@ cursor.execute(
 
 conn.commit()
 conn.close()
-
 
 
 @dp.message(Command("start"))
@@ -473,24 +472,22 @@ async def start_game_handler(message: types.Message, state: FSMContext):
     if is_user_in_tournament_and_active(message.from_user.id):
         await message.answer(ms)
         return
+    if ln == "ru":
+        ms = "У вас есть незаконченная игра. Пожалуйста, сначала завершите это, прежде чем создавать новое."
+        ms1 = "Выберите количество игроков: ⬇️"
+        kb = stop_incomplete_games_ru
+    elif ln == "uz":
+        ms = "Sizda hali tugallanmagan o'yin bor. Iltimos, yangi hosil qilishdan oldin avval shuni tugating."
+        ms1 = "O'yinchilar sonini kiriting: ⬇️"
+        kb = stop_incomplete_games_uz
+    else:
+        ms = f"You have incomplete games. Please finish or stop them before creating a new one."
+        ms1 = "Choose the number of players: ⬇️"
+        kb = stop_incomplete_games
     if message.chat.type == "private":
         if has_incomplete_games(message.from_user.id):
-            if ln == "ru":
-                ms = "У вас есть незаконченная игра. Пожалуйста, сначала завершите это, прежде чем создавать новое."
-                ms1 = "Выберите количество игроков: ⬇️"
-                kb = stop_incomplete_games_ru
-            elif ln == "uz":
-                ms = "Sizda hali tugallanmagan o'yin bor. Iltimos, yangi hosil qilishdan oldin avval shuni tugating."
-                ms1 = "O'yinchilar sonini kiriting: ⬇️"
-                kb = stop_incomplete_games_uz
-            else:
-                ms = f"You have incomplete games. Please finish or stop them before creating a new one."
-                ms1 = "Choose the number of players: ⬇️"
-                kb = stop_incomplete_games
-            await message.answer(
-                ms,
-                reply_markup=kb,
-            )
+
+            await message.answer(ms, reply_markup=kb)
             return
         await message.answer(ms1, reply_markup=count_players)
         await state.set_state(new_game.number_of_players)
@@ -498,7 +495,15 @@ async def start_game_handler(message: types.Message, state: FSMContext):
         await message.answer("Please use this option in a private chat.")
 
 
-@dp.message(F.text.in_(["back to main menu 🔙", "вернуться в главное меню 🔙", "bosh menuga qaytish 🔙"]))
+@dp.message(
+    F.text.in_(
+        [
+            "back to main menu 🔙",
+            "вернуться в главное меню 🔙",
+            "bosh menuga qaytish 🔙",
+        ]
+    )
+)
 async def start_game_handler(message: types.Message, state: FSMContext):
     await state.clear()
     ln = get_user_language(message.from_user.id)
