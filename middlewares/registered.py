@@ -26,7 +26,7 @@ class RegistrationMiddleware(BaseMiddleware):
         elif event.callback_query:
             user_id = event.callback_query.from_user.id
 
-        if user_id:
+        if user_id and not event.callback_query:
             registered = is_user_registered(user_id)
             if not registered and current_state != "registration:pref_name" and current_state != "registration_game:pref1_name":
                 if event.message:
