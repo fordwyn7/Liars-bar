@@ -127,7 +127,7 @@ def get_user_statistics(user_id):
             SELECT username, first_name, last_name, registration_date, nfgame, unity_coin
             FROM users_database WHERE user_id = ? OR nfgame = ?
             """,
-            (user_id,user_id),
+            (user_id, user_id),
         )
         user_data = cursor.fetchone()
         if not user_data:
@@ -339,11 +339,11 @@ async def forward_to_all_users(message: types.Message, state: FSMContext):
             continue
         try:
             if message.text == "/start":
-                copied_msg  = await bot.copy_message(
+                copied_msg = await bot.copy_message(
                     chat_id=user_id,
                     from_chat_id=from_chat_id,
                     message_id=message_id,
-                    reply_markup=get_main_menu(user_id)
+                    reply_markup=get_main_menu(user_id),
                 )
                 # await bot.delete_message(chat_id=user_id, message_id=copied_msg.message_id)
             else:
@@ -351,7 +351,7 @@ async def forward_to_all_users(message: types.Message, state: FSMContext):
                     chat_id=user_id,
                     from_chat_id=from_chat_id,
                     message_id=message_id,
-                    reply_markup=get_main_menu(user_id)
+                    reply_markup=get_main_menu(user_id),
                 )
         except Exception:
             cnt += 1
@@ -571,9 +571,7 @@ async def get_user_archive_by_id(message: types.Message, state: FSMContext):
         response += f"{idx}. game — {start_time.split(' ')[0]} 📅\n"
 
     response += "\n📋 *Send the game number to view its details.*"
-    await message.answer(
-        response, reply_markup=back_to_admin_panel
-    )
+    await message.answer(response, reply_markup=back_to_admin_panel)
     await state.update_data(selected_user_id=user_id)
     await state.set_state(awaiting_admin_game_number.selected_user)
 
@@ -683,10 +681,14 @@ async def confirm_delete_tournament(callback_query: types.CallbackQuery):
 
     for user in registered_users:
         try:
-            await bot.send_message(
-                chat_id=user[0],
-                text=f"⚠️ The tournament you registered has been canceled. We apologize for any inconvenience. 😕",
-            )
+            ln = get_user_language(user[0])
+            if ln == "uz":
+                ms = "⚠️ Siz roʻyxatdan oʻtgan turnir bekor qilindi. Noqulaylik uchun uzr so'raymiz. 😕"
+            elif ln == "ru":
+                ms = "⚠️ Турнир, на который вы зарегистрировались, был отменен. Приносим извинения за возможные неудобства. 😕"
+            else:
+                ms = "⚠️ The tournament you registered has been canceled. We apologize for any inconvenience. 😕"
+            await bot.send_message(chat_id=user[0], text=ms)
         except Exception as e:
             print(f"Failed to send message to user {user[0]}: {e}")
 
@@ -1163,9 +1165,7 @@ async def get_username_for_withdraw(message: types.Message, state: FSMContext):
         ]
     )
 
-    await message.answer(
-        confirmation_message, reply_markup=keyboard
-    )
+    await message.answer(confirmation_message, reply_markup=keyboard)
     await state.set_data({"reward_name": reward_name, "cost": cost})
     await state.update_data(username=username)
 
@@ -1246,10 +1246,14 @@ async def admin_confirm_withdraw(callback_query: types.CallbackQuery):
         chat_id=-1002261491678, message_id=callback_query.message.message_id
     )
     user_id = callback_query.data.split("_")[-1]
-    await bot.send_message(
-        user_id,
-        "✅ Your withdrawal request has been confirmed! The item has been successfully delivered to the user you selected.",
-    )
+    ln = get_user_language(user_id)
+    if ln == "uz":
+        ms = "✅ Coinlarni yechib olish boʻyicha soʻrovingiz tasdiqlandi! Buyurtmangiz siz tanlagan foydalanuvchiga muvaffaqiyatli yetkazib berildi."
+    elif ln == "ru":
+        ms = "✅ Ваш запрос на вывод средств подтвержден! Товар успешно доставлен выбранному вами пользователю."
+    else:
+        ms = "✅ Your withdrawal request has been confirmed! The item has been successfully delivered to the user you selected."
+    await bot.send_message(user_id, ms)
     await callback_query.answer("✅ Withdrawal confirmed!")
 
 
@@ -1260,7 +1264,14 @@ async def admin_cancel_withdraw(callback_query: types.CallbackQuery):
     )
 
     user_id = callback_query.data.split("_")[-1]
-    await bot.send_message(user_id, "❌ Your withdrawal request was canceled.")
+    ln = get_user_language(user_id)
+    if ln == "uz":
+        ms = "❌ Coinlarni yechib olish boʻyicha soʻrovingiz bekor qilindi."
+    elif ln == "ru":
+        ms = "❌ Ваш запрос на вывод средств был отменен."
+    else:
+        ms = "❌ Your withdrawal request was canceled."
+    await bot.send_message(user_id, ms)
     await callback_query.answer("❌ Withdrawal canceled.")
 
 
@@ -1352,7 +1363,10 @@ async def change_referrals_state(message: types.Message, state: FSMContext):
 async def players_in_tournament(message: types.Message):
     tournament = get_ongoing_tournaments()
     if not tournament:
-        await message.answer(f"No ongoing tournaments found or has already been finished.", reply_markup=tournaments_admin_panel_button)
+        await message.answer(
+            f"No ongoing tournaments found or has already been finished.",
+            reply_markup=tournaments_admin_panel_button,
+        )
         return
     tournament_id = tournament[0]["name"]
     players = get_tournament_users_list(tournament_id)
@@ -1364,7 +1378,8 @@ async def players_in_tournament(message: types.Message):
         keyboard.inline_keyboard.append(
             [
                 InlineKeyboardButton(
-                    text = f"🚫 Player {get_user_nfgame(player_id)}", callback_data=f"remove_{player_id}"
+                    text=f"🚫 Player {get_user_nfgame(player_id)}",
+                    callback_data=f"remove_{player_id}",
                 )
             ]
         )
@@ -1377,7 +1392,12 @@ async def players_in_tournament(message: types.Message):
 @dp.message(F.text == "✏️ change amount")
 @admin_required()
 async def change_amounts_t(message: types.Message, state: FSMContext):
-    await message.answer(f"Here you can change some values in the game 👇", reply_markup=change_amounts_buttons)
+    await message.answer(
+        f"Here you can change some values in the game 👇",
+        reply_markup=change_amounts_buttons,
+    )
+
+
 @dp.message(F.text == "💸 change game coins")
 @admin_required()
 async def change_game_coin_t(message: types.Message, state: FSMContext):

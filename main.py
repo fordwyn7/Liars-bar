@@ -9,7 +9,7 @@ from aiogram.filters import Command
 from aiogram.fsm.context import FSMContext
 from aiogram.utils.deep_linking import create_start_link
 from config import *
-from keyboards.keyboard import get_main_menu, count_players, change_name
+from keyboards.keyboard import get_main_menu, count_players
 from states.state import registration, registration_game, new_game
 from keyboards.inline import *
 from db import *
@@ -190,7 +190,6 @@ cursor.execute("SELECT COUNT(*) FROM unity_coin_referral")
 count = cursor.fetchone()[0]
 if count == 0:
     cursor.execute("INSERT INTO unity_coin_referral (unity_coin_refferal) VALUES (10)")
-
 cursor.execute(
     """
 CREATE TABLE IF NOT EXISTS excludeds (
@@ -209,167 +208,321 @@ cursor.execute(
         )
         """
 )
+
+cursor.execute(
+    """
+    CREATE TABLE IF NOT EXISTS user_languages (
+    user_id INTEGER PRIMARY KEY,
+    language TEXT NOT NULL,
+    UNIQUE(user_id, language)
+    );
+    """
+)
 # cursor.execute("DELETE FROM tournament_rounds_users;")
 # cursor.execute("DELETE FROM tournament_users;")
 # cursor.execute("DELETE FROM tournaments_table;")
+cursor.execute("SELECT user_id FROM users_database")
+users = cursor.fetchall()
+
+for user in users:
+    cursor.execute(
+        """
+        INSERT INTO user_languages (user_id, language) 
+        VALUES (?, ?) 
+        ON CONFLICT(user_id) DO UPDATE SET language = excluded.language
+        """,
+        (user[0], "en"),
+    )
+
 conn.commit()
 conn.close()
+
 
 
 @dp.message(Command("start"))
 async def cmd_start(message: types.Message, state: FSMContext):
     await state.clear()
+    user_id = message.from_user.id
+    conn = sqlite3.connect("users_database.db")
+    cursor = conn.cursor()
+    cursor.execute("SELECT language FROM user_languages WHERE user_id = ?", (user_id,))
+    row = cursor.fetchone()
+    conn.close()
+
+    if not row:
+        await message.answer(
+            "🟣 Please select your language: \n\n 🔴 Пожалуйста, выберите язык: \n\n🔵 Iltimos, tilni tanlang:",
+            reply_markup=select_language_button,
+        )
+        return
+
     payload = message.text.split(" ", 1)[-1] if " " in message.text else ""
     await state.update_data(payload=payload)
+    ln = get_user_language(user_id)
     if "game_" in payload:
-        if not is_user_registered(message.from_user.id):
-            await message.answer(
-                "Welcome to the bot! Please enter your username.\n\n"
-                "⚠️ Note: Your username must be UNIQUE and can only contain:\n"
-                "- Latin alphabet characters (a-z, A-Z)\n"
-                "- Numbers (0-9)\n"
-                "- Underscores (_)\n"
-                "and you can use up to 30 characters"
-            )
+        if not is_user_registered(user_id):
+            if ln == "ru":
+                ms = "🎭 Добро пожаловать в Liar's Fortune! 🎭\nПожалуйста, введите *правильное* имя пользователя ✍️"
+            elif ln == "uz":
+                ms = "🎭 Liar's Fortune botiga hush kelibsiz! 🎭\nIltimos. o'zingiz uchun username kiriting ✍️"
+            else:
+                ms = "🎭 Welcome to Liar's Fortune! 🎭\nPlease enter *correct* username ✍️\n\n"
+            await message.answer(ms, reply_markup=get_username_button(ln))
             await state.set_state(registration_game.pref1_name)
             return
+
         game_id = payload.split("game_")[1]
         if get_player_count(game_id) == 0:
-            await message.answer(
-                f"Game has already finished or been stopped. ☹️",
-                reply_markup=get_main_menu(message.from_user.id),
-            )
-            return
-        if game_id == get_game_id_by_user(message.from_user.id):
-            if message.from_user.id == get_game_inviter_id(game_id):
-                await message.answer(
-                    "You are already in this game as a creator",
-                    reply_markup=get_main_menu(message.from_user.id),
-                )
+            if ln == "ru":
+                ms = "Игра уже завершена или остановлена. ☹️"
+            elif ln == "uz":
+                ms = "O'yin allaqachon tugagan yoki to'xtatilgan. ☹️"
             else:
-                await message.answer(
-                    "You are already in this game! 😇", reply_markup=cancel_g
-                )
+                ms = "Game has already finished or been stopped. ☹️"
+            await message.answer(ms)
+            return
+        if game_id == get_game_id_by_user(user_id):
+            if user_id == get_game_inviter_id(game_id):
+                if ln == "ru":
+                    ms = "Вы уже в этой игре как создатель 🧑‍💻"
+                elif ln == "uz":
+                    ms = "Siz yaratuvchi sifatida allaqochon ushbu o'yindasiz 🧑‍💻"
+                else:
+                    ms = "You are already in this game as a creator 🧑‍💻"
+                await message.answer(ms)
+            else:
+                if ln == "ru":
+                    ms = "Вы уже в этой игре 😇"
+                elif ln == "uz":
+                    ms = "Siz allaqochon ushbu o'yindasiz 😇"
+                else:
+                    ms = "You are already in this game 😇"
+                await message.answer(ms)
             return
         if get_needed_players(game_id) <= get_player_count(game_id):
-            await message.answer(
-                f"There is no available space for another player or the game has already finished 😞",
-                reply_markup=get_main_menu(message.from_user.id),
-            )
-
+            if ln == "ru":
+                ms = "Нет свободного места для другого игрока или игра уже закончена 😞"
+            elif ln == "uz":
+                ms = "Boshqa o'yinchi uchun bo'sh joy qolmagan yoki o'yin allaqachon tugagan 😞"
+            else:
+                ms = "There is no available space for another player or the game has already finished 😞"
+            await message.answer(ms)
             await state.clear()
             return
+
         user = message.from_user
         inviter_id = get_game_inviter_id(game_id)
         if not inviter_id:
-            await message.answer(
-                f"This game has finished or been stopped by the creator.",
-                reply_markup=get_main_menu(user.id),
-            )
+            if ln == "ru":
+                ms = "Эта игра завершена или остановлена ​​создателем."
+            elif ln == "uz":
+                ms = "Ushbu o'yin tugagan yoki yaratuvchi tomonidan to'xtatilgan."
+            else:
+                ms = "This game has finished or been stopped by the creator."
+            await message.answer(ms)
             await state.clear()
             return
         if inviter_id and inviter_id == user.id:
-            await message.answer("You are already in this game as the creator!")
+            if ln == "ru":
+                ms = "Вы уже в этой игре как создатель 🧑‍💻"
+            elif ln == "uz":
+                ms = "Siz yaratuvchi sifatida allaqochon ushbu o'yindasiz 🧑‍💻"
+            else:
+                ms = "You are already in this game as a creator 🧑‍💻"
+            await message.answer(ms)
             return
         if is_user_in_game(game_id, user.id):
-            await message.answer("You are already in this game!", reply_markup=cancel_g)
+            if ln == "ru":
+                ms = "Вы уже в этой игре 😇"
+            elif ln == "uz":
+                ms = "Siz allaqochon ushbu o'yindasiz 😇"
+            else:
+                ms = "You are already in this game 😇"
+            await message.answer(ms)
             return
         if not inviter_id:
-            await message.answer(
-                f"This game has finished or been stopped by the creator.",
-                reply_markup=get_main_menu(user.id),
-            )
-
+            if ln == "ru":
+                ms = "Эта игра завершена или остановлена ​​создателем."
+            elif ln == "uz":
+                ms = "Ushbu o'yin tugagan yoki yaratuvchi tomonidan to'xtatilgan."
+            else:
+                ms = "This game has finished or been stopped by the creator."
+            await message.answer(ms)
             await state.clear()
             return
-        if has_incomplete_games(message.from_user.id):
+        if has_incomplete_games(user_id):
+            if ln == "ru":
+                ms = "У вас есть незавершенные игры! \nПожалуйста, сначала остановите их и попробуйте снова. ♻️"
+                kb = stop_incomplete_games_ru
+            elif ln == "uz":
+                ms = "Sizda hali tugallanmagan o'yin bot! \nIltimos avval shuni tugating so'ng qaytadan urinib ko'ring. ♻️"
+                kb = stop_incomplete_games_uz
+            else:
+                ms = "You have incomplete games! \nPlease stop them first and try again. ♻️"
+                kb = stop_incomplete_games
             await message.answer(
-                f"You have incomplete games! \nPlease stop them first and try again.",
-                reply_markup=stop_incomplete_games,
+                ms,
+                reply_markup=kb,
             )
-
             await state.clear()
             return
+
         insert_invitation(inviter_id, user.id, game_id)
         player_count = get_player_count(game_id)
         if player_count < 2:
-            await message.answer(
-                f"This game has finished or been stopped by the creator.",
-                reply_markup=get_main_menu(user.id),
-            )
+            if ln == "ru":
+                ms = "Эта игра завершена или остановлена ​​создателем."
+            elif ln == "uz":
+                ms = "Ushbu o'yin tugagan yoki yaratuvchi tomonidan to'xtatilgan."
+            else:
+                ms = "This game has finished or been stopped by the creator."
+            await message.answer(ms)
             await state.clear()
             return
+        ln1 = get_user_language(inviter_id)
+        if ln1 == "ru":
+            ms1 = (
+                f"Игрок {name} присоединился к игре 🎉 \nИгроки в игре: {player_count}"
+            )
+        elif ln1 == "uz":
+            ms1 = f"{name} o'yinga qo'shildi 🎉\nO'yinchilar soni: {player_count}"
+        else:
+            ms1 = f"Player {name} has joined the game 🎉 \nPlayers in the game: {player_count}"
+        if ln == "ru":
+            ms = f"Вы успешно присоединились к игре! 🤩\nТекущее количество игроков: {player_count}\nДождитесь начала игры. 😊"
+        elif ln == "uz":
+            ms = f"Siz o'yinga muvaffaqiyatli qo'shildingiz! 🤩\nO'yindagi o'yinchilar soni: {player_count}\nO'yin boshlangunicha kutib turing. 😊"
+        else:
+            ms = f"You have successfully joined the game! 🤩\nCurrent number of players: {player_count}\nWaiting for everyone to be ready. 😊"
 
-        await message.answer(
-            f"You have successfully joined the game! 🤩\nCurrent number of players: {player_count}\nWaiting for everyone to be ready...",
-            reply_markup=cancel_g,
-        )
-
+        await message.answer(ms)
         name = get_user_nfgame(user.id)
-        await bot.send_message(
-            inviter_id,
-            f"User {name} has joined the game!\nPlayers in the game: {player_count}",
-        )
+        await bot.send_message(inviter_id, ms1)
         if get_needed_players(game_id) == get_player_count(game_id):
+            if ln1 == "ru":
+                ms = "Все игроки готовы. Вы можете начать игру прямо сейчас. "
+                kb = start_stop_game_ru
+            elif ln1 == "uz":
+                ms = "Barcha o'yinchilar tayyor. O'yinni hoziroq boshlashingiz mumkin."
+                kb = start_stop_game_uz
+            else:
+                ms = "All players ready. You can start the game right now."
+                kb = start_stop_game
             await bot.send_message(
                 inviter_id,
-                f"All players ready. You can start the game right now.",
-                reply_markup=start_stop_game,
+                ms,
+                reply_markup=kb,
             )
         await state.clear()
     else:
         user = message.from_user
         if is_user_registered(user.id):
+            if ln == "ru":
+                ms = "Вы находитесь в главном меню 👇"
+            elif ln == "uz":
+                ms = "Siz asosiy menudasiz 👇 "
+            else:
+                ms = "You are in main menu 👇"
             await message.answer(
-                "Welcome back! You are in the main menu.",
+                ms,
                 reply_markup=get_main_menu(user.id),
             )
         else:
-            await message.answer(
-                "Welcome to the bot! Please enter your username.\n\n"
-                "⚠️ Note: Your username must be UNIQUE and can only contain:\n"
-                "- Latin alphabet characters (a-z, A-Z)\n"
-                "- Numbers (0-9)\n"
-                "- Underscores (_)\n"
-                "and you can use up to 30 characters"
-            )
+            if ln == "ru":
+                ms = "🎭 Добро пожаловать в Liar's Fortune! 🎭\nПожалуйста, введите *правильное* имя пользователя ✍️"
+            elif ln == "uz":
+                ms = "🎭 Liar's Fortune botiga hush kelibsiz! 🎭\nIltimos. o'zingiz uchun username kiriting ✍️"
+            else:
+                ms = "🎭 Welcome to Liar's Fortune! 🎭\nPlease enter *correct* username ✍️\n\n"
+            await message.answer(ms, reply_markup=get_username_button(ln))
             await state.set_state(registration.pref_name)
 
 
-@dp.message(F.text == "start game 🎮")
+@dp.callback_query(lambda c: c.data.startswith("lan_"))
+async def set_language(callback: types.CallbackQuery):
+    user_id = callback.from_user.id
+    language = callback.data.split("lan_")[1]
+
+    conn = sqlite3.connect("users_database.db")
+    cursor = conn.cursor()
+    cursor.execute(
+        """
+        INSERT INTO user_languages (user_id, language) VALUES (?, ?)
+        ON CONFLICT(user_id) DO UPDATE SET language = excluded.language
+        """,
+        (user_id, language),
+    )
+    conn.commit()
+    conn.close()
+
+    await callback.message.delete()
+    await cmd_start(callback.message, FSMContext(bot))
+
+
+@dp.message(F.text_in_(["start game 🎮", "o'yinni boshlash 🎮", "начать игру 🎮"]))
 async def start_game_handler(message: types.Message, state: FSMContext):
+    ln = get_user_language(message.from_user.id)
+    if ln == "ru":
+        ms = "Вы участвуете в турнире и не сможете использовать эту кнопку до окончания турнира ❗️"
+    elif ln == "uz":
+        ms = "Siz turnirda ishtirok etyapsiz va turnir tugamaguncha bu tugmadan foydalana olmaysiz ❗️"
+    else:
+        ms = f"You are participating in a tournament and can't use this button until the tournament ends ❗️"
     if is_user_in_tournament_and_active(message.from_user.id):
-        await message.answer(
-            f"You are participating in a tournament and can't use this button until the tournament ends!"
-        )
+        await message.answer(ms)
         return
     if message.chat.type == "private":
         if has_incomplete_games(message.from_user.id):
+            if ln == "ru":
+                ms = "У вас есть незаконченная игра. Пожалуйста, сначала завершите это, прежде чем создавать новое."
+                ms1 = "Выберите количество игроков: ⬇️"
+                kb = stop_incomplete_games_ru
+            elif ln == "uz":
+                ms = "Sizda hali tugallanmagan o'yin bor. Iltimos, yangi hosil qilishdan oldin avval shuni tugating."
+                ms1 = "O'yinchilar sonini kiriting: ⬇️"
+                kb = stop_incomplete_games_uz
+            else:
+                ms = f"You have incomplete games. Please finish or stop them before creating a new one."
+                ms1 = "Choose the number of players: ⬇️"
+                kb = stop_incomplete_games
             await message.answer(
-                "You have incomplete games. Please finish or stop them before creating a new one.",
-                reply_markup=stop_incomplete_games,
+                ms,
+                reply_markup=kb,
             )
-
             return
-        await message.answer(
-            "Choose the number of players: ⬇️", reply_markup=count_players
-        )
+        await message.answer(ms1, reply_markup=count_players)
         await state.set_state(new_game.number_of_players)
     else:
         await message.answer("Please use this option in a private chat.")
 
 
-@dp.message(F.text == "back to main menu 🔙")
+@dp.message(F.text.in_(["back to main menu 🔙", "вернуться в главное меню 🔙", "bosh menuga qaytish 🔙"]))
 async def start_game_handler(message: types.Message, state: FSMContext):
     await state.clear()
+    ln = get_user_language(message.from_user.id)
+    if ln == "ru":
+        ms = "Вы находитесь в главном меню 👇"
+    elif ln == "uz":
+        ms = "Siz asosiy menudasiz 👇 "
+    else:
+        ms = "You are in main menu 👇"
     await message.answer(
-        f"You are in main manu.",
+        ms,
         reply_markup=get_main_menu(message.from_user.id),
     )
 
 
 @dp.message(new_game.number_of_players)
 async def get_name(message: types.Message, state: FSMContext):
+    ln = get_user_language(message.from_user.id)
+    if ln == "ru":
+        ms = (
+            "Вы ввели неверную информацию! Пожалуйста, выберите один из этих номеров: ⬇️"
+        )
+    elif ln == "uz":
+        ms = "Siz noto'g'ri ma'lumot kiritdingiz! Iltimos, quyidagi raqamlardan birini tanlang: ⬇️"
+    else:
+        ms = "You have entered wrong information! Please choose one of these numbers: ⬇️"
     cnt = 0
     if message.text == "2️⃣":
         cnt = 2
@@ -379,7 +532,7 @@ async def get_name(message: types.Message, state: FSMContext):
         cnt = 4
     else:
         await message.answer(
-            "You have entered wrong information! Please choose one of these numbers: ⬇️",
+            ms,
             reply_markup=count_players,
         )
         await state.set_state(new_game.number_of_players)
@@ -399,17 +552,37 @@ async def get_name(message: types.Message, state: FSMContext):
     )
     conn.commit()
     conn.close()
+    if ln == "ru":
+        ms = f"Вот ваша пригласительная ссылка. Поделитесь этой ссылкой с друзьями, чтобы играть в игру вместе 👇"
+    elif ln == "uz":
+        ms = f"Quida sizning o'yinga taklif havolangiz. Ushbu linkni birga o'ynamoqchi bo'lgan do'stlaringizga yuboring 👇"
+    else:
+        ms = f"Here is your invitation link. Share this link with your friends to play the game together 👇"
     await message.answer(
-        f"Here is your invitation link. Share this link with your friends to play the game together👇. Game starts as soon as {cnt} players gathered.",
+        ms,
         reply_markup=get_main_menu(user.id),
     )
-
-    sharable_message = (
-        "🎮 **Join the Game!** 🎮\n\n"
-        "I just created a game, and I'd love for you to join!\n\n"
-        "Click the link below to join the game:\n"
-        f"\n{invite_link}\n\n"
-    )
+    if ln == "ru":
+        sharable_message = (
+            "🎮 Присоединяйтесь к игре! 🎮\n\n"
+            "Я только что создал игру и буду рад, если вы присоединитесь! 😊\n\n"
+            "Нажмите на ссылку ниже, чтобы присоединиться к игре:\n"
+            f"\n{invite_link}\n\n"
+        )
+    elif ln == "uz":
+        sharable_message = (
+            "🎮 O'yinga qo'shiling! 🎮\n\n"
+            "Men siz bilan birga o'ynash uchun o'yin yaratdim va qoʻshilsangiz hursand bo'lar edim! 😊\n\n"
+            "Oʻyinga qoʻshilish uchun quyidagi havolani bosing:\n"
+            f"\n{invite_link}\n\n"
+        )
+    else:
+        sharable_message = (
+            "🎮 Join the Game! 🎮\n\n"
+            "I just created a game, and I'd love for you to join! 😊\n\n"
+            "Click the link below to join the game:\n"
+            f"\n{invite_link}\n\n"
+        )
 
     await message.answer(
         sharable_message,
@@ -440,7 +613,17 @@ async def get_name(message: types.Message, state: FSMContext):
 
 @dp.message()
 async def any_word(msg: types.Message):
-    await msg.answer(f"You entered unfamiliar information.")
+    if not is_user_registered(msg.from_user.id):
+        await msg.delete()
+    else:
+        ln = get_user_language(msg.from_user.id)
+        if ln == "ru":
+            ms = f"Вы ввели незнакомую информацию."
+        elif ln == "uz":
+            ms = f"Siz noto'g'ri ma'lumot kiritdingiz."
+        else:
+            ms = f"You entered wrong information."
+        await msg.answer(ms)
 
 
 async def main():

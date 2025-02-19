@@ -2,6 +2,18 @@ from aiogram.types import ReplyKeyboardMarkup, KeyboardButton
 import sqlite3
 
 
+def get_user_language(user_id):
+    conn = sqlite3.connect("users_database.db")
+    cursor = conn.cursor()
+
+    cursor.execute("SELECT language FROM user_languages WHERE user_id = ?", (user_id,))
+    row = cursor.fetchone()
+    conn.close()
+
+    if row:
+        return row[0]
+    return "en"
+
 def is_user_admin(user_id):
     conn = sqlite3.connect("users_database.db")
     cursor = conn.cursor()
@@ -13,25 +25,54 @@ def is_user_admin(user_id):
 
 def get_main_menu(user_id: int):
     is_admin = is_user_admin(user_id)
+    ln = get_user_language(user_id)
+    if ln == "uz":
+        st = "o'yinni boshlash 🎮"
+        lb = "🏅 Liderbord"
+        bb = "bonus 🚀"
+        kb = "📱 kabinet"
+        pz = "Sovg'alar 🎁"
+        rf = "❄️ referal"
+        tu = "🤩 turnirlar"
+        gr = "o'yin qoidalari 📜"
+        io = "ma'lumot 📚"
+        ss = "sozlamalar ⚙️"
+    elif ln == "ru":
+        st = "начать игру 🎮"
+        lb = "🏅 Ледербоард"
+        bb = "бонус 🚀"
+        kb = "📱 кабинет"
+        pz = "Призы 🎁"
+        rf = "❄️ реферал"
+        tu = "🤩 турниры"
+        gr = "правила игры 📜"
+        io = "информация 📚"
+        ss = "настройки ⚙️"
+    else:
+        st = "start game 🎮"
+        lb = "🏅 Leaderboard"
+        bb = "bonus 🚀"
+        kb = "📱 cabinet"
+        pz = "Prizes 🎁"
+        rf = "❄️ referral"
+        tu = "🤩 tournaments"
+        gr = "game rules 📜"
+        io = "information 📚"
+        ss = "settings ⚙️"
     keyboard = [
         [
-            KeyboardButton(text="start game 🎮"),
-            KeyboardButton(text="🏅 Leaderboard"),
-            KeyboardButton(text="bonus 🚀"),
-            
+            KeyboardButton(text=st),
+            KeyboardButton(text=lb),
+            KeyboardButton(text=bb),
+        ],
+        [KeyboardButton(text=kb), KeyboardButton(text=pz), KeyboardButton(text=rf)],
+        [
+            KeyboardButton(text=tu),
+            KeyboardButton(text=gr),
         ],
         [
-            KeyboardButton(text="📱 cabinet"),
-            KeyboardButton(text="Prizes 🎁"),
-            KeyboardButton(text="❄️ referral"),
-        ],
-        [
-            KeyboardButton(text="🤩 tournaments"),
-            KeyboardButton(text="game rules 📜"),
-        ],
-        [
-            KeyboardButton(text="information 📚"),
-            KeyboardButton(text="settings ⚙️"),
+            KeyboardButton(text=io),
+            KeyboardButton(text=ss),
         ],
     ]
     if is_admin:
@@ -43,10 +84,40 @@ change_name = ReplyKeyboardMarkup(
     keyboard=[
         [
             KeyboardButton(text="change username 🖌"),
-            KeyboardButton(text="❓ help"),
+            KeyboardButton(text="change Language 🇺🇸"),
         ],
         [
+            KeyboardButton(text="❓ help"),
             KeyboardButton(text="back to main menu 🔙"),
+        ],
+    ],
+    resize_keyboard=True,
+)
+
+change_name_ru = ReplyKeyboardMarkup(
+    keyboard=[
+        [
+            KeyboardButton(text="изменить имя пользователя 🖌"),
+            KeyboardButton(text="изменить язык 🇷🇺"),
+            
+        ],
+        [
+            KeyboardButton(text="❓ помощь"),
+            KeyboardButton(text="вернуться в главное меню 🔙"),
+        ],
+    ],
+    resize_keyboard=True,
+)
+
+change_name_uz = ReplyKeyboardMarkup(
+    keyboard=[
+        [
+            KeyboardButton(text="usernameni o'zgartirish  🖌"),
+            KeyboardButton(text="Tilni o'zgartirish 🇺🇿"),
+        ],
+        [
+            KeyboardButton(text="❓ yordam"),
+            KeyboardButton(text="bosh menuga qaytish 🔙"),
         ],
     ],
     resize_keyboard=True,
@@ -64,11 +135,44 @@ count_players = ReplyKeyboardMarkup(
     resize_keyboard=True,
 )
 
+count_players_ru = ReplyKeyboardMarkup(
+    keyboard=[
+        [
+            KeyboardButton(text="2️⃣"),
+            KeyboardButton(text="3️⃣"),
+            KeyboardButton(text="4️⃣"),
+        ],
+        [KeyboardButton(text="вернуться в главное меню 🔙")],
+    ],
+    resize_keyboard=True,
+)
+
+count_players_uz = ReplyKeyboardMarkup(
+    keyboard=[
+        [
+            KeyboardButton(text="2️⃣"),
+            KeyboardButton(text="3️⃣"),
+            KeyboardButton(text="4️⃣"),
+        ],
+        [KeyboardButton(text="bosh menuga qaytish 🔙")],
+    ],
+    resize_keyboard=True,
+)
+
 cancel_button = ReplyKeyboardMarkup(
     keyboard=[[KeyboardButton(text="back to main menu 🔙")]],
     resize_keyboard=True,
 )
 
+cancel_button_ru = ReplyKeyboardMarkup(
+    keyboard=[[KeyboardButton(text="вернуться в главное меню 🔙")]],
+    resize_keyboard=True,
+)
+
+cancel_button_uz = ReplyKeyboardMarkup(
+    keyboard=[[KeyboardButton(text="bosh menuga qaytish 🔙")]],
+    resize_keyboard=True,
+)
 
 admin_panel_button = ReplyKeyboardMarkup(
     keyboard=[
@@ -148,7 +252,6 @@ change_users_balance = ReplyKeyboardMarkup(
     resize_keyboard=True,
 )
 
-
 admins_list_button = ReplyKeyboardMarkup(
     keyboard=[
         [
@@ -170,6 +273,25 @@ back_button = ReplyKeyboardMarkup(
     ],
     resize_keyboard=True,
 )
+
+back_button_ru = ReplyKeyboardMarkup(
+    keyboard=[
+        [
+            KeyboardButton(text="отмена 🚫"),
+        ],
+    ],
+    resize_keyboard=True,
+)
+
+back_button_uz = ReplyKeyboardMarkup(
+    keyboard=[
+        [
+            KeyboardButton(text="bekor qilish 🚫"),
+        ],
+    ],
+    resize_keyboard=True,
+)
+
 back_to_admin_panel = ReplyKeyboardMarkup(
     keyboard=[
         [

@@ -244,9 +244,6 @@ def save_tournament_to_db(data, tournamnet_link):
         conn.close()
 
 
-
-
-
 @dp.message(F.text == "📝 edit starting")
 @admin_required()
 async def edit_start_and_end_times(message: types.Message, state: FSMContext):
@@ -414,12 +411,26 @@ async def start_turninr(callback_query: types.CallbackQuery):
 async def notify_participants(participants, num_participants):
     for user_id in participants:
         try:
-            await bot.send_message(
-                chat_id=user_id,
-                text=f"🏆 The tournament is starting now❗️\n"
-                f"👥 Number of participants: {num_participants}\n"
-                "📋 Get ready for the first round!",
-            )
+            ln = get_user_language(user_id)
+            if ln == "uz":
+                ims = (
+                    f"🏆 Turnir hozir boshlanmoqda ❗️\n"
+                    f"👥 Turnirdagi ishtirokchilar: {num_participants}\n"
+                    f"📋 Birinchi roundga tayyor turing!"
+                )
+            elif ln == "ru":
+                ims = (
+                    f"🏆 Турнир начинается прямо сейчас❗️\n"
+                    f"👥 Количество участников: {num_participants}\n"
+                    f"📋 Приготовьтесь к первому раунду!"
+                )
+            else:
+                ims = (
+                    f"🏆 The tournament is starting now❗️\n"
+                    f"👥 Number of participants: {num_participants}\n"
+                    "📋 Get ready for the first round!"
+                )
+            await bot.send_message(chat_id=user_id, text=ims)
         except Exception as e:
             print(f"Failed to notify user {user_id}: {e}")
 
@@ -469,9 +480,8 @@ def get_game_id_from_mes(user_id):
         conn.close()
 
 
-
-
 @dp.message(F.text == "✅ start the tournament")
+@admin_required()
 async def show_upcoming_tournaments(message: types.Message):
     users = get_all_user_ids()
     tournaments = get_ongoing_tournaments()
@@ -481,16 +491,8 @@ async def show_upcoming_tournaments(message: types.Message):
     if get_tournament_status(tournament["name"]):
         await message.answer(f"You have already begun the tournamnet ❗️")
         return
-    # await message.answer(f"{get_tournament_status(tournament["name"])}")
     set_tournament_status(tournament["name"], True)
-    # await message.answer(f"{get_tournament_status(tournament["name"])}")
-    response = (
-        "🌟 The tournament is about to begin!\n"
-        "⏳ You have *5 minutes* to join and the tournament will begin.\n\n"
-        "⚠️ Once registered, you cannot quit!\n"
-        "🚨 If you remain inactive during the game, you will be *eliminated* and receive a *penalty*!\n"
-        "🔗 Press the button below to participate!"
-    )
+
     keyboard = InlineKeyboardMarkup(
         inline_keyboard=[
             [
@@ -503,22 +505,51 @@ async def show_upcoming_tournaments(message: types.Message):
     )
     cnt = 0
     message_list = []
-    for user_id in [5400008760, 7328838785, 6497010884]:
+    for user_id in users:
         # [1155076760, 5606480208, 6807731973, 6735261466,6561074671, 5219280507, 7412693353, 7984507370,6047710477, 6596299618]
+        ln = get_user_language(user_id)
+        if ln == "uz":
+            response = (
+                "🌟 Turnir boshlanish arafasida!\n"
+                "⏳ Sizda qo'shilish uchun *5 daqiqa* mavjud so'ng turnir boshlanadi.\n\n"
+                "⚠️ Turnirga qo'shilgandan so'ng uni tark etib bo'lmaydi\n"
+                "🚨 Agar turnir payti o'yinda ishtirok etmasangiz, turnirdan chetlatilasiz va *jarima* ball olasiz.\n"
+                "🔗 Turnirga qo'shilish uchun quidagi tugmani bosing!"
+            )
+        elif ln == "ru":
+            response = (
+                "🌟 Турнир скоро начнется!\n"
+                "⏳ У вас есть *5 минут*, чтобы присоединиться, и турнир начнется.\n\n"
+                "⚠️ После регистрации вы не сможете выйти!\n"
+                "🚨 Если вы останетесь неактивными во время игры, вы будете *исключены* и получите *штраф*!\n"
+                "🔗 Нажмите кнопку ниже, чтобы принять участие!"
+            )
+        else:
+            response = (
+                "🌟 The tournament is about to begin!\n"
+                "⏳ You have *5 minutes* to join and the tournament will begin.\n\n"
+                "⚠️ Once registered, you cannot quit!\n"
+                "🚨 If you remain inactive during the game, you will be *eliminated* and receive a *penalty*!\n"
+                "🔗 Press the button below to participate!"
+            )
+
         if user_id == message.from_user.id:
             continue
         try:
             msg = await bot.send_message(
-                chat_id=user_id, text=response, parse_mode="Markdown", reply_markup=keyboard
+                chat_id=user_id,
+                text=response,
+                parse_mode="Markdown",
+                reply_markup=keyboard,
             )
             message_list.append([user_id, msg.message_id])
-            cnt +=1
+            cnt += 1
         except Exception:
             continue
     await message.answer(
-        f"{cnt} players are given invitation link to the tournament ✅\n You will get the button to start the tournamnet in 3 minutes. ⏰"
+        f"{cnt} players are given invitation link to the tournament ✅\n You will get the button to start the tournamnet in 5 minutes. ⏰"
     )
-    await asyncio.sleep(3*60)
+    await asyncio.sleep(5 * 60)
     for mid in message_list:
         try:
             await bot.delete_message(chat_id=mid[0], message_id=mid[1])
