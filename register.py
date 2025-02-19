@@ -37,6 +37,10 @@ def add_user(user_id, referred_by):
 @dp.message(registration.pref_name)
 async def get_name_fem(message: types.Message, state: FSMContext):
     ln = get_user_language(message.from_user.id)
+    
+    user_data = await state.get_data()
+    payload = user_data.get("payload", "")
+    preferred_name = message.text.strip()
     if ln == "uz":
         m1 = "Iltimos avval username kiriting."
         m2 = "Noto'g'ri username! Iltimos, usernameni berilgan formatda kiriting"
@@ -52,9 +56,6 @@ async def get_name_fem(message: types.Message, state: FSMContext):
         m2 = "Your data is incorrect! Please enter your username in a given format"
         m3 = "There is already user with this username in the bot. Please enter another username."
         m4 = f"🎉 Congratulations on successfully registering, {preferred_name}!\nChoose one of these options 👇"
-    user_data = await state.get_data()
-    payload = user_data.get("payload", "")
-    preferred_name = message.text.strip()
     if "/start" in message.text:
         await message.answer(m1)
         return
