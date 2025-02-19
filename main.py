@@ -382,11 +382,10 @@ async def cmd_start(message: types.Message, state: FSMContext):
             await message.answer(ms)
             await state.clear()
             return
+        name = get_user_nfgame(user.id)
         ln1 = get_user_language(inviter_id)
         if ln1 == "ru":
-            ms1 = (
-                f"Игрок {name} присоединился к игре 🎉 \nИгроки в игре: {player_count}"
-            )
+            ms1 = f"Игрок {name} присоединился к игре 🎉 \nИгроки в игре: {player_count}"
         elif ln1 == "uz":
             ms1 = f"{name} o'yinga qo'shildi 🎉\nO'yinchilar soni: {player_count}"
         else:
@@ -399,7 +398,6 @@ async def cmd_start(message: types.Message, state: FSMContext):
             ms = f"You have successfully joined the game! 🤩\nCurrent number of players: {player_count}\nWaiting for everyone to be ready. 😊"
 
         await message.answer(ms)
-        name = get_user_nfgame(user.id)
         await bot.send_message(inviter_id, ms1)
         if get_needed_players(game_id) == get_player_count(game_id):
             if ln1 == "ru":
