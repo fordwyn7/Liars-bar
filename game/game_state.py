@@ -895,7 +895,7 @@ async def handle_continue_or_liar(callback_query: types.CallbackQuery):
             )
             await send_message_to_all_players(game_id, msge, uz, ru)
             if isinstance(bullet, bool) and bullet:
-                ln = get_user_language(previous_player_id)
+                ln = get_user_language(user_id)
                 if ln == "uz":
                     tt = "Siz boshqalarni ayblaganingiz uchun o'zingizni otdingiz va qurolda haqiqiy o'q bo'lgani uchun halok bo'ldingiz 😵\nSiz o'yindan chetlashtirildingiz 😕"
                 elif ln == "ru":
