@@ -225,7 +225,6 @@ cursor.execute("DELETE FROM daily_bonus WHERE user_id = ?", (6735261466,))
 cursor.execute("DELETE FROM excludeds WHERE user_id = ?", (6735261466,))
 cursor.execute("DELETE FROM users_referral WHERE user_id = ?", (6735261466,))
 cursor.execute("DELETE FROM game_archive WHERE user_id = ?", (6735261466,))
-cursor.execute("DELETE FROM game_state WHERE user_id = ?", (6735261466,))
 cursor.execute("DELETE FROM invitations WHERE user_id = ?", (6735261466,))
 cursor.execute("DELETE FROM user_game_messages WHERE user_id = ?", (6735261466,))
 
