@@ -363,7 +363,7 @@ def get_game_creator_id(game_id):
         return result[0] if result else None
 
 
-async def send_message_to_all_players(game_id, message):
+async def send_message_to_all_players(game_id, message, uz=0, ru=0):
     with sqlite3.connect("users_database.db") as conn:
         cursor = conn.cursor()
         cursor.execute(
@@ -379,7 +379,13 @@ async def send_message_to_all_players(game_id, message):
             if not player_id or is_player_dead(game_id, player_id):
                 continue
             try:
-                msg = await bot.send_message(player_id, message)
+                ln = get_user_language(player)
+                if ln == "uz" and uz != 0:
+                    msg = await bot.send_message(player_id, uz)
+                elif ln == "ru" and ru != 0:
+                    msg = await bot.send_message(player_id, ru)
+                else:
+                    msg = await bot.send_message(player_id, message)
                 save_message(player_id, game_id, msg.message_id)
             except Exception as e:
                 print(f"Failed to send message to player {player_id}: {e}")
@@ -588,9 +594,34 @@ async def periodically_edit_message(
         rang = ["🔴", "🟠", "🟡", "🟢", "⚪️"]
         for row in range(len(massiv)):
             s += rang[row] + " " + massiv[row] + "\n"
-        await bot.send_message(
-            chat_id=chat_id,
-            text=(
+        ln = get_user_language(chat_id)
+        if ln == "uz":
+            ims = (
+                f"O'yin boshlandi. 🚀🚀🚀\nO'yinda {number} ta karta mavjud:\n"
+                f"{number//4} hearts — ♥️\n"
+                f"{number//4} diamonds — ♦️\n"
+                f"{number//4} spades — ♠️\n"
+                f"{number//4} clubs — ♣️\n"
+                f"2 universals — 🎴\n"
+                f"1 Joker — 🃏\n\n"
+                f"O'yinchilar: \n{s}\n"
+                f"Bosh karta: {cur_table}"
+            )
+        elif ln == "ru":
+            ims = (
+                f"Игра началась. 🚀🚀🚀\n"
+                f"В игре {number} карт.\n"
+                f"{number//4} hearts — ♥️\n"
+                f"{number//4} diamonds — ♦️\n"
+                f"{number//4} spades — ♠️\n"
+                f"{number//4} clubs — ♣️\n"
+                f"2 universals — 🎴\n"
+                f"1 Joker — 🃏\n\n"
+                f"Игроки: \n{s}\n"
+                f"Основная карта: {cur_table}"
+            )
+        else:
+            ims = (
                 f"Game has started. 🚀🚀🚀\n"
                 f"There are {number} cards in the game.\n"
                 f"{number//4} hearts — ♥️\n"
@@ -601,8 +632,8 @@ async def periodically_edit_message(
                 f"1 Joker — 🃏\n\n"
                 f"Players in the game: \n{s}\n"
                 f"Current table for cards: {cur_table}\n\n"
-            ),
-        )
+            )
+        await bot.send_message(chat_id=chat_id, text=ims)
     except Exception as e:
         await bot.send_message(
             chat_id,
@@ -2040,6 +2071,7 @@ def update_claim_time(user_id: int):
     conn.commit()
     conn.close()
 
+
 def get_user_language(user_id):
     conn = sqlite3.connect("users_database.db")
     cursor = conn.cursor()
@@ -2050,4 +2082,4 @@ def get_user_language(user_id):
 
     if row:
         return row[0]
-    return "en"  
+    return "en"
