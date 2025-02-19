@@ -316,46 +316,80 @@ async def choose_send_option(message: types.Message, state: FSMContext):
 @admin_required()
 async def send_to_all_anonymously(message: types.Message, state: FSMContext):
     await message.answer(
-        "Send me the message or post to forward anonymously to all users 📝",
+        "Send me the message in *English* 📝",
         reply_markup=back_to_admin_panel,
+        parse_mode="Markdown",
     )
-    await state.set_state(msgtoall.sendallanonym)
+    await state.set_state(msgtoall.english)
 
 
-@dp.message(msgtoall.sendallanonym)
-async def forward_to_all_users(message: types.Message, state: FSMContext):
+@dp.message(msgtoall.english)
+async def get_english_message(message: types.Message, state: FSMContext):
     if message.text == "back to admin panel 🔙":
         await message.answer(
             "You are in admin panel 👇", reply_markup=admin_panel_button
         )
         await state.clear()
         return
+
+    await state.update_data(english=message.text)
+    await message.answer(
+        "Now send me the message in *Russian* 🇷🇺", parse_mode="Markdown"
+    )
+    await state.set_state(msgtoall.russian)
+
+
+@dp.message(msgtoall.russian)
+async def get_russian_message(message: types.Message, state: FSMContext):
+    if message.text == "back to admin panel 🔙":
+        await message.answer(
+            "You are in admin panel 👇", reply_markup=admin_panel_button
+        )
+        await state.clear()
+        return
+
+    await state.update_data(russian=message.text)
+    await message.answer(
+        "Finally, send me the message in *Uzbek* 🇺🇿", parse_mode="Markdown"
+    )
+    await state.set_state(msgtoall.uzbek)
+
+
+@dp.message(msgtoall.uzbek)
+async def get_uzbek_message(message: types.Message, state: FSMContext):
+    if message.text == "back to admin panel 🔙":
+        await message.answer(
+            "You are in admin panel 👇", reply_markup=admin_panel_button
+        )
+        await state.clear()
+        return
+
+    await state.update_data(uzbek=message.text)
+    data = await state.get_data()
+    english_text = data.get("english")
+    russian_text = data.get("russian")
+    uzbek_text = data.get("uzbek")
+
     users = get_all_user_ids()
-    from_chat_id = message.chat.id
-    message_id = message.message_id
     cnt = 0
     for user_id in users:
-        if user_id == message.from_user.id:
-            continue
         try:
-            if message.text == "/start":
-                copied_msg = await bot.copy_message(
-                    chat_id=user_id,
-                    from_chat_id=from_chat_id,
-                    message_id=message_id,
-                    reply_markup=get_main_menu(user_id),
-                )
-                # await bot.delete_message(chat_id=user_id, message_id=copied_msg.message_id)
+            user_lang = get_user_language(user_id)
+            if user_lang == "ru":
+                msg_text = russian_text
+            elif user_lang == "uz":
+                msg_text = uzbek_text
             else:
-                await bot.copy_message(
-                    chat_id=user_id,
-                    from_chat_id=from_chat_id,
-                    message_id=message_id,
-                    reply_markup=get_main_menu(user_id),
-                )
+                msg_text = english_text
+
+            await bot.send_message(
+                user_id, msg_text, reply_markup=get_main_menu(user_id)
+            )
+
         except Exception:
             cnt += 1
             continue
+
     await message.answer(
         f"Message was forwarded anonymously to {len(users) - cnt} users from {len(users)} successfully ✅",
         reply_markup=admin_panel_button,

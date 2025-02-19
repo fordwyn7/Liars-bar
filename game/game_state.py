@@ -610,7 +610,7 @@ async def send_cards(callback_query: types.CallbackQuery):
     ln = get_user_language(next_player_id)
     if ln == "uz":
         gb = "Davom ettirish 🚀"
-        gb1 = "Yolg'onchi! 🙅‍♂️"
+        gb1 = "Yolg'on! 🙅‍♂️"
         mt = f"{get_user_nfgame(user_id)} o'z yurishini qildi. 🌟"
     elif ln == "ru":
         gb = "продолжить 🚀"
@@ -837,12 +837,12 @@ async def handle_continue_or_liar(callback_query: types.CallbackQuery):
             uz = (
                 f"Endi yolg'onchi o'zini otdi va qurolida haqiqiy o'q bor edi 🔰 \nOxir-oqibat u o'ldi va o'yindan chetlashtirildi 😵"
                 if isinstance(bullet, bool) and bullet
-                else f"Endi Yolg'on o'zini otdi va to'pponchasida haqiqiy o'q YO'Q edi ⭕️\nU o'yinda qoladi ✅ \nUning keyingi safar o'lish imkoniyati 1/{6 - bullet}."
+                else f"Endi Yolg'onchi o'zini otdi va ammo to'pponchasida haqiqiy o'q YO'Q edi ⭕️\nU o'yinda qoladi ✅ \nUning keyingi safar o'lish imkoniyati 1/{6 - bullet}."
             )
             ru = (
-                f"Теперь лжец застрелился, и в его пистолете была настоящая пуля 🔰 \nВ конце концов, он мертв и выбывает из игры 😵"
+                f"Теперь лжец застрелил себя, и в его пистолете была настоящая пуля 🔰 \nВ конце концов, он мертв и выбывает из игры 😵"
                 if isinstance(bullet, bool) and bullet
-                else f"Теперь лжец застрелился, и в его пистолете НЕТ настоящей пули ⭕️\nОн останется в игре ✅ \nЕго следующий шанс умереть — 1/{6 - bullet}."
+                else f"Теперь лжец застрелил себя, и в его пистолете НЕТ настоящей пули ⭕️\nОн останется в игре ✅ \nЕго следующий шанс умереть — 1/{6 - bullet}."
             )
             msge = (
                 f"Now liar shot himself and there was a real bullet in his gun 🔰 \nEventually, he is dead and eliminated from the game 😵"

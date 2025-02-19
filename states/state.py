@@ -26,7 +26,9 @@ class Adminid(StatesGroup):
     
 class msgtoall(StatesGroup):
     sendallanonym = State()
-    
+    english = State()
+    russian = State()
+    uzbek = State()
 class msgtoindividual(StatesGroup):
     userid = State()
     sendtoone = State()
