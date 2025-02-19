@@ -1073,6 +1073,7 @@ async def set_new_coin_amount(message: types.Message, state: FSMContext):
 @dp.callback_query(lambda c: c.data.startswith("get_"))
 async def process_withdraw_user(callback_query: types.CallbackQuery, state: FSMContext):
     user_id = callback_query.from_user.id
+    ln = get_user_language(user_id)
     option = callback_query.data
     conn = sqlite3.connect("users_database.db")
     cursor = conn.cursor()
@@ -1125,16 +1126,23 @@ async def process_withdraw_user(callback_query: types.CallbackQuery, state: FSMC
     elif option == "get_1000_stars":
         cost = int(thousand_stars)
         reward_name = "⭐️ 1,000 Stars"
+    if ln == "uz":
+        ms = f"❌ Bu mahsulotni olish uchun sizga yana {cost - user_unity_coins} Unity Coin kerak."
+        ms1 = f"💬 Siz tanlovingiz - {reward_name}! \nIltimos, mahsulotni jo'natmoqchi bo'lgan Telegram foydalanuvchisini usernameni kiriting:\n\n❗️ Agar username noto'g'ri kiritilgan bo'lsa, mahsulot yetkazilmasligini unitmang."
+    elif ln == "ru":
+        ms = f"❌ Вам нужно еще {cost - user_unity_coins} Unity Coin, чтобы получить этот предмет."
+        ms1 = f"💬 Вы выбрали - {reward_name}! \nПожалуйста, укажите имя пользователя Telegram, которому вы хотите отправить предмет:\n\n❗️Обратите внимание, что если имя пользователя введено неверно, ваша награда не будет выдана."
+    else:
+        ms = f"❌ You need {cost - user_unity_coins} more Unity Coins to get this item."
+        ms1 = f"💬 You selected - {reward_name}! \nPlease provide any Telegram username that you want to get item to:\n\n❗️Note that if the username you entered is incorrect, your reward won't be given."
     if user_unity_coins < cost:
         await callback_query.answer(
-            f"❌ You need {cost - user_unity_coins} more Unity Coins to get this item.",
+            ms,
             show_alert=True,
         )
         return
 
-    await callback_query.message.answer(
-        f"💬 You selected - {reward_name}! \nPlease provide any Telegram username that you want to get item to:\n\n❗️Note that if the username you entered is incorrect, your reward won't be given."
-    )
+    await callback_query.message.answer(ms1)
     await state.set_data({"reward_name": reward_name, "cost": cost})
     await state.set_state(waiting_for_username_withdraw.username_withdraw)
 
@@ -1142,25 +1150,49 @@ async def process_withdraw_user(callback_query: types.CallbackQuery, state: FSMC
 @dp.message(waiting_for_username_withdraw.username_withdraw)
 async def get_username_for_withdraw(message: types.Message, state: FSMContext):
     user_id = message.from_user.id
+    ln = get_user_language(user_id)
     username = message.text.strip()
     state_data = await state.get_data()
     reward_name = state_data["reward_name"]
     cost = state_data["cost"]
-    confirmation_message = (
-        f"💬 Please confirm your withdrawal details:\n\n"
-        f"🎁 Item Name: {reward_name}\n"
-        f"👤 To Who: {username}\n"
-        f"💰 Cost: {cost} Unity Coins\n\n"
-        "Do you confirm?"
-    )
+    if ln == "uz":
+        confirmation_message = (
+            f"💬 Iltimos quidagilarni to'g'ri ekanini tasdiqlang:\n\n"
+            f"🎁 Mahsulot: {reward_name}\n"
+            f"👤 Oluvchi foydalanuvchi: {username}\n"
+            f"💰 Narx: {cost} Unity Coins\n\n"
+            "To'g'riligini tasdiqlaysizmi ?"
+        )
+        tt = "Ha ✅"
+        t1 = "Yo'q ❌"
+    elif ln == "ru":
+        confirmation_message = (
+            f"💬 Пожалуйста, подтвердите данные для вывода средств.:\n\n"
+            f"🎁 Название товара: {reward_name}\n"
+            f"👤 Кому: {username}\n"
+            f"💰 стоимость: {cost} Unity Coins\n\n"
+            "Вы подтверждаете?"
+        )
+        tt = "Да ✅"
+        t1 = "Нет ❌"
+    else:
+        confirmation_message = (
+            f"💬 Please confirm your withdrawal details:\n\n"
+            f"🎁 Item Name: {reward_name}\n"
+            f"👤 To Who: {username}\n"
+            f"💰 Cost: {cost} Unity Coins\n\n"
+            "Do you confirm?"
+        )
+        tt = "✅ Yes"
+        t1 = "❌ No"
     await state.clear()
     keyboard = InlineKeyboardMarkup(
         inline_keyboard=[
             [
-                InlineKeyboardButton(text="✅ Yes", callback_data="confirm_withdraw"),
+                InlineKeyboardButton(text=tt, callback_data="confirm_withdraw"),
             ],
             [
-                InlineKeyboardButton(text="❌ No", callback_data="cancel_withdraw"),
+                InlineKeyboardButton(text=t1, callback_data="cancel_withdraw"),
             ],
         ]
     )
@@ -1233,10 +1265,14 @@ async def confirm_withdraw_queer(
             ]
         ),
     )
-
-    await callback_query.message.answer(
-        "✅ Your withdrawal request has been submitted to our admins.\nIt will be processed within 24 hours."
-    )
+    ln = get_user_language(user_id)
+    if ln == "uz":
+        ms = "✅ Soʻrovingiz adminlarimizga muvaffaqiyatli yuborildi.\nU 24 soat ichida koʻrib chiqiladi."
+    elif ln == "ru":
+        ms = "✅ Ваш запрос на вывод средств был отправлен нашим администраторам.\nОн будет обработан в течение 24 часов."
+    else:
+        ms = "✅ Your withdrawal request has been submitted to our admins.\nIt will be processed within 24 hours."
+    await callback_query.message.answer(ms)
     await state.clear()
 
 
