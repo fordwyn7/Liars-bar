@@ -456,6 +456,7 @@ async def set_language(callback: types.CallbackQuery, state: FSMContext):
     conn.close()
 
     await callback.message.delete()
+    await state.clear()
     await cmd_start(callback.message, state)
 
 
