@@ -411,7 +411,7 @@ def format_weekly_leaderboard(user_id):
     return leaderboard_text
 
 
-@dp.message(F.text.in_(["🏅 Leaderboard", "🏅 Ледербоард", "🏅 Liderbord"]))
+@dp.message(F.text.in_(["🏅 Leaderboard", "🏅 Лидербоард", "🏅 Liderbord"]))
 async def show_weekly_leaderboard(message: types.Message):
     leaderboard_text = format_weekly_leaderboard(message.from_user.id)
     await message.answer(leaderboard_text)
