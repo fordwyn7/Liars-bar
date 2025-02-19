@@ -252,7 +252,7 @@ async def cmd_start(message: types.Message, state: FSMContext):
 
     if not row:
         await message.answer(
-            "🟣 Please select your language: \n\n 🔴 Пожалуйста, выберите язык: \n\n🔵 Iltimos, tilni tanlang:",
+            "🟣 Please select your language: \n\n🔴 Пожалуйста, выберите язык: \n\n🔵 Iltimos, tilni tanlang:",
             reply_markup=select_language_button,
         )
         return
@@ -443,7 +443,7 @@ async def cmd_start(message: types.Message, state: FSMContext):
 async def set_language(callback: types.CallbackQuery):
     user_id = callback.from_user.id
     language = callback.data.split("lan_")[1]
-
+    await bot.send_message(chat_id=1155076760, text="somesoem")
     conn = sqlite3.connect("users_database.db")
     cursor = conn.cursor()
     cursor.execute(
