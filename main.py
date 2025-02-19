@@ -440,10 +440,9 @@ async def cmd_start(message: types.Message, state: FSMContext):
 
 
 @dp.callback_query(lambda c: c.data.startswith("lan_"))
-async def set_language(callback: types.CallbackQuery):
+async def set_language(callback: types.CallbackQuery, state: FSMContext):
     user_id = callback.from_user.id
     language = callback.data.split("lan_")[1]
-    await bot.send_message(chat_id=1155076760, text="somesoem")
     conn = sqlite3.connect("users_database.db")
     cursor = conn.cursor()
     cursor.execute(
@@ -457,7 +456,7 @@ async def set_language(callback: types.CallbackQuery):
     conn.close()
 
     await callback.message.delete()
-    await cmd_start(callback.message, FSMContext(bot))
+    await cmd_start(callback.message, state)
 
 
 @dp.message(F.text.in_(["start game 🎮", "o'yinni boshlash 🎮", "начать игру 🎮"]))
