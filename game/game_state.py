@@ -687,13 +687,11 @@ async def handle_continue_or_liar(callback_query: types.CallbackQuery):
                 ln = get_user_language(player)
                 bull = await shoot_self(game_id, player)
                 if type(bull) == type(True):
-                    uz = f"{get_user_nfgame(player)} o'zini otdi va qurolda haqiqiy o'q bo'lgani uchun halok bo'ldi 😵\nU endi o'yindan chetlashtirildi"
-                    ru = f"Игрок {get_user_nfgame(player)} застрелился и погиб от настоящей пули 😵\nТеперь он выбывает из игры."
                     await send_message_to_all_players(
                         game_id,
                         f"Player {get_user_nfgame(player)} shot himself and is dead by the real bullet 😵\nHe is now eliminated from the game.",
-                        uz,
-                        ru,
+                        f"{get_user_nfgame(player)} o'zini otdi va qurolda haqiqiy o'q bo'lgani uchun halok bo'ldi 😵\nU endi o'yindan chetlashtirildi",
+                        f"Игрок {get_user_nfgame(player)} застрелился и погиб от настоящей пули 😵\nТеперь он выбывает из игры.",
                     )
                     if is_user_turn(player, game_id):
                         update_current_turn(game_id)
@@ -871,13 +869,11 @@ async def handle_continue_or_liar(callback_query: types.CallbackQuery):
                 save_message(previous_player_id, game_id, mjj.message_id)
                 delete_user_from_all_games(previous_player_id)
         else:
-            uz = f"{get_user_nfgame(user_id)} {get_user_nfgame(previous_player_id)} ni yolg'onchi deb hisobladi 🤥. Lekin u nohaq bo'lib chiqdi 🫣\nTashlangan kartalar - {previous_player_cards}"
-            ru = f"{get_user_nfgame(user_id)} предположил, что игрок {get_user_nfgame(previous_player_id)} солгал 🤥. Но он был НЕ прав 🫣. \nВот его карты - {previous_player_cards}"
             await send_message_to_all_players(
                 game_id,
                 f"{get_user_nfgame(user_id)} has assumed that player {get_user_nfgame(previous_player_id)} lied 🤥. But he was NOT right 🫣. \nHere is his cards - {previous_player_cards}",
-                uz,
-                ru,
+                f"{get_user_nfgame(user_id)} {get_user_nfgame(previous_player_id)} ni yolg'onchi deb hisobladi 🤥. Lekin u nohaq bo'lib chiqdi 🫣\nTashlangan kartalar - {previous_player_cards}",
+                f"{get_user_nfgame(user_id)} предположил, что игрок {get_user_nfgame(previous_player_id)} солгал 🤥. Но он был НЕ прав 🫣. \nВот его карты - {previous_player_cards}",
             )
             bullet = await shoot_self(game_id, user_id)
             await asyncio.sleep(3)

@@ -363,7 +363,7 @@ def get_game_creator_id(game_id):
         return result[0] if result else None
 
 
-async def send_message_to_all_players(game_id, message, uz, ru):
+async def send_message_to_all_players(game_id, message, uzb, rub):
     with sqlite3.connect("users_database.db") as conn:
         cursor = conn.cursor()
         cursor.execute(
@@ -381,9 +381,9 @@ async def send_message_to_all_players(game_id, message, uz, ru):
             try:
                 ln = get_user_language(player)
                 if ln == "uz":
-                    msg = await bot.send_message(player_id, uz)
+                    msg = await bot.send_message(player_id, uzb)
                 elif ln == "ru":
-                    msg = await bot.send_message(player_id, ru)
+                    msg = await bot.send_message(player_id, rub)
                 else:
                     msg = await bot.send_message(player_id, message)
                 save_message(player_id, game_id, msg.message_id)
