@@ -718,48 +718,48 @@ async def handle_continue_or_liar(callback_query: types.CallbackQuery):
                 winner = get_alive_number(game_id)
                 if winner != 0:
                     ln = get_user_language(winner)
-                if ln == "uz":
-                    ms = "O'yin o'z nihoyasiga yetdi.\nSiz o'yinda g'olib bo'ldingiz 🥳🥳🥳🥳🥳\nG'olib bo'lganingiz bilan tabriklaymiz. \n🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉"
-                elif ln == "ru":
-                    ms = "Игра окончена. \nВы победитель. 🥳🥳🥳🥳🥳\nПоздравляю с победой в игре. \n🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉"
-                else:
-                    ms = "Game has finished. \nYou are winner. 🥳🥳🥳🥳🥳\nConguratulation on winning in the game. \n🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉"
-                await bot.send_message(
-                    chat_id=winner,
-                    text=ms,
-                    reply_markup=get_main_menu(winner),
-                )
-                update_game_details(
-                    game_id, winner, get_user_nfgame(winner) + " - " + str(winner)
-                )
-                conn = sqlite3.connect("users_database.db")
-                cursor = conn.cursor()
-                cursor.execute(
-                    """
-                    SELECT user_id
-                    FROM user_game_messages
-                    WHERE game_id = ?
-                    """,
-                    (game_id,),
-                )
-                user_ids = cursor.fetchall()
-                user_ids = list(set([user for user in user_ids]))
-                for users in user_ids:
-                    users = users[0]
-                    ln = get_user_language(users)
-                    if users and is_player_dead(game_id, users):
-                        update_game_details(
-                            game_id,
-                            users,
-                            get_user_nfgame(winner) + " - " + str(winner),
-                        )
-                        if ln == "uz":
-                            ms = f"Siz mag'lub bo'lgan o'yin oz nihoyasiga yetdi ⭐️\nG'olib: {get_user_nfgame(winner)} (ID: {winner}) 🏆"
-                        elif ln == "ru":
-                            ms = f"Игра, в которой вы умерли, закончилась ⭐️\nПобедитель: {get_user_nfgame(winner)} (ID: {winner}) 🏆"
-                        else:
-                            ms = f"The game in which you died has ended ⭐️\nWinner: {get_user_nfgame(winner)} (ID: {winner}) 🏆"
-                        await bot.send_message(chat_id=users, text=ms)
+                    if ln == "uz":
+                        ms = "O'yin o'z nihoyasiga yetdi.\nSiz o'yinda g'olib bo'ldingiz 🥳🥳🥳🥳🥳\nG'olib bo'lganingiz bilan tabriklaymiz. \n🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉"
+                    elif ln == "ru":
+                        ms = "Игра окончена. \nВы победитель. 🥳🥳🥳🥳🥳\nПоздравляю с победой в игре. \n🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉"
+                    else:
+                        ms = "Game has finished. \nYou are winner. 🥳🥳🥳🥳🥳\nConguratulation on winning in the game. \n🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉"
+                    await bot.send_message(
+                        chat_id=winner,
+                        text=ms,
+                        reply_markup=get_main_menu(winner),
+                    )
+                    update_game_details(
+                        game_id, winner, get_user_nfgame(winner) + " - " + str(winner)
+                    )
+                    conn = sqlite3.connect("users_database.db")
+                    cursor = conn.cursor()
+                    cursor.execute(
+                        """
+                        SELECT user_id
+                        FROM user_game_messages
+                        WHERE game_id = ?
+                        """,
+                        (game_id,),
+                    )
+                    user_ids = cursor.fetchall()
+                    user_ids = list(set([user for user in user_ids]))
+                    for users in user_ids:
+                        users = users[0]
+                        ln = get_user_language(users)
+                        if users and is_player_dead(game_id, users):
+                            update_game_details(
+                                game_id,
+                                users,
+                                get_user_nfgame(winner) + " - " + str(winner),
+                            )
+                            if ln == "uz":
+                                ms = f"Siz mag'lub bo'lgan o'yin oz nihoyasiga yetdi ⭐️\nG'olib: {get_user_nfgame(winner)} (ID: {winner}) 🏆"
+                            elif ln == "ru":
+                                ms = f"Игра, в которой вы умерли, закончилась ⭐️\nПобедитель: {get_user_nfgame(winner)} (ID: {winner}) 🏆"
+                            else:
+                                ms = f"The game in which you died has ended ⭐️\nWinner: {get_user_nfgame(winner)} (ID: {winner}) 🏆"
+                            await bot.send_message(chat_id=users, text=ms)
                 tournament_id = get_tournament_id_by_user(winner)
                 if tournament_id and is_user_in_tournament(tournament_id, winner):
                     cur_round = int(get_current_round_number(tournament_id))
