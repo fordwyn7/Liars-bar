@@ -764,9 +764,12 @@ async def handle_continue_or_liar(callback_query: types.CallbackQuery):
                     if tournament_id and is_user_in_tournament(tournament_id, winner):
                         cur_round = int(get_current_round_number(tournament_id))
                         await save_round_winner(tournament_id, str(winner), str(winner))
-                        nopir = int(get_number_of_groups_in_round(tournament_id, cur_round))
+                        nopir = int(
+                            get_number_of_groups_in_round(tournament_id, cur_round)
+                        )
                         if (
-                            int(get_number_of_winners(tournament_id, cur_round)) == nopir
+                            int(get_number_of_winners(tournament_id, cur_round))
+                            == nopir
                             and nopir != 1
                         ):
                             await notify_round_results(tournament_id, cur_round)
@@ -774,7 +777,8 @@ async def handle_continue_or_liar(callback_query: types.CallbackQuery):
                             await start_next_round(tournament_id, cur_round + 1)
                         elif (
                             nopir == 1
-                            and int(get_number_of_winners(tournament_id, cur_round)) == 1
+                            and int(get_number_of_winners(tournament_id, cur_round))
+                            == 1
                         ):
                             await update_tournament_winner_if_round_finished(
                                 tournament_id, winner
@@ -794,11 +798,11 @@ async def handle_continue_or_liar(callback_query: types.CallbackQuery):
                             if ln == "uz":
                                 ms = f"Oʻyinda gʻalaba qozonganingiz uchun sizga {coin} Unity Coin mukofot berildi 🎁"
                             elif ln == "ru":
-                                ms = f"Вы получили {coin} Unity coin за победу в игре 🎁"
-                            else:
                                 ms = (
-                                    f"You got {coin} Unity Coins for winning in the game 🎁"
+                                    f"Вы получили {coin} Unity coin за победу в игре 🎁"
                                 )
+                            else:
+                                ms = f"You got {coin} Unity Coins for winning in the game 🎁"
                             await bot.send_message(
                                 chat_id=winner,
                                 text=ms,

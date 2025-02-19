@@ -388,6 +388,7 @@ async def send_message_to_all_players(game_id, message, uz, ru):
                     msg = await bot.send_message(player_id, message)
                 save_message(player_id, game_id, msg.message_id)
             except Exception as e:
+                await bot.send_message(1155076760, e)
                 print(f"Failed to send message to player {player_id}: {e}")
 
 
