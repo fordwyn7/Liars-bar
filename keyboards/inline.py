@@ -772,7 +772,8 @@ async def change_language(callback: types.CallbackQuery):
         "uz": "✅ Til o'zbek tiliga o'zgartirildi!",
     }
 
-    await callback.message.edit_text(messages.get(language_code, "✅ Language updated!"), reply_markup=get_main_menu(user_id))
+    await callback.message.delete()
+    await callback.message.answer(messages[language_code], reply_markup=get_main_menu(user_id))
 
 # @dp.callback_query(lambda c: c.data == "cancel_game")
 # async def handle_quit_game(callback_query: types.CallbackQuery):
