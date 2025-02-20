@@ -723,3 +723,129 @@ async def earn_feature_for_users(message: types.Message):
         msg = f"Here you can find all the options for earn Unity Coins 💰"
         kb = main_earn_button
     await message.answer(msg, reply_markup=kb)
+
+
+from aiogram import types
+from aiogram.utils.keyboard import InlineKeyboardBuilder
+import sqlite3
+
+
+# Function to get one unsubscribed channel for a user
+def get_unsubscribed_channel(user_id):
+    conn = sqlite3.connect("your_database.db")  # Replace with actual DB path
+    cursor = conn.cursor()
+
+    cursor.execute(
+        """
+        SELECT channel_id, channel_link FROM channels_earn 
+        WHERE channel_id NOT IN (
+            SELECT channel_id FROM channel_subscriptions WHERE user_id = ?
+        )
+        LIMIT 1
+        """,
+        (user_id,),
+    )
+
+    channel = cursor.fetchone()
+    conn.close()
+
+    return channel  # Returns (channel_id, channel_link) or None if no channels left
+
+
+# Function to save a user's subscription
+def save_subscription(user_id, channel_id):
+    conn = sqlite3.connect("your_database.db")
+    cursor = conn.cursor()
+
+    cursor.execute(
+        """
+        INSERT OR IGNORE INTO channel_subscriptions (user_id, channel_id) 
+        VALUES (?, ?)
+        """,
+        (user_id, channel_id),
+    )
+
+    conn.commit()
+    conn.close()
+
+
+@dp.message(F.text.in_(["Join channels 💎", "Подписаться 💎", "obuna bo'lish 💎"]))
+async def join_channels_to_earn(message: types.Message):
+    user_id = message.from_user.id
+    ln = get_user_language(user_id)
+
+    channel = get_unsubscribed_channel(user_id)
+
+    if not channel:
+        no_channels_msg = {
+            "uz": "Hozircha obuna bo'lish uchun hech qanday kanallar yo'q 😓",
+            "ru": "Пока нет каналов, на которые можно подписаться 😓",
+            "en": "There are no channels to subscribe to yet 😓",
+        }
+        await message.answer(
+            no_channels_msg.get(ln, "There are no channels to subscribe to yet 😓")
+        )
+        return
+
+    channel_id, channel_link = channel
+
+    join_messages = {
+        "uz": f"✅ Ushbu kanalga qo'shiling va 5 Unity Coin mukofotiga ega bo'ling! 🎉\n\n"
+        f"⬇️ Pastdagi tugmani bosib obuna bo'ling:\n👉 <b>{channel_link}</b>",
+        "ru": f"✅ Присоединяйтесь к этому каналу и получите 5 Unity Coin в подарок! 🎉\n\n"
+        f"⬇️ Нажмите кнопку ниже, чтобы подписаться:\n👉 <b>{channel_link}</b>",
+        "en": f"✅ Join this channel and receive 5 Unity Coins as a reward! 🎉\n\n"
+        f"⬇️ Click the button below to subscribe:\n👉 <b>{channel_link}</b>",
+    }
+
+    keyboard = InlineKeyboardBuilder()
+    keyboard.button(text="✅ Join Channel", url=channel_link)
+    keyboard.button(
+        text="🔍 Check Subscription", callback_data=f"check_sub:{channel_id}"
+    )
+    keyboard.button(text="⏭️ Skip", callback_data=f"skip_sub:{channel_id}")
+    keyboard.adjust(1)
+
+    await message.answer(
+        join_messages.get(ln, join_messages["en"]), reply_markup=keyboard.as_markup()
+    )
+
+
+@dp.callback_query(lambda c: c.data.startswith("check_sub:"))
+async def check_subscription(callback: types.CallbackQuery):
+    user_id = callback.from_user.id
+    ln = get_user_language(user_id)
+    if ln == "uz":
+        ms1 = "🎉 Sizga 5 Unity Coins taqdim etildi."
+        ms2 = "🚨 Siz hali obuna bo'lmadingiz."
+    elif ln == "ru":
+        ms1 = "🎉 Вы получили 5 Unity Coin."
+        ms2 = "🚨 Вы еще не подписаны!"
+    else:
+        ms1 = "🎉 You have been awarded 5 Unity Coins."
+        ms2 = "🚨 You are not subscribed yet!"
+    channel_id = callback.data.split(":")[1]
+    member = await bot.get_chat_member(chat_id=channel_id, user_id=user_id)
+    if member.status in ["member", "administrator", "creator"]:
+        save_subscription(user_id, channel_id)
+        conn = sqlite3.connect("users_database.db")
+        cursor = conn.cursor()
+        cursor.execute(
+            "UPDATE users_database SET unity_coin = unity_coin + ? WHERE user_id = ?",
+            (5, callback.from_user.id),
+        )
+        conn.commit()
+        conn.close()
+        await callback.message.edit_text(ms1)
+        await join_channels_to_earn(callback.message)
+    else:
+        await callback.answer(ms2, show_alert=True)
+
+
+@dp.callback_query(lambda c: c.data.startswith("skip_sub:"))
+async def skip_subscription(callback: types.CallbackQuery):
+    user_id = callback.from_user.id
+    channel_id = callback.data.split(":")[1]
+    save_subscription(user_id, channel_id)
+    await callback.message.delete()
+    await join_channels_to_earn(callback.message)

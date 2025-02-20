@@ -20,7 +20,6 @@ import game.tournaments
 MAIN_ADMIN_ID = 1155076760
 conn = sqlite3.connect("users_database.db")
 cursor = conn.cursor()
-
 cursor.execute(
     """
 CREATE TABLE IF NOT EXISTS users_database (
@@ -31,8 +30,8 @@ CREATE TABLE IF NOT EXISTS users_database (
     last_name TEXT,
     registration_date TEXT, 
     nfgame TEXT
-)
-"""
+    )
+    """
 )
 cursor.execute("PRAGMA table_info(users_database);")
 columns = cursor.fetchall()
@@ -56,7 +55,6 @@ CREATE TABLE IF NOT EXISTS user_game_messages (
 );
 """
 )
-
 cursor.execute(
     """
 CREATE TABLE IF NOT EXISTS game_archive (
@@ -69,7 +67,6 @@ CREATE TABLE IF NOT EXISTS game_archive (
 )
 """
 )
-
 cursor.execute(
     """
     CREATE TABLE IF NOT EXISTS invitations (
@@ -112,7 +109,6 @@ cursor.execute(
         )
     """
 )
-
 cursor.execute(
     """
 CREATE TABLE IF NOT EXISTS tournaments_table (
@@ -208,7 +204,6 @@ cursor.execute(
         )
         """
 )
-
 cursor.execute(
     """
     CREATE TABLE IF NOT EXISTS user_languages (
@@ -218,25 +213,31 @@ cursor.execute(
     );
     """
 )
+cursor.execute(
+    """
+CREATE TABLE IF NOT EXISTS channels_earn (
+    channel_id TEXT PRIMARY KEY,
+    channel_link TEXT,
+    UNIQUE(channel_id)
+);
+"""
+)
 
+cursor.execute(
+    """
+CREATE TABLE IF NOT EXISTS channel_subscriptions (
+    user_id TEXT,
+    channel_id TEXT,
+    UNIQUE(channel_id),
+    PRIMARY KEY (user_id, channel_id),
+    FOREIGN KEY (channel_id) REFERENCES channels_earn(channel_id)
+);
+"""
+)
 
 # cursor.execute("DELETE FROM tournament_rounds_users;")
 # cursor.execute("DELETE FROM tournament_users;")
 # cursor.execute("DELETE FROM tournaments_table;")
-
-
-# cursor.execute("SELECT user_id FROM users_database")
-# users = cursor.fetchall()
-
-# for user in users:
-#     cursor.execute(
-#         """
-#         INSERT INTO user_languages (user_id, language)
-#         VALUES (?, ?)
-#         ON CONFLICT(user_id) DO UPDATE SET language = excluded.language
-#         """,
-#         (user[0], "en"),
-#     )
 
 conn.commit()
 conn.close()
@@ -385,7 +386,9 @@ async def cmd_start(message: types.Message, state: FSMContext):
         name = get_user_nfgame(user.id)
         ln1 = get_user_language(inviter_id)
         if ln1 == "ru":
-            ms1 = f"Игрок {name} присоединился к игре 🎉 \nИгроки в игре: {player_count}"
+            ms1 = (
+                f"Игрок {name} присоединился к игре 🎉 \nИгроки в игре: {player_count}"
+            )
         elif ln1 == "uz":
             ms1 = f"{name} o'yinga qo'shildi 🎉\nO'yinchilar soni: {player_count}"
         else:
@@ -525,7 +528,9 @@ async def start_game_handler(message: types.Message, state: FSMContext):
 async def get_name(message: types.Message, state: FSMContext):
     ln = get_user_language(message.from_user.id)
     if ln == "ru":
-        ms = "Вы ввели неверную информацию! Пожалуйста, выберите один из этих номеров: ⬇️"
+        ms = (
+            "Вы ввели неверную информацию! Пожалуйста, выберите один из этих номеров: ⬇️"
+        )
         kb = count_players_ru
     elif ln == "uz":
         ms = "Siz noto'g'ri ma'lumot kiritdingiz! Iltimos, quyidagi raqamlardan birini tanlang: ⬇️"
