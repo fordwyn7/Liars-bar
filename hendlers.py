@@ -837,22 +837,49 @@ async def skip_subscription(callback: types.CallbackQuery):
 
     save_subscription(user_id, channel_id)
     await callback.message.delete()
+    ln = get_user_language(user_id)
+    if ln == "uz":
+        ms12 = "🎉 Sizga 5 Unity Coin berildi."
+        ms22 = "Obuna bo'lish uchun boshqa kanallar yo'q 😓"
+    elif ln == "ru":
+        ms12 = "🎉 Вы получили 5 Unity Coin"
+        ms22 = "Пока нет каналов, на которые можно подписаться 😓"
+    else:
+        ms12 = "🎉 You have been awarded 5 Unity Coins."
+        ms22 = "There are no channels to subscribe to yet 😓"
+    if ln == "uz":
+        ms1 = "✅ Kanalga qo'shilish"
+        ms2 = "🔍 Tekshirish"
+        ms3 = "⏭️ O'tkazib yuborish"
+        ms4 = "✅ Ushbu kanalga qo'shiling va mukofot sifatida 5 ta Unity Coinga ega bo'ling! 🎉\n\n⬇️ Obuna bo'lish uchun quyidagi tugmani bosing:"
+        ms5 = "🚨 Siz hali obuna bo'lmagansiz!"
+    elif ln == "ru":
+        ms1 = "✅ Подписаться"
+        ms2 = "🔍 Проверить"
+        ms3 = "⏭️ Пропустить"
+        ms4 = "✅ Присоединяйтесь к этому каналу и получите 5 монет Unity в награду! 🎉\n\n⬇️ Нажмите кнопку ниже, чтобы подписаться:"
+        ms5 = "🚨 Вы еще не подписаны!"
+    else:
+        ms1 = "✅ Subscribe"
+        ms2 = "🔍 Check"
+        ms3 = "⏭️ Skip"
+        ms4 = "✅ Join this channel and receive 5 Unity Coins as a reward! 🎉\n\n⬇️ Click the button below to subscribe:"
+        ms5 = "🚨 You are not subscribed yet!"
+    await callback.message.edit_text(ms12)
     channels = get_unsubscribed_channels(user_id)
     if not channels:
-        await callback.message.answer("There are no channels to subscribe to yet 😓")
+        await callback.message.answer(ms22)
         return
 
     channel_id, channel_link = channels
 
     keyboard = InlineKeyboardBuilder()
-    keyboard.button(text="✅ Join Channel", url=channel_link)
-    keyboard.button(
-        text="🔍 Check Subscription", callback_data=f"check_sub:{channel_id}"
-    )
-    keyboard.button(text="⏭️ Skip", callback_data=f"skip_sub:{channel_id}")
+    keyboard.button(text=ms1, url=channel_link)
+    keyboard.button(text=ms2, callback_data=f"check_sub:{channel_id}")
+    keyboard.button(text=ms3, callback_data=f"skip_sub:{channel_id}")
     keyboard.adjust(1)
 
     await callback.message.answer(
-        "✅ Join this channel and receive 5 Unity Coins as a reward! 🎉\n\n⬇️ Click the button below to subscribe:",
+        ms4,
         reply_markup=keyboard.as_markup(),
     )
