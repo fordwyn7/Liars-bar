@@ -228,7 +228,6 @@ cursor.execute(
 CREATE TABLE IF NOT EXISTS channel_subscriptions (
     user_id TEXT,
     channel_id TEXT,
-    UNIQUE(channel_id),
     PRIMARY KEY (user_id, channel_id),
     FOREIGN KEY (channel_id) REFERENCES channels_earn(channel_id)
 );
