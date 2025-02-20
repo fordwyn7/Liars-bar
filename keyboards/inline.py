@@ -804,13 +804,14 @@ async def delete_course_callback(call: types.CallbackQuery):
     conn.close()
     await call.answer("Channel has been successfully deleted ✅", show_alert=True)
 
-    keyboard = await generate_courses_keyboard()
+    keyboard = generate_courses_keyboard()
     await call.message.edit_reply_markup(reply_markup=keyboard)
 
 @dp.callback_query(F.data.startswith("view_course:"))
 async def view_course_callbackfef(call: types.CallbackQuery):
     channel_identifier = call.data.split(":")[1]
     await call.message.answer(channel_identifier)
+    await call.answer()
 # @dp.callback_query(lambda c: c.data == "cancel_game")
 # async def handle_quit_game(callback_query: types.CallbackQuery):
 #     await bot.delete_message(
