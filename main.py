@@ -217,8 +217,7 @@ cursor.execute(
     """
 CREATE TABLE IF NOT EXISTS channels_earn (
     channel_id TEXT PRIMARY KEY,
-    channel_link TEXT,
-    UNIQUE(channel_id)
+    channel_link TEXT
 );
 """
 )
@@ -234,8 +233,8 @@ CREATE TABLE IF NOT EXISTS channel_subscriptions (
 """
 )
 
-# cursor.execute("DELETE FROM channels_earn;")
-# cursor.execute("DELETE FROM channel_subscriptions;")
+cursor.execute("DELETE FROM channels_earn;")
+cursor.execute("DELETE FROM channel_subscriptions;")
 # cursor.execute("DELETE FROM tournaments_table;")
 
 conn.commit()
