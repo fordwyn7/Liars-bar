@@ -825,6 +825,7 @@ async def check_subscription(callback: types.CallbackQuery):
             ms4,
             reply_markup=keyboard.as_markup(),
         )
+
     else:
         await callback.answer(ms5, show_alert=True)
 
@@ -864,7 +865,7 @@ async def skip_subscription(callback: types.CallbackQuery):
         ms3 = "⏭️ Skip"
         ms4 = "✅ Join this channel and receive 5 Unity Coins as a reward! 🎉\n\n⬇️ Click the button below to subscribe:"
         ms5 = "🚨 You are not subscribed yet!"
-    await callback.message.edit_text(ms12)
+    await callback.message.delete()
     channels = get_unsubscribed_channels(user_id)
     if not channels:
         await callback.message.answer(ms22)
