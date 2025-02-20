@@ -765,7 +765,34 @@ async def join_channels_to_earn(message: types.Message):
 async def check_subscription(callback: types.CallbackQuery):
     user_id = callback.from_user.id
     channel_id = callback.data.split(":")[1]
-
+    ln = get_user_language(user_id)
+    if ln == "uz":
+        ms12 = "🎉 Sizga 5 Unity Coin berildi."
+        ms22 = "Obuna bo'lish uchun boshqa kanallar yo'q 😓"
+    elif ln == "ru":
+        ms12 = "🎉 Вы получили 5 Unity Coin"
+        ms22 = "Пока нет каналов, на которые можно подписаться 😓"
+    else:
+        ms12 = "🎉 You have been awarded 5 Unity Coins."
+        ms22 = "There are no channels to subscribe to yet 😓"
+    if ln == "uz":
+        ms1 = "✅ Kanalga qo'shilish"
+        ms2 = "🔍 Tekshirish"
+        ms3 = "⏭️ O'tkazib yuborish"
+        ms4 = "✅ Ushbu kanalga qo'shiling va mukofot sifatida 5 ta Unity Coinga ega bo'ling! 🎉\n\n⬇️ Obuna bo'lish uchun quyidagi tugmani bosing:"
+        ms5 = "🚨 Siz hali obuna bo'lmagansiz!"
+    elif ln == "ru":
+        ms1 = "✅ Подписаться"
+        ms2 = "🔍 Проверить"
+        ms3 = "⏭️ Пропустить"
+        ms4 = "✅ Присоединяйтесь к этому каналу и получите 5 монет Unity в награду! 🎉\n\n⬇️ Нажмите кнопку ниже, чтобы подписаться:"
+        ms5 = "🚨 Вы еще не подписаны!"
+    else:
+        ms1 = "✅ Subscribe"
+        ms2 = "🔍 Check"
+        ms3 = "⏭️ Skip"
+        ms4 = "✅ Join this channel and receive 5 Unity Coins as a reward! 🎉\n\n⬇️ Click the button below to subscribe:"
+        ms5 = "🚨 You are not subscribed yet!"
     member = await bot.get_chat_member(chat_id=channel_id, user_id=user_id)
 
     if member.status in ["member", "administrator", "creator"]:
@@ -779,34 +806,7 @@ async def check_subscription(callback: types.CallbackQuery):
         )
         conn.commit()
         conn.close()
-        ln = get_user_language(user_id)
-        if ln == "uz":
-            ms12 = "🎉 Sizga 5 Unity Coin berildi."
-            ms22 = "Obuna bo'lish uchun boshqa kanallar yo'q 😓"
-        elif ln == "ru":
-            ms12 = "🎉 Вы получили 5 Unity Coin"
-            ms22 = "Пока нет каналов, на которые можно подписаться 😓"
-        else:
-            ms12 = "🎉 You have been awarded 5 Unity Coins."
-            ms22 = "There are no channels to subscribe to yet 😓"
-        if ln == "uz":
-            ms1 = "✅ Kanalga qo'shilish"
-            ms2 = "🔍 Tekshirish"
-            ms3 = "⏭️ O'tkazib yuborish"
-            ms4 = "✅ Ushbu kanalga qo'shiling va mukofot sifatida 5 ta Unity Coinga ega bo'ling! 🎉\n\n⬇️ Obuna bo'lish uchun quyidagi tugmani bosing:"
-            ms5 = "🚨 Siz hali obuna bo'lmagansiz!"
-        elif ln == "ru":
-            ms1 = "✅ Подписаться"
-            ms2 = "🔍 Проверить"
-            ms3 = "⏭️ Пропустить"
-            ms4 = "✅ Присоединяйтесь к этому каналу и получите 5 монет Unity в награду! 🎉\n\n⬇️ Нажмите кнопку ниже, чтобы подписаться:"
-            ms5 = "🚨 Вы еще не подписаны!"
-        else:
-            ms1 = "✅ Subscribe"
-            ms2 = "🔍 Check"
-            ms3 = "⏭️ Skip"
-            ms4 = "✅ Join this channel and receive 5 Unity Coins as a reward! 🎉\n\n⬇️ Click the button below to subscribe:"
-            ms5 = "🚨 You are not subscribed yet!"
+        
         await callback.message.edit_text(ms12)
         channels = get_unsubscribed_channels(user_id)
         if not channels:
@@ -825,7 +825,6 @@ async def check_subscription(callback: types.CallbackQuery):
             ms4,
             reply_markup=keyboard.as_markup(),
         )
-
     else:
         await callback.answer(ms5, show_alert=True)
 
