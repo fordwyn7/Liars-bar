@@ -81,7 +81,7 @@ main_earn_button_uz = ReplyKeyboardMarkup(
             KeyboardButton(text="bust x2 ⚡️"),
         ],
         [
-            KeyboardButton(text=""),
+            KeyboardButton(text="bosh menuga qaytish 🔙"),
         ],
     ],
     resize_keyboard=True,
