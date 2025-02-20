@@ -750,20 +750,6 @@ def get_unsubscribed_channel(user_id):
     return channel
 
 
-def save_subscription(user_id, channel_id):
-    conn = sqlite3.connect("users_database.db")
-    cursor = conn.cursor()
-
-    cursor.execute(
-        """
-        INSERT OR IGNORE INTO channel_subscriptions (user_id, channel_id) 
-        VALUES (?, ?)
-        """,
-        (user_id, channel_id),
-    )
-
-    conn.commit()
-    conn.close()
 
 
 @dp.message(F.text.in_(["Join channels 💎", "Подписаться 💎", "obuna bo'lish 💎"]))
