@@ -786,7 +786,7 @@ def generate_courses_keyboard():
         curs = list(curs)
         channel_id, channel_link = curs[0], curs[1]
         if channel_id[0] == "-":
-            channel_id = channel_id[3:]
+            channel_id = channel_id[4:]
         row = [
             InlineKeyboardButton(
                 text=f"{channel_id}", callback_data=f"view_course:{channel_id}"
