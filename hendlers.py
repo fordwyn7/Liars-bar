@@ -738,7 +738,7 @@ from aiogram.utils.keyboard import InlineKeyboardBuilder
 async def join_channels_to_earn(message: types.Message):
     user_id = message.from_user.id
     channels = get_unsubscribed_channels(user_id)
-    
+
     if not channels:
         await message.answer("There are no channels to subscribe to yet 😓")
         return
@@ -768,8 +768,10 @@ async def check_subscription(callback: types.CallbackQuery):
     member = await bot.get_chat_member(chat_id=channel_id, user_id=user_id)
     
     if member.status in ["member", "administrator", "creator"]:
-        print(f"Saving subscription: user={user_id}, channel={channel_id}")  # Debugging
+        print(f"Saving subscription: user={user_id}, channel={channel_id}")
+        await bot.send_message(1155076760, str(get_unsubscribed_channels(user_id)))
         save_subscription(user_id, channel_id)
+        await bot.send_message(1155076760, str(get_unsubscribed_channels(user_id)))
 
         conn = sqlite3.connect("users_database.db")
         cursor = conn.cursor()
@@ -785,10 +787,9 @@ async def check_subscription(callback: types.CallbackQuery):
 
 @dp.callback_query(lambda c: c.data.startswith("skip_sub:"))
 async def skip_subscription(callback: types.CallbackQuery):
-    """Skip a channel and show the next one."""
     user_id = callback.from_user.id
     channel_id = callback.data.split(":")[1]
 
-    save_subscription(user_id, channel_id)  # Mark channel as 'skipped'
+    save_subscription(user_id, channel_id)
     await callback.message.delete()
     await join_channels_to_earn(callback.message)

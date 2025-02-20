@@ -2103,7 +2103,6 @@ def get_unsubscribed_channels(user_id):
 
 
 def save_subscription(user_id, channel_id):
-    """Save user's subscription in the database, ensuring no duplicates."""
     conn = sqlite3.connect("users_database.db")
     cursor = conn.cursor()
 
