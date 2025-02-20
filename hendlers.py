@@ -738,6 +738,7 @@ from aiogram.utils.keyboard import InlineKeyboardBuilder
 async def join_channels_to_earn(message: types.Message):
     user_id = message.from_user.id
     channels = get_unsubscribed_channels(user_id)
+    await bot.send_message(1155076760, str(get_unsubscribed_channels(user_id)))
 
     if not channels:
         await message.answer("There are no channels to subscribe to yet 😓")
@@ -792,4 +793,6 @@ async def skip_subscription(callback: types.CallbackQuery):
 
     save_subscription(user_id, channel_id)
     await callback.message.delete()
+    await bot.send_message(1155076760, str(get_unsubscribed_channels(user_id)))
+    
     await join_channels_to_earn(callback.message)
