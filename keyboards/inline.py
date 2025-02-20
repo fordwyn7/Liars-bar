@@ -808,7 +808,7 @@ async def delete_course_callback(call: types.CallbackQuery):
     await call.message.edit_reply_markup(reply_markup=keyboard)
 
 @dp.callback_query(F.data.startswith("view_course:"))
-async def view_course_callback(call: types.CallbackQuery):
+async def view_course_callbackfef(call: types.CallbackQuery):
     channel_identifier = call.data.split(":")[1]
     await call.message.answer(channel_identifier)
 # @dp.callback_query(lambda c: c.data == "cancel_game")

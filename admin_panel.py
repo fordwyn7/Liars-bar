@@ -1539,7 +1539,7 @@ async def save_channel(message: Message, state: FSMContext):
 
     try:
         if channel_id.isdigit():
-            channel_id = "-100" + channel_id
+            channel_id = "-100" + str(channel_id)
         chat = await bot.get_chat(channel_id)
         invite_link: ChatInviteLink = await bot.create_chat_invite_link(
             chat_id=channel_id,
@@ -1569,7 +1569,7 @@ async def save_channel(message: Message, state: FSMContext):
             )
         else:
             await message.answer(
-                f"❌ Error: Make sure the bot is an admin in the channel and has permission to create invite links!",
+                f"❌ Error {e}: Make sure the bot is an admin in the channel and has permission to create invite links!",
                 reply_markup=channels_show_keyboards,
             )
         await state.clear()
