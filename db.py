@@ -2106,20 +2106,23 @@ def get_unsubscribed_channels(user_id):
 
 
 def save_subscription(user_id, channel_id):
-    """Save user's subscription in database."""
-    conn = sqlite3.connect("users_database.db")  
+    """Save user's subscription in the database, ensuring no duplicates."""
+    conn = sqlite3.connect("users_database.db")
     cursor = conn.cursor()
-    
+
     try:
         cursor.execute(
             """
-            INSERT INTO channel_subscription (user_id, channel_id) 
+            INSERT OR IGNORE INTO channel_subscription (user_id, channel_id)
             VALUES (?, ?)
-            """
-            , (user_id, channel_id)
+            """,
+            (user_id, channel_id)
         )
         conn.commit()
-    except sqlite3.Error as e:
-        print("Database Error:", e)  # Debugging error message
+        print(f"[DEBUG] Successfully saved subscription: user={user_id}, channel={channel_id}")
+
+    except sqlite3.IntegrityError as e:
+        print(f"[ERROR] Database Error: {e}")
+
     finally:
         conn.close()
