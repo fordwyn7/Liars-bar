@@ -815,12 +815,14 @@ async def delete_course_callback(call: types.CallbackQuery):
 
 @dp.callback_query(F.data.startswith("view_course:"))
 async def view_course_callbackfef(call: types.CallbackQuery):
-    channel_identifier = call.data.split(":")[1]
+    chid = call.data.split(":")[1]
+    if chid[0] == "-":
+        chid = chid[3:]
     conn = sqlite3.connect("users_database.db")
     cursor = conn.cursor()
     cursor.execute(
         "SELECT channel_link FROM channel_earn WHERE channel_id = ?",
-        (channel_identifier,),
+        (chid,),
     )
     chn = cursor.fetchall()
     conn.close()
