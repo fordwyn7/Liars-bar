@@ -2106,7 +2106,7 @@ def get_unsubscribed_channels(user_id):
     return [channel[0] for channel in channels]
 
 def save_subscription(user_id, channel_id):
-    conn = sqlite3.connect("your_database.db")  
+    conn = sqlite3.connect("users_database.db")  
     cursor = conn.cursor()
     
     cursor.execute(
