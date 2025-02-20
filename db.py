@@ -2094,15 +2094,15 @@ def get_unsubscribed_channels(user_id):
     cursor.execute(
         """
         SELECT ce.channel_id, ce.channel_link
-        FROM channels_earn ce
-        LEFT JOIN channel_subscriptions cs 
+        FROM channel_earn ce
+        LEFT JOIN channel_subscription cs 
         ON ce.channel_id = cs.channel_id AND cs.user_id = ?
         WHERE cs.channel_id IS NULL
         """,
         (user_id,),
     )
     
-    result = cursor.fetchall()  # Fetch all results
+    result = cursor.fetchall()
     
     conn.close()  # ✅ Close connection immediately
 
@@ -2120,12 +2120,12 @@ def save_subscription(user_id, channel_id):
     
     try:
         cursor.execute(
-            "INSERT OR IGNORE INTO channel_subscriptions (user_id, channel_id) VALUES (?, ?)",
+            "INSERT OR IGNORE INTO channel_subscription (user_id, channel_id) VALUES (?, ?)",
             (user_id, channel_id)
         )
         conn.commit()
     except sqlite3.IntegrityError:
         print(f"Database Error: UNIQUE constraint failed for user={user_id}, channel={channel_id}")
     finally:
-        conn.close()  # Close connection to ensure changes are applied
+        conn.close()
 
