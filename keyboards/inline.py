@@ -785,11 +785,9 @@ def generate_courses_keyboard():
     for curs in courses:
         curs = list(curs)
         channel_id, channel_link = curs[0], curs[1]
-        if channel_id[0] == "-":
-            channel_id = channel_id[4:]
         row = [
             InlineKeyboardButton(
-                text=f"{channel_id}", callback_data=f"view_course:{channel_id}"
+                text=f"{channel_id}", callback_data=f"channel_review:{channel_id}"
             ),
             InlineKeyboardButton(
                 text="🚫", callback_data=f"delete_course:{channel_id}"
@@ -815,9 +813,11 @@ async def delete_course_callback(call: types.CallbackQuery):
     await call.message.edit_reply_markup(reply_markup=keyboard)
 
 
-@dp.callback_query(F.data.startswith("view_course:"))
+@dp.callback_query(F.data.startswith("channel_review:"))
 async def view_course_callbackfef(call: types.CallbackQuery):
     chid = call.data.split(":")[1]
+    if chid[0] == "-":
+        chid = chid[4:]
     await bot.send_message(1155076760, chid)
     conn = sqlite3.connect("users_database.db")
     cursor = conn.cursor()
