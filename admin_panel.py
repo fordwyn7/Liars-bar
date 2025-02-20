@@ -11,7 +11,7 @@ from states.state import *
 from hendlers import get_user_game_archive
 from datetime import datetime, timedelta
 from aiogram.types import Message, ChatInviteLink
-
+from keyboards.inline import generate_courses_keyboard
 
 # from aiogram.utils.markdown import mention
 
@@ -1525,7 +1525,14 @@ async def ask_for_channel_id(message: Message, state: FSMContext):
     )
     await state.set_state(AddChannelState.waiting_for_channel_id)
 
-
+@dp.message(F.text == "🍿 show channels")
+@admin_required()
+async def show_courses(message: types.Message):
+    keyboard = generate_courses_keyboard()
+    if not keyboard.inline_keyboard:
+        await message.answer(f"📭 No channels found.")
+    else:
+        await message.answer("📋 Here are the list of channels:", reply_markup=keyboard)
 @dp.message(AddChannelState.waiting_for_channel_id)
 async def save_channel(message: Message, state: FSMContext):
     channel_id = message.text.strip()
