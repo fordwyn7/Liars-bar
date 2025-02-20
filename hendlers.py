@@ -738,8 +738,6 @@ from aiogram.utils.keyboard import InlineKeyboardBuilder
 async def join_channels_to_earn(message: types.Message):
     user_id = message.from_user.id
     channels = get_unsubscribed_channels(user_id)
-    await bot.send_message(1155076760, str(get_unsubscribed_channels(user_id)))
-
     if not channels:
         await message.answer("There are no channels to subscribe to yet 😓")
         return
@@ -769,7 +767,6 @@ async def check_subscription(callback: types.CallbackQuery):
         print(f"Saving subscription: user={user_id}, channel={channel_id}")
         save_subscription(user_id, channel_id)
         new_channels = get_unsubscribed_channels(user_id)
-        await bot.send_message(1155076760, str(new_channels)) 
         conn = sqlite3.connect("users_database.db")
         cursor = conn.cursor()
         cursor.execute("UPDATE users_database SET unity_coin = unity_coin + ? WHERE user_id = ?", (5, user_id))
@@ -794,7 +791,6 @@ async def skip_subscription(callback: types.CallbackQuery):
 
     save_subscription(user_id, channel_id)
     await callback.message.delete()
-    await bot.send_message(1155076760, str(get_unsubscribed_channels(user_id)))
     new_channels = get_unsubscribed_channels(user_id)
     if new_channels:
         await join_channels_to_earn(callback.message)
