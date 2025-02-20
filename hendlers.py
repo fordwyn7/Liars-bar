@@ -729,25 +729,7 @@ from aiogram.utils.keyboard import InlineKeyboardBuilder
 
 
 
-def get_unsubscribed_channel(user_id):
-    conn = sqlite3.connect("users_database.db")
-    cursor = conn.cursor()
 
-    cursor.execute(
-        """
-        SELECT channel_id, channel_link FROM channels_earn 
-        WHERE channel_id NOT IN (
-            SELECT channel_id FROM channel_subscriptions WHERE user_id = ?
-        )
-        LIMIT 1
-        """,
-        (user_id,),
-    )
-
-    channel = cursor.fetchone()
-    conn.close()
-
-    return channel
 
 
 
