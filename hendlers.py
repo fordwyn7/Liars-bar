@@ -736,10 +736,9 @@ from aiogram.utils.keyboard import InlineKeyboardBuilder
 
 @dp.message(F.text.in_(["Join channels 💎", "Подписаться 💎", "obuna bo'lish 💎"]))
 async def join_channels_to_earn(message: types.Message):
-    """Send user the first unsubscribed channel to join."""
     user_id = message.from_user.id
     channels = get_unsubscribed_channels(user_id)
-
+    
     if not channels:
         await message.answer("There are no channels to subscribe to yet 😓")
         return

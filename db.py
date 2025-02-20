@@ -2097,8 +2097,8 @@ def get_unsubscribed_channels(user_id):
     cursor.execute("SELECT channel_id, channel_link FROM channel_earn")
     all_channels = cursor.fetchall()
     conn.close()
-    unsubscribed_channels = [(channel_id, channel_link) for channel_id, channel_link in all_channels if channel_id not in subscribed_channels]
-    return unsubscribed_channels[0] if unsubscribed_channels else None
+    unsubscribed_channels = {(channel_id, channel_link) for channel_id, channel_link in all_channels if channel_id not in subscribed_channels}
+    return list(unsubscribed_channels)[0] if unsubscribed_channels else None
 
 
 
