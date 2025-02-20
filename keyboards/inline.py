@@ -816,7 +816,6 @@ async def delete_course_callback(call: types.CallbackQuery):
 @dp.callback_query(F.data.startswith("channel_review:"))
 async def view_course_callbackfef(call: types.CallbackQuery):
     chid = call.data.split(":")[1]
-    await bot.send_message(1155076760, chid)
     conn = sqlite3.connect("users_database.db")
     cursor = conn.cursor()
     cursor.execute(
@@ -825,7 +824,7 @@ async def view_course_callbackfef(call: types.CallbackQuery):
     )
     chn = cursor.fetchall()
     conn.close()
-    await call.message.answer(chn[0])
+    await call.message.answer(chn[0][0])
     await call.answer()
 
 
