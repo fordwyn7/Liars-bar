@@ -821,9 +821,9 @@ async def check_subscription(callback: types.CallbackQuery):
         conn.close()
         await callback.message.edit_text(ms1)
         await join_channels_to_earn(callback.message)
+        
     else:
-        await callback.answer(ms2, show_alert=True)
-
+        await callback.answer(ms2, show_alert=True)    
 
 @dp.callback_query(lambda c: c.data.startswith("skip_sub:"))
 async def skip_subscription(callback: types.CallbackQuery):

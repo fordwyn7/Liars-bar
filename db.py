@@ -2085,25 +2085,25 @@ def get_user_language(user_id):
     return "en"
 
 
-def get_unsubscribed_channels(user_id):
-    conn = sqlite3.connect("users_database.db") 
+def get_unsubscribed_channel(user_id):
+    conn = sqlite3.connect("users_database.db")
     cursor = conn.cursor()
     
     cursor.execute(
         """
-        SELECT channel_id, channel_link 
-        FROM channels_earn 
-        WHERE channel_id NOT IN (
-            SELECT channel_id FROM channel_subscriptions WHERE user_id = ?
-        )
+        SELECT ce.channel_id, ce.channel_link
+        FROM channels_earn ce
+        LEFT JOIN channel_subscriptions cs ON ce.channel_id = cs.channel_id AND cs.user_id = ?
+        WHERE cs.channel_id IS NULL
+        LIMIT 1
         """,
-        (user_id,)
+        (user_id,),
     )
-    channels = cursor.fetchall()
+    
+    result = cursor.fetchone()
     conn.close()
-    if not channels:
-        return None 
-    return [channel[0] for channel in channels]
+    return result
+
 
 def save_subscription(user_id, channel_id):
     conn = sqlite3.connect("users_database.db")  
