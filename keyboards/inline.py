@@ -818,8 +818,7 @@ async def delete_course_callback(call: types.CallbackQuery):
 @dp.callback_query(F.data.startswith("view_course:"))
 async def view_course_callbackfef(call: types.CallbackQuery):
     chid = call.data.split(":")[1]
-    if chid[0] == "-":
-        chid = chid[3:]
+    await bot.send_message(1155076760, chid)
     conn = sqlite3.connect("users_database.db")
     cursor = conn.cursor()
     cursor.execute(
