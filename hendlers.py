@@ -777,8 +777,11 @@ async def check_subscription(callback: types.CallbackQuery):
         conn.close()
 
         await callback.message.edit_text("🎉 You have been awarded 5 Unity Coins.")
-        await asyncio.sleep(2) 
-        await join_channels_to_earn(callback.message)
+        new_channels = get_unsubscribed_channels(user_id)
+        if new_channels:
+            await join_channels_to_earn(callback.message)
+        else:
+            await callback.message.answer("There are no more channels to subscribe to yet 😓")
     else:
         await callback.answer("🚨 You are not subscribed yet!", show_alert=True)
 
@@ -792,6 +795,8 @@ async def skip_subscription(callback: types.CallbackQuery):
     save_subscription(user_id, channel_id)
     await callback.message.delete()
     await bot.send_message(1155076760, str(get_unsubscribed_channels(user_id)))
-    await asyncio.sleep(2) 
-    
-    await join_channels_to_earn(callback.message)
+    new_channels = get_unsubscribed_channels(user_id)
+    if new_channels:
+        await join_channels_to_earn(callback.message)
+    else:
+        await callback.message.answer("There are no more channels to subscribe to yet 😓")
