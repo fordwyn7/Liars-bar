@@ -744,7 +744,7 @@ async def join_channels_to_earn(message: types.Message):
         await message.answer("There are no channels to subscribe to yet 😓")
         return
 
-    channel_id, channel_link = channels[0]  # Get first unsubscribed channel
+    channel_id, channel_link = channels
 
     keyboard = InlineKeyboardBuilder()
     keyboard.button(text="✅ Join Channel", url=channel_link)
