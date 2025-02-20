@@ -1530,7 +1530,7 @@ async def save_channel(message: Message, state: FSMContext):
         conn = sqlite3.connect("users_database.db")  
         cursor = conn.cursor()
         cursor.execute(
-            "INSERT INTO channels_earn (channel_id, channel_link) VALUES (?, ?)",
+            "INSERT INTO channel_earn (channel_id, channel_link) VALUES (?, ?)",
             (channel_id, channel_link),
         )
         conn.commit()

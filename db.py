@@ -2092,8 +2092,8 @@ def get_unsubscribed_channels(user_id):
     cursor.execute(
         """
         SELECT ce.channel_id, ce.channel_link
-        FROM channels_earn ce
-        LEFT JOIN channel_subscriptions cs ON ce.channel_id = cs.channel_id AND cs.user_id = ?
+        FROM channel_earn ce
+        LEFT JOIN channel_subscription cs ON ce.channel_id = cs.channel_id AND cs.user_id = ?
         WHERE cs.channel_id IS NULL
         LIMIT 1
         """,
@@ -2113,7 +2113,7 @@ def save_subscription(user_id, channel_id):
     try:
         cursor.execute(
             """
-            INSERT INTO channel_subscriptions (user_id, channel_id) 
+            INSERT INTO channel_subscription (user_id, channel_id) 
             VALUES (?, ?)
             """
             , (user_id, channel_id)

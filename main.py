@@ -215,7 +215,7 @@ cursor.execute(
 )
 cursor.execute(
     """
-CREATE TABLE IF NOT EXISTS channels_earn (
+CREATE TABLE IF NOT EXISTS channel_earn (
     channel_id TEXT PRIMARY KEY,
     channel_link TEXT
 );
@@ -224,17 +224,17 @@ CREATE TABLE IF NOT EXISTS channels_earn (
 
 cursor.execute(
     """
-CREATE TABLE IF NOT EXISTS channel_subscriptions (
+CREATE TABLE IF NOT EXISTS channel_subscription (
     user_id TEXT,
     channel_id TEXT,
     PRIMARY KEY (user_id, channel_id),
-    FOREIGN KEY (channel_id) REFERENCES channels_earn(channel_id)
+    FOREIGN KEY (channel_id) REFERENCES channel_earn(channel_id)
 );
 """
 )
 
-# cursor.execute("DELETE FROM channels_earn;")
-# cursor.execute("DELETE FROM channel_subscriptions;")
+# cursor.execute("DELETE FROM channel_earn;")
+# cursor.execute("DELETE FROM channel_subscription;")
 # cursor.execute("DELETE FROM tournaments_table;")
 
 conn.commit()
