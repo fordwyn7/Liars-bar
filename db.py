@@ -2086,8 +2086,33 @@ def get_user_language(user_id):
 
 
 
+def get_unsubscribed_channels(user_id):
+    """Fetch channels the user is NOT subscribed to."""
+    conn = sqlite3.connect("users_database.db") 
+    cursor = conn.cursor()
+    
+    cursor.execute(
+        """
+        SELECT channel_id, channel_link 
+        FROM channels_earn 
+        WHERE channel_id NOT IN (
+            SELECT channel_id FROM channel_subscriptions WHERE user_id = ?
+        )
+        """
+        , (user_id,)
+    )
+    
+    channels = cursor.fetchall()
+    conn.close()
+    
+    if not channels:
+        return None 
+    
+    return channels  # Returns a list of tuples [(channel_id, channel_link)]
+
 
 def save_subscription(user_id, channel_id):
+    """Save user's subscription in database."""
     conn = sqlite3.connect("users_database.db")  
     cursor = conn.cursor()
     
@@ -2096,31 +2121,11 @@ def save_subscription(user_id, channel_id):
             """
             INSERT INTO channel_subscriptions (user_id, channel_id) 
             VALUES (?, ?)
-            """,
-            (user_id, channel_id)
+            """
+            , (user_id, channel_id)
         )
         conn.commit()
     except sqlite3.Error as e:
-        print("Database Error:", e) 
+        print("Database Error:", e)  # Debugging error message
     finally:
         conn.close()
-
-def get_unsubscribed_channel(user_id):
-    conn = sqlite3.connect("users_database.db")
-    cursor = conn.cursor()
-
-    cursor.execute(
-        """
-        SELECT channel_id, channel_link FROM channels_earn 
-        WHERE channel_id NOT IN (
-            SELECT channel_id FROM channel_subscriptions WHERE user_id = ?
-        )
-        LIMIT 1
-        """,
-        (user_id,),
-    )
-
-    channel = cursor.fetchone()
-    conn.close()
-
-    return channel

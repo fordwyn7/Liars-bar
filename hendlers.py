@@ -736,81 +736,60 @@ from aiogram.utils.keyboard import InlineKeyboardBuilder
 
 @dp.message(F.text.in_(["Join channels 💎", "Подписаться 💎", "obuna bo'lish 💎"]))
 async def join_channels_to_earn(message: types.Message):
+    """Send user the first unsubscribed channel to join."""
     user_id = message.from_user.id
-    ln = get_user_language(user_id)
+    channels = get_unsubscribed_channels(user_id)
 
-    channel = get_unsubscribed_channel(user_id)
-
-    if not channel:
-        no_channels_msg = {
-            "uz": "Hozircha obuna bo'lish uchun hech qanday kanallar yo'q 😓",
-            "ru": "Пока нет каналов, на которые можно подписаться 😓",
-            "en": "There are no channels to subscribe to yet 😓",
-        }
-        await message.answer(
-            no_channels_msg.get(ln, "There are no channels to subscribe to yet 😓")
-        )
+    if not channels:
+        await message.answer("There are no channels to subscribe to yet 😓")
         return
 
-    channel_id, channel_link = channel
-
-    join_messages = {
-        "uz": f"✅ Ushbu kanalga qo'shiling va 5 Unity Coin mukofotiga ega bo'ling! 🎉\n\n"
-        f"⬇️ Pastdagi tugmani bosib obuna bo'ling:",
-        "ru": f"✅ Присоединяйтесь к этому каналу и получите 5 Unity Coin в подарок! 🎉\n\n"
-        f"⬇️ Нажмите кнопку ниже, чтобы подписаться:",
-        "en": f"✅ Join this channel and receive 5 Unity Coins as a reward! 🎉\n\n"
-        f"⬇️ Click the button below to subscribe:",
-    }
+    channel_id, channel_link = channels[0]  # Get first unsubscribed channel
 
     keyboard = InlineKeyboardBuilder()
     keyboard.button(text="✅ Join Channel", url=channel_link)
-    keyboard.button(
-        text="🔍 Check Subscription", callback_data=f"check_sub:{channel_id}"
-    )
+    keyboard.button(text="🔍 Check Subscription", callback_data=f"check_sub:{channel_id}")
     keyboard.button(text="⏭️ Skip", callback_data=f"skip_sub:{channel_id}")
     keyboard.adjust(1)
 
     await message.answer(
-        join_messages.get(ln, join_messages["en"]), reply_markup=keyboard.as_markup()
+        "✅ Join this channel and receive 5 Unity Coins as a reward! 🎉\n\n⬇️ Click the button below to subscribe:",
+        reply_markup=keyboard.as_markup()
     )
 
 
+# ---------- Callback Handlers ----------
+
 @dp.callback_query(lambda c: c.data.startswith("check_sub:"))
 async def check_subscription(callback: types.CallbackQuery):
+    """Check if user has subscribed and reward them."""
     user_id = callback.from_user.id
-    ln = get_user_language(user_id)
-    if ln == "uz":
-        ms1 = "🎉 Sizga 5 Unity Coins taqdim etildi."
-        ms2 = "🚨 Siz hali obuna bo'lmadingiz."
-    elif ln == "ru":
-        ms1 = "🎉 Вы получили 5 Unity Coin."
-        ms2 = "🚨 Вы еще не подписаны!"
-    else:
-        ms1 = "🎉 You have been awarded 5 Unity Coins."
-        ms2 = "🚨 You are not subscribed yet!"
     channel_id = callback.data.split(":")[1]
+
     member = await bot.get_chat_member(chat_id=channel_id, user_id=user_id)
+    
     if member.status in ["member", "administrator", "creator"]:
+        print(f"Saving subscription: user={user_id}, channel={channel_id}")  # Debugging
         save_subscription(user_id, channel_id)
+
         conn = sqlite3.connect("users_database.db")
         cursor = conn.cursor()
-        cursor.execute(
-            "UPDATE users_database SET unity_coin = unity_coin + ? WHERE user_id = ?",
-            (5, callback.from_user.id),
-        )
+        cursor.execute("UPDATE users_database SET unity_coin = unity_coin + ? WHERE user_id = ?", (5, user_id))
         conn.commit()
         conn.close()
-        await callback.message.edit_text(ms1)
+
+        await callback.message.edit_text("🎉 You have been awarded 5 Unity Coins.")
         await join_channels_to_earn(callback.message)
-        
     else:
-        await callback.answer(ms2, show_alert=True)    
+        await callback.answer("🚨 You are not subscribed yet!", show_alert=True)
+
 
 @dp.callback_query(lambda c: c.data.startswith("skip_sub:"))
 async def skip_subscription(callback: types.CallbackQuery):
+    """Skip a channel and show the next one."""
     user_id = callback.from_user.id
     channel_id = callback.data.split(":")[1]
-    save_subscription(user_id, channel_id)
+
+    save_subscription(user_id, channel_id)  # Mark channel as 'skipped'
     await callback.message.delete()
     await join_channels_to_earn(callback.message)
