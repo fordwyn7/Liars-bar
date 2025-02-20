@@ -747,12 +747,11 @@ def get_unsubscribed_channel(user_id):
     channel = cursor.fetchone()
     conn.close()
 
-    return channel  # Returns (channel_id, channel_link) or None if no channels left
+    return channel
 
 
-# Function to save a user's subscription
 def save_subscription(user_id, channel_id):
-    conn = sqlite3.connect("your_database.db")
+    conn = sqlite3.connect("users_database.db")
     cursor = conn.cursor()
 
     cursor.execute(
@@ -789,11 +788,11 @@ async def join_channels_to_earn(message: types.Message):
 
     join_messages = {
         "uz": f"✅ Ushbu kanalga qo'shiling va 5 Unity Coin mukofotiga ega bo'ling! 🎉\n\n"
-        f"⬇️ Pastdagi tugmani bosib obuna bo'ling:\n👉 <b>{channel_link}</b>",
+        f"⬇️ Pastdagi tugmani bosib obuna bo'ling:",
         "ru": f"✅ Присоединяйтесь к этому каналу и получите 5 Unity Coin в подарок! 🎉\n\n"
-        f"⬇️ Нажмите кнопку ниже, чтобы подписаться:\n👉 <b>{channel_link}</b>",
+        f"⬇️ Нажмите кнопку ниже, чтобы подписаться:",
         "en": f"✅ Join this channel and receive 5 Unity Coins as a reward! 🎉\n\n"
-        f"⬇️ Click the button below to subscribe:\n👉 <b>{channel_link}</b>",
+        f"⬇️ Click the button below to subscribe:",
     }
 
     keyboard = InlineKeyboardBuilder()
