@@ -768,7 +768,6 @@ async def check_subscription(callback: types.CallbackQuery):
     if member.status in ["member", "administrator", "creator"]:
         print(f"Saving subscription: user={user_id}, channel={channel_id}")
         save_subscription(user_id, channel_id)
-        await asyncio.sleep(0.1) 
         new_channels = get_unsubscribed_channels(user_id)
         await bot.send_message(1155076760, str(new_channels)) 
         conn = sqlite3.connect("users_database.db")
@@ -778,6 +777,7 @@ async def check_subscription(callback: types.CallbackQuery):
         conn.close()
 
         await callback.message.edit_text("🎉 You have been awarded 5 Unity Coins.")
+        await asyncio.sleep(2) 
         await join_channels_to_earn(callback.message)
     else:
         await callback.answer("🚨 You are not subscribed yet!", show_alert=True)
@@ -790,8 +790,8 @@ async def skip_subscription(callback: types.CallbackQuery):
     channel_id = callback.data.split(":")[1]
 
     save_subscription(user_id, channel_id)
-    await asyncio.sleep(0.1)
     await callback.message.delete()
     await bot.send_message(1155076760, str(get_unsubscribed_channels(user_id)))
+    await asyncio.sleep(2) 
     
     await join_channels_to_earn(callback.message)

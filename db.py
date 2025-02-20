@@ -2090,7 +2090,6 @@ def get_unsubscribed_channels(user_id):
     cursor = conn.cursor()
     cursor.execute("PRAGMA synchronous = OFF")
     cursor.execute("PRAGMA journal_mode = WAL")
-
     cursor.execute(
         """
         SELECT ce.channel_id, ce.channel_link
@@ -2103,9 +2102,10 @@ def get_unsubscribed_channels(user_id):
     )
     
     result = cursor.fetchall()
+    conn.close()
     
-    conn.close()  # ✅ Close connection immediately
-
+    print(f"Unsubscribed channels for user {user_id}: {result}") 
+    
     if not result:
         return None  
     
@@ -2124,8 +2124,8 @@ def save_subscription(user_id, channel_id):
             (user_id, channel_id)
         )
         conn.commit()
-    except sqlite3.IntegrityError:
-        print(f"Database Error: UNIQUE constraint failed for user={user_id}, channel={channel_id}")
+        print(f"Subscription saved: user={user_id}, channel={channel_id}")
+    except sqlite3.IntegrityError as e:
+        print(f"Database Error: {e} for user={user_id}, channel={channel_id}")
     finally:
         conn.close()
-
