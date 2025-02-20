@@ -803,8 +803,20 @@ async def skip_subscription(callback: types.CallbackQuery):
 
     save_subscription(user_id, channel_id)
     await callback.message.delete()
-    new_channels = get_unsubscribed_channels(user_id)
-    if new_channels:
-        await join_channels_to_earn(callback.message)
-    else:
-        await callback.message.answer("There are no more channels to subscribe to yet 😓")
+    channels = get_unsubscribed_channels(user_id)
+    if not channels:
+        await callback.message.answer("There are no channels to subscribe to yet 😓")
+        return
+
+    channel_id, channel_link = channels
+
+    keyboard = InlineKeyboardBuilder()
+    keyboard.button(text="✅ Join Channel", url=channel_link)
+    keyboard.button(text="🔍 Check Subscription", callback_data=f"check_sub:{channel_id}")
+    keyboard.button(text="⏭️ Skip", callback_data=f"skip_sub:{channel_id}")
+    keyboard.adjust(1)
+
+    await callback.message.answer(
+        "✅ Join this channel and receive 5 Unity Coins as a reward! 🎉\n\n⬇️ Click the button below to subscribe:",
+        reply_markup=keyboard.as_markup()
+    )
