@@ -234,8 +234,8 @@ CREATE TABLE IF NOT EXISTS channel_subscriptions (
 """
 )
 
-# cursor.execute("DELETE FROM tournament_rounds_users;")
-# cursor.execute("DELETE FROM tournament_users;")
+cursor.execute("DELETE FROM channels_earn;")
+cursor.execute("DELETE FROM channel_subscriptions;")
 # cursor.execute("DELETE FROM tournaments_table;")
 
 conn.commit()
