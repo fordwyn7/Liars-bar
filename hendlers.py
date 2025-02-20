@@ -772,6 +772,7 @@ async def check_subscription(callback: types.CallbackQuery):
         print(f"Saving subscription: user={user_id}, channel={channel_id}")
         await bot.send_message(1155076760, str(get_unsubscribed_channels(user_id)))
         save_subscription(user_id, channel_id)
+        await asyncio.sleep(0.1)
         await bot.send_message(1155076760, str(get_unsubscribed_channels(user_id)))
 
         conn = sqlite3.connect("users_database.db")
@@ -792,6 +793,7 @@ async def skip_subscription(callback: types.CallbackQuery):
     channel_id = callback.data.split(":")[1]
 
     save_subscription(user_id, channel_id)
+    await asyncio.sleep(0.1)
     await callback.message.delete()
     await bot.send_message(1155076760, str(get_unsubscribed_channels(user_id)))
     
