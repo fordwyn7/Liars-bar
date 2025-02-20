@@ -14,6 +14,7 @@ def get_user_language(user_id):
         return row[0]
     return "en"
 
+
 def is_user_admin(user_id):
     conn = sqlite3.connect("users_database.db")
     cursor = conn.cursor()
@@ -23,39 +24,103 @@ def is_user_admin(user_id):
     return result is not None
 
 
+main_earn_button = ReplyKeyboardMarkup(
+    keyboard=[
+        [
+            KeyboardButton(text="bonus 🚀"),
+            KeyboardButton(text="mystery box 🎁"),
+        ],
+        [
+            KeyboardButton(text="❄️ referral"),
+            KeyboardButton(text="🤩 tournaments"),
+        ],
+        [
+            KeyboardButton(text="Join channels 💎"),
+            KeyboardButton(text="Dual Boost ⚡️"),
+        ],
+        [
+            KeyboardButton(text="back to main menu 🔙"),
+        ],
+    ],
+    resize_keyboard=True,
+)
+
+main_earn_button_ru = ReplyKeyboardMarkup(
+    keyboard=[
+        [
+            KeyboardButton(text="бонус 🚀"),
+            KeyboardButton(text="Тайнбокс 🎁"),
+        ],
+        [
+            KeyboardButton(text="❄️ реферал"),
+            KeyboardButton(text="🤩 турниры"),
+        ],
+        [
+            KeyboardButton(text="Подписаться 💎"),
+            KeyboardButton(text="Буст x2 ⚡️"),
+        ],
+        [
+            KeyboardButton(text="вернуться в главное меню 🔙"),
+        ],
+    ],
+    resize_keyboard=True,
+)
+
+main_earn_button_uz = ReplyKeyboardMarkup(
+    keyboard=[
+        [
+            KeyboardButton(text="bonus 🚀"),
+            KeyboardButton(text="sirli quti 🎁"),
+        ],
+        [
+            KeyboardButton(text="❄️ referal"),
+            KeyboardButton(text="🤩 turnirlar"),
+        ],
+        [
+            KeyboardButton(text="obuna bo'lish 💎"),
+            KeyboardButton(text="bust x2 ⚡️"),
+        ],
+        [
+            KeyboardButton(text=""),
+        ],
+    ],
+    resize_keyboard=True,
+)
+
+
 def get_main_menu(user_id: int):
     is_admin = is_user_admin(user_id)
     ln = get_user_language(user_id)
     if ln == "uz":
         st = "o'yinni boshlash 🎮"
         lb = "🏅 Liderbord"
-        bb = "bonus 🚀"
+        bb = "pul ishlash 💸"
         kb = "📱 kabinet"
         pz = "Sovg'alar 🎁"
-        rf = "❄️ referal"
-        tu = "🤩 turnirlar"
+        # rf = "❄️ referal"
+        # tu = "🤩 turnirlar"
         gr = "o'yin qoidalari 📜"
         io = "ma'lumot 📚"
         ss = "sozlamalar ⚙️"
     elif ln == "ru":
         st = "новая игра 🎮"
         lb = "🏅 Лидербоард"
-        bb = "бонус 🚀"
+        bb = "зарабатывать 💸"
         kb = "📱 кабинет"
         pz = "Призы 🎁"
-        rf = "❄️ реферал"
-        tu = "🤩 турниры"
+        # rf = "❄️ реферал"
+        # tu = "🤩 турниры"
         gr = "правила игры 📜"
         io = "информация 📚"
         ss = "настройки ⚙️"
     else:
         st = "start game 🎮"
         lb = "🏅 Leaderboard"
-        bb = "bonus 🚀"
+        bb = "earn 💸"
         kb = "📱 cabinet"
         pz = "Prizes 🎁"
-        rf = "❄️ referral"
-        tu = "🤩 tournaments"
+        # rf = "❄️ referral"
+        # tu = "🤩 tournaments"
         gr = "game rules 📜"
         io = "information 📚"
         ss = "settings ⚙️"
@@ -63,11 +128,13 @@ def get_main_menu(user_id: int):
         [
             KeyboardButton(text=st),
             KeyboardButton(text=lb),
-            KeyboardButton(text=bb),
         ],
-        [KeyboardButton(text=kb), KeyboardButton(text=pz), KeyboardButton(text=rf)],
         [
-            KeyboardButton(text=tu),
+            KeyboardButton(text=bb),
+            KeyboardButton(text=pz),
+        ],
+        [
+            KeyboardButton(text=kb),
             KeyboardButton(text=gr),
         ],
         [
@@ -99,7 +166,6 @@ change_name_ru = ReplyKeyboardMarkup(
         [
             KeyboardButton(text="изменить имя пользователя 🖌"),
             KeyboardButton(text="изменить язык 🇷🇺"),
-            
         ],
         [
             KeyboardButton(text="❓ помощь"),

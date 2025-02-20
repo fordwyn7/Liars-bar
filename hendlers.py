@@ -707,3 +707,19 @@ async def change_langguage(message: types.Message):
 #         reply_markup=get_main_menu(message.from_user.id),
 #     )
 #     await state.clear()
+
+
+@dp.message(F.text.in_(["pul ishlash 💸", "зарабатывать 💸", "earn 💸"]))
+async def earn_feature_for_users(message: types.Message):
+    user_id = message.from_user.id
+    ln = get_user_language(user_id)
+    if ln == "uz":
+        msg = "Bu yerda siz Unity Coinlarni ishlash bo'yicha barcha variantlarini topishingiz mumkin 💰"
+        kb = main_earn_button_uz
+    elif ln == "ru":
+        msg = "Здесь вы найдете все варианты заработка Unity Coin 💰"
+        kb = main_earn_button_ru
+    else:
+        msg = f"Here you can find all the options for earn Unity Coins 💰"
+        kb = main_earn_button
+    await message.answer(msg, reply_markup=kb)

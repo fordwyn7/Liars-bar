@@ -1265,7 +1265,7 @@ async def confirm_withdraw_queer(
         f"👤 To Who: {username}\n"
         f"💰 Cost: {cost} Unity Coins\n"
         f"🔢 User ID: {user_id}\n"
-        f"💸 User's balance: {balance} Unity coins 💰 *"
+        f"💸 User's balance: {balance} Unity coins 💰"
     )
     conn = sqlite3.connect("users_database.db")
     cursor = conn.cursor()
