@@ -87,3 +87,5 @@ class waitforreferralamount(StatesGroup):
 class waitforcoinamount(StatesGroup):
     amount = State()
     
+class AddChannelState(StatesGroup):
+    waiting_for_channel_id = State()

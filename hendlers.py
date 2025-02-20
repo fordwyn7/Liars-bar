@@ -730,7 +730,7 @@ from aiogram.utils.keyboard import InlineKeyboardBuilder
 
 
 def get_unsubscribed_channel(user_id):
-    conn = sqlite3.connect("users_database.db")  # Replace with actual DB path
+    conn = sqlite3.connect("users_database.db")
     cursor = conn.cursor()
 
     cursor.execute(

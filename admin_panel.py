@@ -10,6 +10,8 @@ from aiogram.utils.keyboard import InlineKeyboardBuilder
 from states.state import *
 from hendlers import get_user_game_archive
 from datetime import datetime, timedelta
+from aiogram.types import Message, ChatInviteLink
+
 
 # from aiogram.utils.markdown import mention
 
@@ -1503,4 +1505,38 @@ async def change_game_coin_state(message: types.Message, state: FSMContext):
             f"New game coin amount is successfully set ✅",
             reply_markup=admin_panel_button,
         )
+        await state.clear()
+
+
+@dp.message(F.text == "➕ Add channel")
+@admin_required()
+async def ask_for_channel_id(message: Message, state: FSMContext):
+    await message.answer("Please send me the channel username (e.g., @channelusername) or ID.")
+    await state.set_state(AddChannelState.waiting_for_channel_id)
+
+@dp.message(AddChannelState.waiting_for_channel_id)
+async def save_channel(message: Message, state: FSMContext):
+    channel_id = message.text.strip()
+
+    try:
+        chat = await bot.get_chat(channel_id)
+        invite_link: ChatInviteLink = await bot.create_chat_invite_link(
+            chat_id=channel_id,
+            creates_join_request=False, 
+            expire_date=None,  
+            member_limit=None
+        )
+        channel_link = invite_link.invite_link
+        conn = sqlite3.connect("users_database.db")  
+        cursor = conn.cursor()
+        cursor.execute(
+            "INSERT INTO channels_earn (channel_id, channel_link) VALUES (?, ?)",
+            (channel_id, channel_link),
+        )
+        conn.commit()
+        await message.answer(f"✅ Channel successfully added!\n\n🔗 Invite Link: {channel_link}")
+        await state.clear()
+
+    except Exception as e:
+        await message.answer(f"❌ Error: {e}\nMake sure the bot is an admin in the channel and has permission to create invite links!")
         await state.clear()
