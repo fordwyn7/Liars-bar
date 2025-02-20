@@ -4,7 +4,7 @@ from aiogram import types
 from aiogram.fsm.context import FSMContext
 from keyboards.keyboard import *
 from keyboards.inline import *
-from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup, InlineKeyboardBuilder
+from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 
 from states.state import NewGameState, MessagetoAdmin, awaiting_game_number
 from db import *
@@ -725,9 +725,12 @@ async def earn_feature_for_users(message: types.Message):
     await message.answer(msg, reply_markup=kb)
 
 
+from aiogram.utils.keyboard import InlineKeyboardBuilder
+
+
 
 def get_unsubscribed_channel(user_id):
-    conn = sqlite3.connect("users_database.db")
+    conn = sqlite3.connect("users_database.db")  # Replace with actual DB path
     cursor = conn.cursor()
 
     cursor.execute(
