@@ -2105,20 +2105,15 @@ def get_unsubscribed_channels(user_id):
 def save_subscription(user_id, channel_id):
     conn = sqlite3.connect("users_database.db")
     cursor = conn.cursor()
-
+    
     try:
         cursor.execute(
-            """
-            INSERT OR IGNORE INTO channel_subscription (user_id, channel_id)
-            VALUES (?, ?)
-            """,
+            "INSERT OR IGNORE INTO channel_subscriptions (user_id, channel_id) VALUES (?, ?)",
             (user_id, channel_id)
         )
         conn.commit()
-        print(f"[DEBUG] Successfully saved subscription: user={user_id}, channel={channel_id}")
-
-    except sqlite3.IntegrityError as e:
-        print(f"[ERROR] Database Error: {e}")
-
+    except sqlite3.IntegrityError:
+        print(f"Database Error: UNIQUE constraint failed for user={user_id}, channel={channel_id}")
     finally:
-        conn.close()
+        conn.close()  # Close connection to ensure changes are applied
+

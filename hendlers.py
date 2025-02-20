@@ -758,11 +758,8 @@ async def join_channels_to_earn(message: types.Message):
     )
 
 
-# ---------- Callback Handlers ----------
-
 @dp.callback_query(lambda c: c.data.startswith("check_sub:"))
 async def check_subscription(callback: types.CallbackQuery):
-    """Check if user has subscribed and reward them."""
     user_id = callback.from_user.id
     channel_id = callback.data.split(":")[1]
 
@@ -770,11 +767,10 @@ async def check_subscription(callback: types.CallbackQuery):
     
     if member.status in ["member", "administrator", "creator"]:
         print(f"Saving subscription: user={user_id}, channel={channel_id}")
-        await bot.send_message(1155076760, str(get_unsubscribed_channels(user_id)))
         save_subscription(user_id, channel_id)
-        await asyncio.sleep(0.1)
-        await bot.send_message(1155076760, str(get_unsubscribed_channels(user_id)))
-
+        await asyncio.sleep(0.1) 
+        new_channels = get_unsubscribed_channels(user_id)
+        await bot.send_message(1155076760, str(new_channels)) 
         conn = sqlite3.connect("users_database.db")
         cursor = conn.cursor()
         cursor.execute("UPDATE users_database SET unity_coin = unity_coin + ? WHERE user_id = ?", (5, user_id))
@@ -785,6 +781,7 @@ async def check_subscription(callback: types.CallbackQuery):
         await join_channels_to_earn(callback.message)
     else:
         await callback.answer("🚨 You are not subscribed yet!", show_alert=True)
+
 
 
 @dp.callback_query(lambda c: c.data.startswith("skip_sub:"))
