@@ -250,25 +250,23 @@ async def cmd_start(message: types.Message, state: FSMContext):
     cursor.execute("SELECT language FROM user_languages WHERE user_id = ?", (user_id,))
     row = cursor.fetchone()
     conn.close()
-
     if not row and message.text == "/start":
         await message.answer(
             "🟣 Please select your language: \n\n🔴 Пожалуйста, выберите язык: \n\n🔵 Iltimos, tilni tanlang:",
             reply_markup=select_language_button,
         )
         return
-
     payload = message.text.split(" ", 1)[-1] if " " in message.text else ""
     await state.update_data(payload=payload)
     ln = get_user_language(user_id)
     if "game_" in payload:
         if not is_user_registered(user_id):
             if ln == "ru":
-                ms = "🎭 Добро пожаловать в Liar's Fortune! 🎭\nПожалуйста, введите *правильное* имя пользователя ✍️"
+                ms = "🎭 Добро пожаловать в Liar's Fortune! 🎭\nПожалуйста, введите правильное имя пользователя ✍️"
             elif ln == "uz":
                 ms = "🎭 Liar's Fortune botiga hush kelibsiz! 🎭\nIltimos. o'zingiz uchun username kiriting ✍️"
             else:
-                ms = "🎭 Welcome to Liar's Fortune! 🎭\nPlease enter *correct* username ✍️\n\n"
+                ms = "🎭 Welcome to Liar's Fortune! 🎭\nPlease enter correct username ✍️\n\n"
             await message.answer(ms, reply_markup=get_username_button(ln))
             await state.set_state(registration_game.pref1_name)
             return
@@ -431,11 +429,11 @@ async def cmd_start(message: types.Message, state: FSMContext):
             )
         else:
             if ln == "ru":
-                ms = "🎭 Добро пожаловать в Liar's Fortune! 🎭\nПожалуйста, введите *правильное* имя пользователя ✍️"
+                ms = "🎭 Добро пожаловать в Liar's Fortune! 🎭\nПожалуйста, введите правильное имя пользователя ✍️"
             elif ln == "uz":
                 ms = "🎭 Liar's Fortune botiga hush kelibsiz! 🎭\nIltimos. o'zingiz uchun username kiriting ✍️"
             else:
-                ms = "🎭 Welcome to Liar's Fortune! 🎭\nPlease enter *correct* username ✍️\n\n"
+                ms = "🎭 Welcome to Liar's Fortune! 🎭\nPlease enter correct username ✍️\n\n"
             await message.answer(ms, reply_markup=get_username_button(ln))
             await state.set_state(registration.pref_name)
 

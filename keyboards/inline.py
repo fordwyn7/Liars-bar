@@ -775,6 +775,42 @@ async def change_language(callback: types.CallbackQuery):
     await callback.message.delete()
     await callback.message.answer(messages[language_code], reply_markup=get_main_menu(user_id))
 
+
+
+def generate_courses_keyboard():
+    courses = getall_channels()
+    keyboard = InlineKeyboardMarkup(inline_keyboard=[])
+    for curs in courses:
+        curs = list(curs)
+        channel_id, channel_link = curs[0], curs[1]
+        row = [
+            InlineKeyboardButton(
+                text=f"{channel_id}", callback_data=f"view_course:{channel_link}"
+            ),
+            InlineKeyboardButton(text="🚫", callback_data=f"delete_course:{channel_id}"),
+        ]
+        keyboard.inline_keyboard.append(row)
+    return keyboard
+
+@dp.callback_query(F.data.startswith("delete_course:"))
+async def delete_course_callback(call: types.CallbackQuery):
+    channel_identifier = call.data.split(":")[1]
+    conn = sqlite3.connect("users_database.db")
+    cursor = conn.cursor()
+    cursor.execute(
+        "DELETE FROM channel_earn WHERE channel_id = ?", (channel_identifier,)
+    )
+    conn.commit()
+    conn.close()
+    await call.answer("Channel has been successfully deleted ✅", show_alert=True)
+
+    keyboard = await generate_courses_keyboard()
+    await call.message.edit_reply_markup(reply_markup=keyboard)
+
+@dp.callback_query(F.data.startswith("view_course:"))
+async def view_course_callback(call: types.CallbackQuery):
+    channel_identifier = call.data.split(":")[1]
+    await call.message.answer(channel_identifier)
 # @dp.callback_query(lambda c: c.data == "cancel_game")
 # async def handle_quit_game(callback_query: types.CallbackQuery):
 #     await bot.delete_message(

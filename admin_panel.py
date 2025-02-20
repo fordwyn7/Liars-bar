@@ -1508,35 +1508,61 @@ async def change_game_coin_state(message: types.Message, state: FSMContext):
         await state.clear()
 
 
+@dp.message(F.text == "🔗 channels")
+@admin_required()
+async def channels_show_button(message: Message, state: FSMContext):
+    await message.answer(
+        f"Here what you can do with channels that people can earn coins for subscribing. ⭐️",
+        reply_markup=channels_show_keyboards,
+    )
+
+
 @dp.message(F.text == "➕ Add channel")
 @admin_required()
 async def ask_for_channel_id(message: Message, state: FSMContext):
-    await message.answer("Please send me the channel username (e.g., @channelusername) or ID.")
+    await message.answer(
+        "Please send me the channel username (e.g., @channelusername) or ID."
+    )
     await state.set_state(AddChannelState.waiting_for_channel_id)
+
 
 @dp.message(AddChannelState.waiting_for_channel_id)
 async def save_channel(message: Message, state: FSMContext):
     channel_id = message.text.strip()
 
     try:
+        if channel_id.isdigit():
+            channel_id = "-100" + channel_id
         chat = await bot.get_chat(channel_id)
         invite_link: ChatInviteLink = await bot.create_chat_invite_link(
             chat_id=channel_id,
-            creates_join_request=False, 
-            expire_date=None,  
-            member_limit=None
+            creates_join_request=False,
+            expire_date=None,
+            member_limit=None,
         )
         channel_link = invite_link.invite_link
-        conn = sqlite3.connect("users_database.db")  
+        conn = sqlite3.connect("users_database.db")
         cursor = conn.cursor()
         cursor.execute(
             "INSERT INTO channel_earn (channel_id, channel_link) VALUES (?, ?)",
             (channel_id, channel_link),
         )
         conn.commit()
-        await message.answer(f"✅ Channel successfully added!\n\n🔗 Invite Link: {channel_link}")
+        await message.answer(
+            f"✅ Channel successfully added!\n\n🔗 Invite Link: {channel_link}"
+        )
         await state.clear()
 
     except Exception as e:
-        await message.answer(f"❌ Error: {e}\nMake sure the bot is an admin in the channel and has permission to create invite links!")
+        e = str(e)
+        if "UNIQUE" in e:
+            await message.answer(
+                f"❌ You have already added this channel!",
+                reply_markup=channels_show_keyboards,
+            )
+        else:
+            await message.answer(
+                f"❌ Error: Make sure the bot is an admin in the channel and has permission to create invite links!",
+                reply_markup=channels_show_keyboards,
+            )
         await state.clear()

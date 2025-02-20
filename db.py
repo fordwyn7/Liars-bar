@@ -2129,3 +2129,14 @@ def save_subscription(user_id, channel_id):
         print(f"Database Error: {e} for user={user_id}, channel={channel_id}")
     finally:
         conn.close()
+        
+
+def getall_channels():
+    conn = sqlite3.connect("users_database.db")
+    cursor = conn.cursor()
+    cursor.execute(
+        "SELECT channel_id, channel_link FROM channel_earn"
+    )
+    courses = cursor.fetchall()
+    conn.close()
+    return courses

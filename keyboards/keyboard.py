@@ -260,7 +260,23 @@ admin_panel_button = ReplyKeyboardMarkup(
         ],
         [
             KeyboardButton(text="👨‍👩‍👦‍👦 refferals"),
+            KeyboardButton(text="🔗 channels"),
+        ],
+        [
             KeyboardButton(text="🔙 main menu"),
+        ],
+    ],
+    resize_keyboard=True,
+)
+
+channels_show_keyboards = ReplyKeyboardMarkup(
+    keyboard=[
+        [
+            KeyboardButton(text="🍿 show channels"),
+            KeyboardButton(text="➕ Add channel"),
+        ],
+        [
+            KeyboardButton(text="back to admin panel 🔙"),
         ],
     ],
     resize_keyboard=True,
