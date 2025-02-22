@@ -905,7 +905,7 @@ CARD_PRICES = {
 @dp.message(F.text == "checkkk")
 async def buy_card(callback: types.Message):
     user_id = callback.from_user.id
-    card_key = callback.data.split("_")[-1]
+    card_key = 1
     
     if card_key not in CARD_PRICES:
         return await callback.answer("❌ Invalid selection.", show_alert=True)
