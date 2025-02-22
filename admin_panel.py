@@ -1593,4 +1593,4 @@ async def ask_for_channel_id(message: Message, state: FSMContext):
         "🔹 *\[ОСТАЛОСЬ ВРЕМЕНИ: *60 минут*\]*\n\n"
         "🎭 *Обыграй\.* 🃏 *Перехитри\.* 🏆 *Побеждай\.*"
     )
-    await message.answer(text)
+    await message.answer(text, parse_mode="Markdown")
