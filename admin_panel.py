@@ -1617,22 +1617,22 @@ async def ask_for_channel_id(message: Message, state: FSMContext):
         "🔴 *ДВОЙНАЯ ВЫГОДА ЗАВЕРШЕНА!*\n\n"
         "⚡ *Событие официально завершено!* Надеемся, ты успел получить максимум выгоды!\n\n"
         "🎭 *Пропустил?* _Не переживай! Следующий Double Trouble может начаться В ЛЮБОЙ МОМЕНТ... Будь начеку!_\n\n"
-        "🔔 *Подпишись на канал* [Liar’s Fortune](https://t.me/liars_fortune_channel), *чтобы выиграть ПО-КРУПНОМУ!!*\n\n"
+        "🔔 *Подпишись на канал* [Liar’s Fortune](t.me/liars_fortune_channel), *чтобы выиграть ПО-КРУПНОМУ!!*\n\n"
         "🎭 *Обыграй.* 🃏 *Перехитри.* 🏆 *Побеждай.*"
     )
     text_end_uz = (
         "🔴 *2X YAKUNLANDI!*\n\n"
         "⚡ *2X rasmiy yakunlandi!* Umid qilamizki, MAKSIMAL yutuq olgansiz!\n\n"
         "🤖 *O‘tkazib yubordingizmi? Xavotir olmang!* Keyingi Double Trouble istalgan vaqtda boshlanishi mumkin... _E’tiborli bo‘ling!_\n\n"
-        "🔔 *KATTA yutuqlarni qo‘ldan boy bermaslik uchun* [Liar’s Fortune](https://t.me/liars_fortune_channel) *kanaliga obuna bo‘ling!*\n\n"
+        "🔔 *KATTA yutuqlarni qo‘ldan boy bermaslik uchun* [Liar’s Fortune](t.me/liars_fortune_channel) *kanaliga obuna bo‘ling!*\n\n"
         "🎭 *Hushyor bo‘l.* 🃏 *Ustun kel.* 🏆 *G‘alaba qil!*"
     )
     text_end_en = (
         "🔴 *DOUBLE TROUBLE ENDED!*\n\n"
         "⚡ *The event has officially ended!* Hope you made the most out of it!\n\n"
         "🤖 *Missed it?* _Don’t worry! The next Double Trouble could strike at ANY time... Stay alert!_\n\n"
-        "🔔 *Subscribe to* [Liar’s Fortune](https://t.me/liars_fortune_channel) *, to win BIG!*\n\n"
-        "🧠 *Outwit.* 🃏 *Outsmart.* 🏆 *Win.*"
+        "🔔 *Subscribe to* [Liar’s Fortune](t.me/liars_fortune_channel) *, to win BIG!*\n\n"
+        "🎭 *Outwit.* 🃏 *Outsmart.* 🏆 *Win.*"
     )
 
     await message.answer(text_ru, parse_mode="Markdown")
