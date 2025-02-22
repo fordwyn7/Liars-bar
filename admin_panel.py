@@ -1581,7 +1581,7 @@ async def save_channel(message: Message, state: FSMContext):
 @dp.message(F.text == "/start_double_trouble")
 @admin_required()
 async def ask_for_channel_id(message: Message, state: FSMContext):
-    text = (
+    text_ru = (
         "🔥 *ДВОЙНАЯ ВЫГОДА: ВРЕМЯ ВЫИГРЫВАТЬ ПО-КРУПНОМУ!* 🔥\n\n"
         "🎉 *Внимание, игроки!* В течение следующих *60 минут* "
         "за каждую победу вы получите *ДВОЙНЫЕ Unity Coins!* "
@@ -1590,7 +1590,54 @@ async def ask_for_channel_id(message: Message, state: FSMContext):
         "⚔ *Твоя стратегия важна.* Твой момент важен. "
         "Твои *выигрыши? Безграничны!* 💰\n\n"
         "⏳ *Но поторопись!* Когда таймер дойдет до нуля, бонус исчезнет. ⏳\n\n"
-        "🔹 *[ОСТАЛОСЬ ВРЕМЕНИ: *60 минут*]*\n\n"
+        "🕒 *[ОСТАЛОСЬ ВРЕМЕНИ: *60 минут*]*\n\n"
         "🎭 *Обыграй.* 🃏 *Перехитри.* 🏆 *Побеждай.*"
     )
-    await message.answer(text, parse_mode="Markdown")
+    text_uz = (
+        "🔥 *2X VAQTI: ULKAN G‘ALABALARINI QO‘LGA KIRIT!* 🔥\n\n"
+        "🎉 *Diqqat, o‘yinchilar!* Keyingi *60 daqiqa* ichida har bir g‘alabangiz "
+        "uchun *2X Unity Coins* olasiz! _Bu — 2X mukofot, 2X zavq va hoziroq "
+        "o‘ynash uchun ikki barobar sabab!_ 🎮🔥\n\n"
+        "💰 *Strategiyangiz muhim. Vaqtingiz muhim. Yutuqlaringiz? Cheksiz.*\n\n"
+        "⏳ *Lekin shoshiling!* Vaqt tugashi bilan bonus ham yo‘qoladi. ⏳\n\n"
+        "🕒 *[QOLGAN VAQT: *60 daqiqa*]*\n\n"
+        "🎭 *Hushyor bo‘l.* 🃏 *Ustun kel.* 🏆 *G‘alaba qil!*"
+    )
+    text_en = (
+        "🔥 *DOUBLE TROUBLE: IT’S TIME TO WIN BIG!* 🔥\n\n"
+        "🎉 *Attention, players!* For the next *60 minutes*, "
+        "every game you win will give you *DOUBLE Unity Coins!* "
+        "_That’s twice the rewards, twice the fun, and twice the reason to play NOW!_ 🎮🔥\n\n"
+        "💰 *Your strategy matters. Your timing matters. Your winnings? Unlimited.*\n\n"
+        "⏳ *But hurry!* Time is running out! Once the clock hits zero, the bonus disappears. ⏳\n\n"
+        "🕒 *[TIME REMAINING: *60 minutes*]*\n\n"
+        "🎭 *Outwit.* 🃏 *Outsmart.* 🏆 *Win.*"
+    )
+    text_end_ru = (
+        "🔴 *ДВОЙНАЯ ВЫГОДА ЗАВЕРШЕНА!*\n\n"
+        "⚡ *Событие официально завершено!* Надеемся, ты успел получить максимум выгоды!\n\n"
+        "🎭 *Пропустил?* _Не переживай! Следующий Double Trouble может начаться В ЛЮБОЙ МОМЕНТ... Будь начеку!_\n\n"
+        "🔔 *Подпишись на канал* [Liar’s Fortune](https://t.me/liars_fortune_channel), *чтобы выиграть ПО-КРУПНОМУ!!*\n\n"
+        "🎭 *Обыграй.* 🃏 *Перехитри.* 🏆 *Побеждай.*"
+    )
+    text_end_uz = (
+        "🔴 *2X YAKUNLANDI!*\n\n"
+        "⚡ *2X rasmiy yakunlandi!* Umid qilamizki, MAKSIMAL yutuq olgansiz!\n\n"
+        "🤖 *O‘tkazib yubordingizmi? Xavotir olmang!* Keyingi Double Trouble istalgan vaqtda boshlanishi mumkin... _E’tiborli bo‘ling!_\n\n"
+        "🔔 *KATTA yutuqlarni qo‘ldan boy bermaslik uchun* [Liar’s Fortune](https://t.me/liars_fortune_channel) *kanaliga obuna bo‘ling!*\n\n"
+        "🎭 *Hushyor bo‘l.* 🃏 *Ustun kel.* 🏆 *G‘alaba qil!*"
+    )
+    text_end_en = (
+        "🔴 *DOUBLE TROUBLE ENDED!*\n\n"
+        "⚡ *The event has officially ended!* Hope you made the most out of it!\n\n"
+        "🤖 *Missed it?* _Don’t worry! The next Double Trouble could strike at ANY time... Stay alert!_\n\n"
+        "🔔 *Subscribe to* [Liar’s Fortune](https://t.me/liars_fortune_channel) *, to win BIG!*\n\n"
+        "🧠 *Outwit.* 🃏 *Outsmart.* 🏆 *Win.*"
+    )
+
+    await message.answer(text_ru, parse_mode="Markdown")
+    await message.answer(text_uz, parse_mode="Markdown")
+    await message.answer(text_en, parse_mode="Markdown")
+    await message.answer(text_end_en, parse_mode="Markdown")
+    await message.answer(text_end_ru, parse_mode="Markdown")
+    await message.answer(text_end_uz, parse_mode="Markdown")
