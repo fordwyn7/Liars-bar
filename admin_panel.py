@@ -1661,9 +1661,36 @@ async def ask_for_channel_id(message: Message, state: FSMContext):
             ]
         ]
     )
-    await message.answer(text_ru, parse_mode="Markdown")
-    await message.answer(text_uz, parse_mode="Markdown")
-    await message.answer(text_en, parse_mode="Markdown")
-    await message.answer(text_end_en, reply_markup=keyboard_en, parse_mode="Markdown")
-    await message.answer(text_end_ru, reply_markup=keyboard_ru, parse_mode="Markdown")
-    await message.answer(text_end_uz, reply_markup=keyboard_uz, parse_mode="Markdown")
+    set_game_coin(10)
+    users = get_all_user_ids()
+    for user_id in users:
+        try:
+            user_lang = get_user_language(user_id)
+            if user_lang == "ru":
+                msg_text = text_ru
+            elif user_lang == "uz":
+                msg_text = text_uz
+            else:
+                msg_text = text_en
+            await bot.send_message(user_id, msg_text, parse_mode="Markdown")
+        except Exception:
+            continue
+    await asyncio.sleep(60 * 60)
+    set_game_coin(5)
+    for user_id in users:
+        try:
+            user_lang = get_user_language(user_id)
+            if user_lang == "ru":
+                msg_text = text_end_ru
+                kb = keyboard_ru
+            elif user_lang == "uz":
+                msg_text = text_end_uz
+                kb = keyboard_uz
+            else:
+                msg_text = text_end_uz
+                kb = keyboard_uz
+            await bot.send_message(
+                user_id, msg_text, reply_markup=kb, parse_mode="Markdown"
+            )
+        except Exception:
+            continue
