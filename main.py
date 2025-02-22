@@ -243,6 +243,7 @@ CREATE TABLE IF NOT EXISTS supper_tools (
 );
 """
 )
+
 # cursor.execute("DELETE FROM channel_earn;")
 # cursor.execute("DELETE FROM channel_subscription;")
 # cursor.execute("DELETE FROM tournaments_table;")

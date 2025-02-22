@@ -763,8 +763,8 @@ async def join_channels_to_earn(message: types.Message):
 
 @dp.callback_query(lambda c: c.data.startswith("check_sub:"))
 async def check_subscription(callback: types.CallbackQuery):
-    user_id = callback.from_user.id
     channel_id = callback.data.split(":")[1]
+    user_id = callback.from_user.id
     ln = get_user_language(user_id)
     if ln == "uz":
         ms12 = "🎉 Sizga 5 Unity Coin berildi."
@@ -882,3 +882,55 @@ async def skip_subscription(callback: types.CallbackQuery):
         ms4,
         reply_markup=keyboard.as_markup(),
     )
+    
+@dp.message(F.text.in_(["🛍 shop", "🛍 do'kon", "🛍 магазин"]))
+async def buying_(message: types.Message):
+    user_id = message.from_user.id
+    ln = get_user_language(user_id)
+    if ln == "uz":
+        ms12 = ""
+    elif ln == "ru":
+        ms12 = ""
+    else:
+        ms12 = ""
+from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton, PreCheckoutQuery, LabeledPrice
+
+# Define prices (Stars are in integer format, e.g., 100 = 100 Stars)
+CARD_PRICES = {
+    "card_1": 100,  # 🃏 Card 1 costs 100 Stars
+    "card_2": 250,  # 🎭 Card 2 costs 250 Stars
+    "card_3": 500   # 💎 Card 3 costs 500 Stars
+}
+
+@dp.message(F.text == "checkkk")
+async def buy_card(callback: types.Message):
+    user_id = callback.from_user.id
+    card_key = callback.data.split("_")[-1]
+    
+    if card_key not in CARD_PRICES:
+        return await callback.answer("❌ Invalid selection.", show_alert=True)
+
+    price = CARD_PRICES[card_key]
+    
+    await bot.send_invoice(
+        chat_id=user_id,
+        title="Purchase Card",
+        description=f"Buy this card for {price} Stars!",
+        payload=f"card_{card_key}",  
+        provider_token="TELEGRAM_STARS",
+        currency="XTR",  # Stars currenc
+        prices=[LabeledPrice(label=f"Card {card_key}", amount=price)],
+        start_parameter=f"buy_card_{card_key}"
+    )
+
+@dp.pre_checkout_query()
+async def pre_checkout(pre_checkout_query: PreCheckoutQuery):
+    await bot.answer_pre_checkout_query(pre_checkout_query.id, ok=True)
+
+@dp.message(F.successful_payment)
+async def payment_success(message: types.Message):
+    user_id = message.from_user.id
+    card_key = message.successful_payment.invoice_payload.split("_")[-1]
+
+    # Give the user the card (you can update a database here)
+    await message.answer(f"✅ You have successfully purchased *Card {card_key}*! 🎉", parse_mode="MarkdownV2")
