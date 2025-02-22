@@ -1525,6 +1525,7 @@ async def ask_for_channel_id(message: Message, state: FSMContext):
     )
     await state.set_state(AddChannelState.waiting_for_channel_id)
 
+
 @dp.message(F.text == "🍿 show channels")
 @admin_required()
 async def show_courses(message: types.Message):
@@ -1533,6 +1534,8 @@ async def show_courses(message: types.Message):
         await message.answer(f"📭 No channels found.")
     else:
         await message.answer("📋 Here are the list of channels:", reply_markup=keyboard)
+
+
 @dp.message(AddChannelState.waiting_for_channel_id)
 async def save_channel(message: Message, state: FSMContext):
     channel_id = message.text.strip()
@@ -1573,3 +1576,21 @@ async def save_channel(message: Message, state: FSMContext):
                 reply_markup=channels_show_keyboards,
             )
         await state.clear()
+
+
+@dp.message(F.text == "/start_double_trouble")
+@admin_required()
+async def ask_for_channel_id(message: Message, state: FSMContext):
+    text = (
+        "🔥 <b>ДВОЙНАЯ ВЫГОДА: ВРЕМЯ ВЫИГРЫВАТЬ ПО-КРУПНОМУ!</b> 🔥\n\n"
+        "🎉 <b>Внимание, игроки!</b> В течение следующих <b>60 минут</b> "
+        "за каждую победу вы получите <b>ДВОЙНЫЕ Unity Coins</b>! "
+        "<i>Это вдвое больше наград, вдвое больше веселья</i> и "
+        "<u>вдвое больше причин играть прямо СЕЙЧАС</u>! 🎮🔥\n\n"
+        "⚔ <b>Твоя стратегия важна.</b> Твой момент важен. "
+        "Твои <b>выигрыши? Безграничны!</b> 💰\n\n"
+        "⏳ <b>Но поторопись!</b> Когда таймер дойдет до нуля, бонус исчезнет. ⏳\n\n"
+        "🔹 <b>[ОСТАЛОСЬ ВРЕМЕНИ: 59:30]</b>\n\n"
+        "🎭 <b>Обыграй.</b> 🃏 <b>Перехитри.</b> 🏆 <b>Побеждай.</b>"
+    )
+    await message.answer(text)
