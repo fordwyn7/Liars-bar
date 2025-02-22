@@ -897,7 +897,7 @@ from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton, PreCheckou
 
 # Define prices (Stars are in integer format, e.g., 100 = 100 Stars)
 CARD_PRICES = {
-    "card_1": 100,  # 🃏 Card 1 costs 100 Stars
+    "card_1": 1,  # 🃏 Card 1 costs 100 Stars
     "card_2": 250,  # 🎭 Card 2 costs 250 Stars
     "card_3": 500   # 💎 Card 3 costs 500 Stars
 }
