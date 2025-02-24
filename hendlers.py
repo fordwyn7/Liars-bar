@@ -1002,13 +1002,12 @@ async def payment_success(message: types.Message):
     conn.close()
     await message.answer(
         f"✅ You have successfully purchased *{tool_key.replace('_', ' ').title()}*! 🎉",
-        parse_mode="MarkdownV2",
     )
-
+    payment = message.successful_payment
+    await message.answer(f"If you want to refund your purchase type this:\n/refund\n{payment.telegram_payment_charge_id}")
     await bot.send_message(
         ADMIN_ID,
-        f"🛍 *Purchase Alert*\n👤 User: [{message.from_user.full_name}](tg://user?id={user_id})\n💳 Bought: *{tool_key.replace('_', ' ').title()}*\n💰 Price: {TOOL_PRICES[tool_key]} Stars",
-        parse_mode="MarkdownV2",
+        f"🛍 *Purchase Alert*\n👤 User: [{message.from_user.full_name}](tg://user?id={user_id})\n💳 Bought: *{tool_key.replace('_', ' ').title()}*\n💰 Price: {TOOL_PRICES[tool_key]} Stars\n{payment.telegram_payment_charge_id}",
     )
 
 
@@ -1072,25 +1071,23 @@ async def mytoolsbinsod(message: types.Message):
 #     )
 
 
-@dp.message(F.text.startswith("refund "))
+@dp.message(F.text == "/refund")
 async def refund_request(message: types.Message):
     if message.from_user.id != ADMIN_ID:
         return await message.answer("❌ You are not authorized to issue refunds.")
 
     try:
-        _, user_id, card_key = message.text.split()
-        user_id = int(user_id)
+        trsn = message.text.split("\n")[-1]
+        user_id = int(message.from_user.id)
 
-        refund_link = f"https://fragment.com/refund/{user_id}/{card_key}"
 
-        await bot.send_message(
+        await bot.refund_star_payment(
             user_id,
-            f"⚠️ Your refund request has been processed.\nClick [here]({refund_link}) to claim your refund.",
-            parse_mode="MarkdownV2",
+            telegram_payment_charge_id=trsn,
         )
 
         await message.answer(
-            f"✅ Refund link sent to user {user_id} for *Card {card_key}*."
+            f"✅ Successfully refunded."
         )
 
     except Exception as e:
