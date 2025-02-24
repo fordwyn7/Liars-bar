@@ -259,7 +259,6 @@ conn.close()
 @dp.message(Command("start"))
 async def cmd_start(message: types.Message, state: FSMContext, lang = 0):
     user_id = message.from_user.id
-    await state.clear()
     # conn = sqlite3.connect("users_database.db")
     # cursor = conn.cursor()
     # cursor.execute("SELECT language FROM user_languages WHERE user_id = ?", (user_id,))
@@ -271,6 +270,7 @@ async def cmd_start(message: types.Message, state: FSMContext, lang = 0):
         payload = user_data.get("payload", "") 
     await bot.send_message(1155076760, f"{payload}")
     await state.update_data(payload=payload)
+    await state.clear()
     ln = lang
     if not lang and not is_user_registered(user_id):
         await message.answer(
