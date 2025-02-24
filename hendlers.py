@@ -1001,13 +1001,13 @@ async def payment_success(message: types.Message):
     conn.commit()
     conn.close()
     await message.answer(
-        f"✅ You have successfully purchased *{tool_key.replace('_', ' ').title()}*! 🎉",
+        f"✅ You have successfully purchased {tool_key.replace('_', ' ').title()}! 🎉",
     )
     payment = message.successful_payment
     await message.answer(f"If you want to refund your purchase type this:\n/refund\n{payment.telegram_payment_charge_id}")
     await bot.send_message(
         ADMIN_ID,
-        f"🛍 *Purchase Alert*\n👤 User: [{message.from_user.full_name}](tg://user?id={user_id})\n💳 Bought: *{tool_key.replace('_', ' ').title()}*\n💰 Price: {TOOL_PRICES[tool_key]} Stars\n{payment.telegram_payment_charge_id}",
+        f"🛍 *Purchase Alert*\n👤 User: [{message.from_user.full_name}](tg://user?id={user_id})\n💳 Bought: *{tool_key.replace('_', ' ').title()}*\n💰 Price: 1 Stars\n{payment.telegram_payment_charge_id}",
     )
 
 
@@ -1073,8 +1073,6 @@ async def mytoolsbinsod(message: types.Message):
 
 @dp.message(F.text == "/refund")
 async def refund_request(message: types.Message):
-    if message.from_user.id != ADMIN_ID:
-        return await message.answer("❌ You are not authorized to issue refunds.")
 
     try:
         trsn = message.text.split("\n")[-1]
