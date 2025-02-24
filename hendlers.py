@@ -977,7 +977,9 @@ async def process_purchase(callback: types.CallbackQuery):
 async def pre_checkout(pre_checkout_query: PreCheckoutQuery):
     await bot.answer_pre_checkout_query(pre_checkout_query.id, ok=True)
 
+
 ADMIN_ID = 1155076760
+
 
 @dp.message(F.successful_payment)
 async def payment_success(message: types.Message):
@@ -1003,11 +1005,19 @@ async def payment_success(message: types.Message):
         parse_mode="MarkdownV2",
     )
 
-    # Notify the admin
     await bot.send_message(
         ADMIN_ID,
         f"🛍 *Purchase Alert*\n👤 User: [{message.from_user.full_name}](tg://user?id={user_id})\n💳 Bought: *{tool_key.replace('_', ' ').title()}*\n💰 Price: {TOOL_PRICES[tool_key]} Stars",
         parse_mode="MarkdownV2",
+    )
+
+
+@dp.message(F.text.in_(["my tools", "mening qurollarim"]))
+async def mytoolsbinsod(message: types.Message):
+    user_id = message.from_user.id
+    tools = fetch_user_tools(user_id)
+    await message.answer(
+        f"Skip Pass ⏭️: {tools["skipper"]}\nBlock Press 🚫: {tools["blocker"]}\nCard Changer 🔄:{tools["changer"]}"
     )
 
 
@@ -1016,7 +1026,6 @@ async def payment_success(message: types.Message):
 #     "card_2": 250,  # 🎭 Card 2 costs 250 Stars
 #     "card_3": 500,  # 💎 Card 3 costs 500 Stars
 # }
-
 
 
 # @dp.message(F.text == "checkkk")

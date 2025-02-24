@@ -2140,3 +2140,22 @@ def getall_channels():
     courses = cursor.fetchall()
     conn.close()
     return courses
+
+def fetch_user_tools(user_id):
+    conn = sqlite3.connect("users_database.db")
+    cursor = conn.cursor()
+    cursor.execute(
+        """
+        SELECT skipper, blocker, changer 
+        FROM supper_tool 
+        WHERE user_id = ?
+        """, 
+        (user_id,)
+    )
+    tools = cursor.fetchone()
+
+    return {
+        "skipper": tools[0] if tools else 0,
+        "blocker": tools[1] if tools else 0,
+        "changer": tools[2] if tools else 0
+    }
