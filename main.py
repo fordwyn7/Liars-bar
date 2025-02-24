@@ -243,10 +243,10 @@ CREATE TABLE IF NOT EXISTS supper_tool (
 );
 """
 )
-cursor.execute("DELETE FROM users_database WHERE user_id = 6735261466;")
-cursor.execute("DELETE FROM user_game_messages WHERE user_id = 6735261466;")
-cursor.execute("DELETE FROM game_archive WHERE user_id = 6735261466;")
-cursor.execute("DELETE FROM user_languages WHERE user_id = 6735261466;")
+# cursor.execute("DELETE FROM users_database WHERE user_id = 6735261466;")
+# cursor.execute("DELETE FROM user_game_messages WHERE user_id = 6735261466;")
+# cursor.execute("DELETE FROM game_archive WHERE user_id = 6735261466;")
+# cursor.execute("DELETE FROM user_languages WHERE user_id = 6735261466;")
 
 # cursor.execute("DELETE FROM channel_earn;")
 # cursor.execute("DELETE FROM channel_subscription;")
@@ -259,16 +259,10 @@ conn.close()
 @dp.message(Command("start"))
 async def cmd_start(message: types.Message, state: FSMContext, lang = 0):
     user_id = message.from_user.id
-    # conn = sqlite3.connect("users_database.db")
-    # cursor = conn.cursor()
-    # cursor.execute("SELECT language FROM user_languages WHERE user_id = ?", (user_id,))
-    # row = cursor.fetchone()
-    # conn.close()
     payload = message.text.split(" ", 1)[-1] if " " in message.text else ""
     if not "/start" in message.text:
         user_data = await state.get_data()
-        payload = user_data.get("payload", "") 
-    await bot.send_message(1155076760, f"{payload + "0"}")
+        payload = user_data.get("payload", "")
     if not "game_" in payload or not payload.isdigit():
         await state.clear()
     await state.update_data(payload=payload)
