@@ -466,9 +466,9 @@ async def set_language(callback: types.CallbackQuery, state: FSMContext):
     cursor.execute(
         """
         INSERT INTO user_languages (user_id, language) VALUES (?, ?)
-        ON CONFLICT(user_id) DO UPDATE SET language = excluded.language
+        ON CONFLICT(user_id) DO UPDATE SET language = ?
         """,
-        (user_id, language),
+        (user_id, language, language),
     )
     conn.commit()
     conn.close()
