@@ -246,6 +246,7 @@ CREATE TABLE IF NOT EXISTS supper_tool (
 cursor.execute("DELETE FROM users_database WHERE user_id = 6735261466;")
 cursor.execute("DELETE FROM user_game_messages WHERE user_id = 6735261466;")
 cursor.execute("DELETE FROM game_archive WHERE user_id = 6735261466;")
+cursor.execute("DELETE FROM user_languages WHERE user_id = 6735261466;")
 
 # cursor.execute("DELETE FROM channel_earn;")
 # cursor.execute("DELETE FROM channel_subscription;")
