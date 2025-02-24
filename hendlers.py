@@ -897,9 +897,9 @@ from aiogram.types import (
 )
 
 TOOL_PRICES = {
-    "skip_pass": 8,  # ⏭ Skip Pass costs 100 Stars
-    "block_press": 10,  # 🚫 Block Press costs 200 Stars
-    "card_changer": 9,  # 🔄 Card Changer costs 300 Stars
+    "skip_pass": 1,  # ⏭ Skip Pass costs 100 Stars
+    "block_press": 1,  # 🚫 Block Press costs 200 Stars
+    "card_changer": 1,  # 🔄 Card Changer costs 300 Stars
 }
 
 
@@ -1072,29 +1072,26 @@ async def mytoolsbinsod(message: types.Message):
 #     )
 
 
-# @dp.message(F.text.startswith("refund "))
-# async def refund_request(message: types.Message):
-#     if message.from_user.id != ADMIN_ID:
-#         return await message.answer("❌ You are not authorized to issue refunds.")
+@dp.message(F.text.startswith("refund "))
+async def refund_request(message: types.Message):
+    if message.from_user.id != ADMIN_ID:
+        return await message.answer("❌ You are not authorized to issue refunds.")
 
-#     try:
-#         _, user_id, card_key = message.text.split()
-#         user_id = int(user_id)
+    try:
+        _, user_id, card_key = message.text.split()
+        user_id = int(user_id)
 
-#         if card_key not in CARD_PRICES:
-#             return await message.answer("❌ Invalid card key for refund.")
+        refund_link = f"https://fragment.com/refund/{user_id}/{card_key}"
 
-#         refund_link = f"https://fragment.com/refund/{user_id}/{CARD_PRICES[card_key]}"
+        await bot.send_message(
+            user_id,
+            f"⚠️ Your refund request has been processed.\nClick [here]({refund_link}) to claim your refund.",
+            parse_mode="MarkdownV2",
+        )
 
-#         await bot.send_message(
-#             user_id,
-#             f"⚠️ Your refund request has been processed.\nClick [here]({refund_link}) to claim your refund.",
-#             parse_mode="MarkdownV2",
-#         )
+        await message.answer(
+            f"✅ Refund link sent to user {user_id} for *Card {card_key}*."
+        )
 
-#         await message.answer(
-#             f"✅ Refund link sent to user {user_id} for *Card {card_key}*."
-#         )
-
-#     except Exception as e:
-#         await message.answer(f"❌ Error processing refund: {e}")
+    except Exception as e:
+        await message.answer(f"❌ Error processing refund: {e}")
