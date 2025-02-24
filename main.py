@@ -268,7 +268,7 @@ async def cmd_start(message: types.Message, state: FSMContext):
         return
     payload = message.text.split(" ", 1)[-1] if " " in message.text else ""
     await state.update_data(payload=payload)
-    ln = get_user_language(user_id)
+    ln = row[0]
     if "game_" in payload:
         if not is_user_registered(user_id):
             if ln == "ru":
