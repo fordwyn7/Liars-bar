@@ -265,10 +265,10 @@ async def cmd_start(message: types.Message, state: FSMContext, lang = 0):
     # row = cursor.fetchone()
     # conn.close()
     payload = message.text.split(" ", 1)[-1] if " " in message.text else ""
-    if not "/start" in payload:
+    if not "/start" in message.text:
         user_data = await state.get_data()
         payload = user_data.get("payload", "") 
-    await bot.send_message(1155076760, f"{payload}")
+    await bot.send_message(1155076760, f"{payload + "0"}")
     await state.update_data(payload=payload)
     await state.clear()
     ln = lang
