@@ -4,7 +4,12 @@ from aiogram import types
 from aiogram.fsm.context import FSMContext
 from keyboards.keyboard import *
 from keyboards.inline import *
-from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton, PreCheckoutQuery, LabeledPrice
+from aiogram.types import (
+    InlineKeyboardMarkup,
+    InlineKeyboardButton,
+    PreCheckoutQuery,
+    LabeledPrice,
+)
 
 from states.state import NewGameState, MessagetoAdmin, awaiting_game_number
 from db import *
@@ -806,7 +811,7 @@ async def check_subscription(callback: types.CallbackQuery):
         )
         conn.commit()
         conn.close()
-        
+
         await callback.message.edit_text(ms12)
         channels = get_unsubscribed_channels(user_id)
         if not channels:
@@ -882,89 +887,205 @@ async def skip_subscription(callback: types.CallbackQuery):
         ms4,
         reply_markup=keyboard.as_markup(),
     )
-    
+
+
+from aiogram.types import (
+    InlineKeyboardMarkup,
+    InlineKeyboardButton,
+    LabeledPrice,
+    PreCheckoutQuery,
+)
+
+TOOL_PRICES = {
+    "skip_pass": 8,  # ⏭ Skip Pass costs 100 Stars
+    "block_press": 10,  # 🚫 Block Press costs 200 Stars
+    "card_changer": 9,  # 🔄 Card Changer costs 300 Stars
+}
+
+
 @dp.message(F.text.in_(["🛍 shop", "🛍 do'kon", "🛍 магазин"]))
 async def buying_(message: types.Message):
     user_id = message.from_user.id
     ln = get_user_language(user_id)
+
     if ln == "uz":
-        ms12 = ""
+        ms12 = (
+            "🛒 *Liar's Bar do'koni*ga xush kelibsiz!\n\n"
+            "🎲 *Vositalarni xarid qiling va har bir o‘yinda g‘alaba qozonish imkoniyatingizni oshiring!*"
+        )
+
     elif ln == "ru":
-        ms12 = ""
+        ms12 = (
+            "🛒 Добро пожаловать в *магазин Liar's Bar*!\n\n"
+            "🎲 *Покупайте инструменты и увеличивайте свои шансы на победу в каждой игре!*"
+        )
+
     else:
-        ms12 = ""
+        ms12 = (
+            "🛒 Welcome to the *Liar's Bar Shop*!\n\n"
+            "🎲 *Buy tools and increase your chances to win in each game!*"
+        )
 
-CARD_PRICES = {
-    "card_1": 1,  # 🃏 Card 1 costs 100 Stars
-    "card_2": 250,  # 🎭 Card 2 costs 250 Stars
-    "card_3": 500   # 💎 Card 3 costs 500 Stars
-}
+    keyboard = InlineKeyboardMarkup(
+        inline_keyboard=[
+            [
+                InlineKeyboardButton(
+                    text="⏭ Skip Pass (8 ⭐)", callback_data="buy_skip_pass"
+                )
+            ],
+            [
+                InlineKeyboardButton(
+                    text="🚫 Block Press (10 ⭐)", callback_data="buy_block_press"
+                )
+            ],
+            [
+                InlineKeyboardButton(
+                    text="🔄 Card Changer (9 ⭐)", callback_data="buy_card_changer"
+                )
+            ],
+        ]
+    )
 
-ADMIN_ID = 1155076760
+    await message.answer(ms12, reply_markup=keyboard)
 
-@dp.message(F.text == "checkkk")
-async def buy_card(callback: types.Message):
+
+@dp.callback_query(F.data.startswith("buy_"))
+async def process_purchase(callback: types.CallbackQuery):
     user_id = callback.from_user.id
-    card_key = "card_1"
+    tool_key = callback.data.replace("buy_", "")
 
-    if card_key not in CARD_PRICES:
+    if tool_key not in TOOL_PRICES:
         return await callback.answer("❌ Invalid selection.", show_alert=True)
 
-    price = CARD_PRICES[card_key]
+    price = TOOL_PRICES[tool_key]
 
     await bot.send_invoice(
         chat_id=user_id,
-        title="Purchase Card",
-        description=f"Buy this card for {price} Stars!",
-        payload=f"card_{card_key}",  
+        title="Purchase Tool",
+        description=f"Buy {tool_key.replace('_', ' ').title()} for {price} Stars!",
+        payload=f"tool_{tool_key}",
         provider_token="TELEGRAM_STARS",
         currency="XTR",
-        prices=[LabeledPrice(label=f"Card {card_key}", amount=price)],
-        start_parameter=f"buy_card_{card_key}"
+        prices=[
+            LabeledPrice(label=f"{tool_key.replace('_', ' ').title()}", amount=price)
+        ],
+        start_parameter=f"buy_tool_{tool_key}",
     )
+
 
 @dp.pre_checkout_query()
 async def pre_checkout(pre_checkout_query: PreCheckoutQuery):
     await bot.answer_pre_checkout_query(pre_checkout_query.id, ok=True)
 
+ADMIN_ID = 1155076760
+
 @dp.message(F.successful_payment)
 async def payment_success(message: types.Message):
     user_id = message.from_user.id
-    card_key = message.successful_payment.invoice_payload.split("_")[-1]
-
+    tool_key = message.successful_payment.invoice_payload.split("_")[-1]
+    conn = sqlite3.connect("users_database.db")
+    cursor = conn.cursor()
+    cursor.execute(
+        """
+        INSERT INTO supper_tool (user_id, skipper, blocker, changer)
+        VALUES (?, 0, 0, 0)
+        ON CONFLICT(user_id) DO UPDATE SET 
+            skipper = skipper + (CASE WHEN ? = 'skip_pass' THEN 1 ELSE 0 END),
+            blocker = blocker + (CASE WHEN ? = 'block_press' THEN 1 ELSE 0 END),
+            changer = changer + (CASE WHEN ? = 'card_changer' THEN 1 ELSE 0 END)
+        """,
+        (user_id, tool_key, tool_key, tool_key),
+    )
+    conn.commit()
+    conn.close()
     await message.answer(
-        f"✅ You have successfully purchased *Card {card_key}*! 🎉",
-        parse_mode="MarkdownV2"
+        f"✅ You have successfully purchased *{tool_key.replace('_', ' ').title()}*! 🎉",
+        parse_mode="MarkdownV2",
     )
 
+    # Notify the admin
     await bot.send_message(
         ADMIN_ID,
-        f"🛍 *Purchase Alert*\n👤 User: [{message.from_user.full_name}](tg://user?id={user_id})\n💳 Bought: *Card {card_key}*\n💰 Price: {CARD_PRICES[card_key]} Stars",
-        parse_mode="MarkdownV2"
+        f"🛍 *Purchase Alert*\n👤 User: [{message.from_user.full_name}](tg://user?id={user_id})\n💳 Bought: *{tool_key.replace('_', ' ').title()}*\n💰 Price: {TOOL_PRICES[tool_key]} Stars",
+        parse_mode="MarkdownV2",
     )
 
-@dp.message(F.text.startswith("refund "))
-async def refund_request(message: types.Message):
-    if message.from_user.id != ADMIN_ID:
-        return await message.answer("❌ You are not authorized to issue refunds.")
 
-    try:
-        _, user_id, card_key = message.text.split()
-        user_id = int(user_id)
+# CARD_PRICES = {
+#     "card_1": 1,  # 🃏 Card 1 costs 100 Stars
+#     "card_2": 250,  # 🎭 Card 2 costs 250 Stars
+#     "card_3": 500,  # 💎 Card 3 costs 500 Stars
+# }
 
-        if card_key not in CARD_PRICES:
-            return await message.answer("❌ Invalid card key for refund.")
 
-        refund_link = f"https://fragment.com/refund/{user_id}/{CARD_PRICES[card_key]}"
-        
-        await bot.send_message(
-            user_id,
-            f"⚠️ Your refund request has been processed.\nClick [here]({refund_link}) to claim your refund.",
-            parse_mode="MarkdownV2"
-        )
 
-        await message.answer(f"✅ Refund link sent to user {user_id} for *Card {card_key}*.")
-    
-    except Exception as e:
-        await message.answer(f"❌ Error processing refund: {e}")
+# @dp.message(F.text == "checkkk")
+# async def buy_card(callback: types.Message):
+#     user_id = callback.from_user.id
+#     card_key = "card_1"
 
+#     if card_key not in CARD_PRICES:
+#         return await callback.answer("❌ Invalid selection.", show_alert=True)
+
+#     price = CARD_PRICES[card_key]
+
+#     await bot.send_invoice(
+#         chat_id=user_id,
+#         title="Purchase Card",
+#         description=f"Buy this card for {price} Stars!",
+#         payload=f"card_{card_key}",
+#         provider_token="TELEGRAM_STARS",
+#         currency="XTR",
+#         prices=[LabeledPrice(label=f"Card {card_key}", amount=price)],
+#         start_parameter=f"buy_card_{card_key}",
+#     )
+
+
+# @dp.pre_checkout_query()
+# async def pre_checkout(pre_checkout_query: PreCheckoutQuery):
+#     await bot.answer_pre_checkout_query(pre_checkout_query.id, ok=True)
+
+
+# @dp.message(F.successful_payment)
+# async def payment_success(message: types.Message):
+#     user_id = message.from_user.id
+#     card_key = message.successful_payment.invoice_payload.split("_")[-1]
+
+#     await message.answer(
+#         f"✅ You have successfully purchased *Card {card_key}*! 🎉",
+#         parse_mode="MarkdownV2",
+#     )
+
+#     await bot.send_message(
+#         ADMIN_ID,
+#         f"🛍 *Purchase Alert*\n👤 User: [{message.from_user.full_name}](tg://user?id={user_id})\n💳 Bought: *Card {card_key}*\n💰 Price: {CARD_PRICES[card_key]} Stars",
+#         parse_mode="MarkdownV2",
+#     )
+
+
+# @dp.message(F.text.startswith("refund "))
+# async def refund_request(message: types.Message):
+#     if message.from_user.id != ADMIN_ID:
+#         return await message.answer("❌ You are not authorized to issue refunds.")
+
+#     try:
+#         _, user_id, card_key = message.text.split()
+#         user_id = int(user_id)
+
+#         if card_key not in CARD_PRICES:
+#             return await message.answer("❌ Invalid card key for refund.")
+
+#         refund_link = f"https://fragment.com/refund/{user_id}/{CARD_PRICES[card_key]}"
+
+#         await bot.send_message(
+#             user_id,
+#             f"⚠️ Your refund request has been processed.\nClick [here]({refund_link}) to claim your refund.",
+#             parse_mode="MarkdownV2",
+#         )
+
+#         await message.answer(
+#             f"✅ Refund link sent to user {user_id} for *Card {card_key}*."
+#         )
+
+#     except Exception as e:
+#         await message.answer(f"❌ Error processing refund: {e}")

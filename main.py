@@ -235,15 +235,14 @@ CREATE TABLE IF NOT EXISTS channel_subscription (
 
 cursor.execute(
     """
-CREATE TABLE IF NOT EXISTS supper_tools (
+CREATE TABLE IF NOT EXISTS supper_tool (
     user_id TEXT PRIMARY KEY,
-    dual_shoot INTEGER,
-    swapper INTEGER,
-    defender INTEGER
+    skipper INTEGER,
+    blocker INTEGER,
+    changer INTEGER
 );
 """
 )
-
 # cursor.execute("DELETE FROM channel_earn;")
 # cursor.execute("DELETE FROM channel_subscription;")
 # cursor.execute("DELETE FROM tournaments_table;")
