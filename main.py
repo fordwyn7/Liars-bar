@@ -260,7 +260,7 @@ async def cmd_start(message: types.Message, state: FSMContext):
     cursor.execute("SELECT language FROM user_languages WHERE user_id = ?", (user_id,))
     row = cursor.fetchone()
     conn.close()
-    if not row and message.text == "/start":
+    if not row and "/start" in message.text:
         await message.answer(
             "🟣 Please select your language: \n\n🔴 Пожалуйста, выберите язык: \n\n🔵 Iltimos, tilni tanlang:",
             reply_markup=select_language_button,

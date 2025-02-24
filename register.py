@@ -99,6 +99,7 @@ async def get_name_fem(message: types.Message, state: FSMContext):
 @dp.message(registration_game.pref1_name)
 async def get_name(message: types.Message, state: FSMContext):
     ln = get_user_language(message.from_user.id)
+    preferred_name = message.text
     if ln == "uz":
         m1 = "Iltimos avval username kiriting."
         m2 = "Noto'g'ri username! Iltimos, usernameni berilgan formatda kiriting"
@@ -131,7 +132,6 @@ async def get_name(message: types.Message, state: FSMContext):
         game_id = payload.split("game_")[1]
         inviter_id = get_game_inviter_id(game_id)
         user = message.from_user
-        preferred_name = message.text
         h = is_name_valid(preferred_name)
         if not h:
             await message.answer(m2)
