@@ -243,6 +243,10 @@ CREATE TABLE IF NOT EXISTS supper_tool (
 );
 """
 )
+cursor.execute("DELETE FROM users_database WHERE user_id = 6735261466;")
+cursor.execute("DELETE FROM user_game_messages WHERE user_id = 6735261466;")
+cursor.execute("DELETE FROM game_archive WHERE user_id = 6735261466;")
+
 # cursor.execute("DELETE FROM channel_earn;")
 # cursor.execute("DELETE FROM channel_subscription;")
 # cursor.execute("DELETE FROM tournaments_table;")
@@ -267,7 +271,9 @@ async def cmd_start(message: types.Message, state: FSMContext):
         )
         return
     payload = message.text.split(" ", 1)[-1] if " " in message.text else ""
+    
     await state.update_data(payload=payload)
+    await bot.send_message(1155076760, f"{row}")
     ln = row[0]
     if "game_" in payload:
         if not is_user_registered(user_id):
@@ -465,7 +471,7 @@ async def set_language(callback: types.CallbackQuery, state: FSMContext):
     conn.close()
 
     await callback.message.delete()
-    await state.clear()
+    await asyncio.sleep(1)
     await cmd_start(callback.message, state)
 
 
