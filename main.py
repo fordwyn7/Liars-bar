@@ -474,10 +474,9 @@ async def set_language(callback: types.CallbackQuery, state: FSMContext):
     conn.close()
 
     await callback.message.delete()
-    await asyncio.sleep(2)
-    await cmd_start(callback.message, state)
-
-
+    await runner(callback.message, state)
+async def runner(msg: types.Message, st: FSMContext):
+    await cmd_start(msg, st)
 @dp.message(F.text.in_(["start game 🎮", "o'yinni boshlash 🎮", "новая игра 🎮"]))
 async def start_game_handler(message: types.Message, state: FSMContext):
     ln = get_user_language(message.from_user.id)
