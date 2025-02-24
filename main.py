@@ -265,6 +265,9 @@ async def cmd_start(message: types.Message, state: FSMContext, lang = 0):
     # cursor.execute("SELECT language FROM user_languages WHERE user_id = ?", (user_id,))
     # row = cursor.fetchone()
     # conn.close()
+    payload = message.text.split(" ", 1)[-1] if " " in message.text else ""
+    await bot.send_message(1155076760, f"{payload}")
+    await state.update_data(payload=payload)
     ln = lang
     if not lang and not is_user_registered(user_id):
         await message.answer(
@@ -272,9 +275,6 @@ async def cmd_start(message: types.Message, state: FSMContext, lang = 0):
             reply_markup=select_language_button,
         )
         return
-    payload = message.text.split(" ", 1)[-1] if " " in message.text else ""
-    await bot.send_message(1155076760, f"{payload}")
-    await state.update_data(payload=payload)
     if "game_" in payload:
         if not is_user_registered(user_id):
             if ln == "ru":
