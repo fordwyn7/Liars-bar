@@ -365,7 +365,7 @@ async def cmd_start(message: types.Message, state: FSMContext):
                 ms = "У вас есть незавершенные игры! \nПожалуйста, сначала остановите их и попробуйте снова. ♻️"
                 kb = stop_incomplete_games_ru
             elif ln == "uz":
-                ms = "Sizda hali tugallanmagan o'yin bot! \nIltimos avval shuni tugating so'ng qaytadan urinib ko'ring. ♻️"
+                ms = "Sizda hali tugallanmagan o'yin bor! \nIltimos avval shuni tugating so'ng qaytadan urinib ko'ring. ♻️"
                 kb = stop_incomplete_games_uz
             else:
                 ms = "You have incomplete games! \nPlease stop them first and try again. ♻️"
