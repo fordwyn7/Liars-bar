@@ -4,7 +4,7 @@ from aiogram import types
 from aiogram.fsm.context import FSMContext
 from keyboards.keyboard import *
 from keyboards.inline import *
-from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
+from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton, PreCheckoutQuery, LabeledPrice
 
 from states.state import NewGameState, MessagetoAdmin, awaiting_game_number
 from db import *
@@ -893,32 +893,32 @@ async def buying_(message: types.Message):
         ms12 = ""
     else:
         ms12 = ""
-from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton, PreCheckoutQuery, LabeledPrice
 
-# Define prices (Stars are in integer format, e.g., 100 = 100 Stars)
 CARD_PRICES = {
     "card_1": 1,  # 🃏 Card 1 costs 100 Stars
     "card_2": 250,  # 🎭 Card 2 costs 250 Stars
     "card_3": 500   # 💎 Card 3 costs 500 Stars
 }
 
+ADMIN_ID = 1155076760
+
 @dp.message(F.text == "checkkk")
 async def buy_card(callback: types.Message):
     user_id = callback.from_user.id
     card_key = "card_1"
-    
+
     if card_key not in CARD_PRICES:
         return await callback.answer("❌ Invalid selection.", show_alert=True)
 
     price = CARD_PRICES[card_key]
-    
+
     await bot.send_invoice(
         chat_id=user_id,
         title="Purchase Card",
         description=f"Buy this card for {price} Stars!",
         payload=f"card_{card_key}",  
         provider_token="TELEGRAM_STARS",
-        currency="XTR",  # Stars currenc
+        currency="XTR",
         prices=[LabeledPrice(label=f"Card {card_key}", amount=price)],
         start_parameter=f"buy_card_{card_key}"
     )
@@ -932,5 +932,39 @@ async def payment_success(message: types.Message):
     user_id = message.from_user.id
     card_key = message.successful_payment.invoice_payload.split("_")[-1]
 
-    # Give the user the card (you can update a database here)
-    await message.answer(f"✅ You have successfully purchased *Card {card_key}*! 🎉", parse_mode="MarkdownV2")
+    await message.answer(
+        f"✅ You have successfully purchased *Card {card_key}*! 🎉",
+        parse_mode="MarkdownV2"
+    )
+
+    await bot.send_message(
+        ADMIN_ID,
+        f"🛍 *Purchase Alert*\n👤 User: [{message.from_user.full_name}](tg://user?id={user_id})\n💳 Bought: *Card {card_key}*\n💰 Price: {CARD_PRICES[card_key]} Stars",
+        parse_mode="MarkdownV2"
+    )
+
+@dp.message(F.text.startswith("refund "))
+async def refund_request(message: types.Message):
+    if message.from_user.id != ADMIN_ID:
+        return await message.answer("❌ You are not authorized to issue refunds.")
+
+    try:
+        _, user_id, card_key = message.text.split()
+        user_id = int(user_id)
+
+        if card_key not in CARD_PRICES:
+            return await message.answer("❌ Invalid card key for refund.")
+
+        refund_link = f"https://fragment.com/refund/{user_id}/{CARD_PRICES[card_key]}"
+        
+        await bot.send_message(
+            user_id,
+            f"⚠️ Your refund request has been processed.\nClick [here]({refund_link}) to claim your refund.",
+            parse_mode="MarkdownV2"
+        )
+
+        await message.answer(f"✅ Refund link sent to user {user_id} for *Card {card_key}*.")
+    
+    except Exception as e:
+        await message.answer(f"❌ Error processing refund: {e}")
+
