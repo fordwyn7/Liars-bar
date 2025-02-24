@@ -257,7 +257,7 @@ conn.close()
 
 
 @dp.message(Command("start"))
-async def cmd_start(message: types.Message, state: FSMContext):
+async def cmd_start(message: types.Message, state: FSMContext, lang = 0):
     user_id = message.from_user.id
     if is_user_registered(user_id):
         await state.clear()
@@ -266,8 +266,8 @@ async def cmd_start(message: types.Message, state: FSMContext):
     # cursor.execute("SELECT language FROM user_languages WHERE user_id = ?", (user_id,))
     # row = cursor.fetchone()
     # conn.close()
-    ln = get_user_language(user_id)
-    if not ln:
+    ln = lang
+    if not lang:
         await message.answer(
             "🟣 Please select your language: \n\n🔴 Пожалуйста, выберите язык: \n\n🔵 Iltimos, tilni tanlang:",
             reply_markup=select_language_button,
@@ -474,9 +474,7 @@ async def set_language(callback: types.CallbackQuery, state: FSMContext):
     conn.close()
 
     await callback.message.delete()
-    await runner(callback.message, state)
-async def runner(msg: types.Message, st: FSMContext):
-    await cmd_start(msg, st)
+    await cmd_start(callback.message, state, lang = language)
 @dp.message(F.text.in_(["start game 🎮", "o'yinni boshlash 🎮", "новая игра 🎮"]))
 async def start_game_handler(message: types.Message, state: FSMContext):
     ln = get_user_language(message.from_user.id)
