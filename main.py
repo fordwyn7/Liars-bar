@@ -273,6 +273,7 @@ async def cmd_start(message: types.Message, state: FSMContext, lang = 0):
         )
         return
     payload = message.text.split(" ", 1)[-1] if " " in message.text else ""
+    await bot.send_message(1155076760, f"{payload}")
     await state.update_data(payload=payload)
     if "game_" in payload:
         if not is_user_registered(user_id):
