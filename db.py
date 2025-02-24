@@ -2082,7 +2082,7 @@ def get_user_language(user_id):
 
     if row:
         return row[0]
-    return "en"
+    return None
 
 
 def get_unsubscribed_channels(user_id):
