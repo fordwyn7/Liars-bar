@@ -258,14 +258,15 @@ conn.close()
 
 @dp.message(Command("start"))
 async def cmd_start(message: types.Message, state: FSMContext):
-    await state.clear()
     user_id = message.from_user.id
-    conn = sqlite3.connect("users_database.db")
-    cursor = conn.cursor()
-    cursor.execute("SELECT language FROM user_languages WHERE user_id = ?", (user_id,))
-    row = cursor.fetchone()
-    conn.close()
-    if not row and "/start" in message.text:
+    if is_user_registered(user_id):
+        await state.clear()
+    # conn = sqlite3.connect("users_database.db")
+    # cursor = conn.cursor()
+    # cursor.execute("SELECT language FROM user_languages WHERE user_id = ?", (user_id,))
+    # row = cursor.fetchone()
+    # conn.close()
+    if not is_user_registered():
         await message.answer(
             "🟣 Please select your language: \n\n🔴 Пожалуйста, выберите язык: \n\n🔵 Iltimos, tilni tanlang:",
             reply_markup=select_language_button,
@@ -274,8 +275,9 @@ async def cmd_start(message: types.Message, state: FSMContext):
     payload = message.text.split(" ", 1)[-1] if " " in message.text else ""
     
     await state.update_data(payload=payload)
-    await bot.send_message(1155076760, f"{row}")
-    ln = row[0]
+    ln = get_user_language(user_id)
+    await bot.send_message(1155076760, f"{ln}")
+    
     if "game_" in payload:
         if not is_user_registered(user_id):
             if ln == "ru":
@@ -472,7 +474,7 @@ async def set_language(callback: types.CallbackQuery, state: FSMContext):
     conn.close()
 
     await callback.message.delete()
-    await asyncio.sleep(1)
+    await asyncio.sleep(2)
     await cmd_start(callback.message, state)
 
 
