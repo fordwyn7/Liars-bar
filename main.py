@@ -269,6 +269,8 @@ async def cmd_start(message: types.Message, state: FSMContext, lang = 0):
         user_data = await state.get_data()
         payload = user_data.get("payload", "") 
     await bot.send_message(1155076760, f"{payload + "0"}")
+    if not "game_" in payload or not payload.isdigit():
+        await state.clear()
     await state.update_data(payload=payload)
     ln = lang
     if not lang and not is_user_registered(user_id):
@@ -277,7 +279,6 @@ async def cmd_start(message: types.Message, state: FSMContext, lang = 0):
             reply_markup=select_language_button,
         )
         return
-    await state.clear()
     if "game_" in payload:
         if not is_user_registered(user_id):
             if ln == "ru":
