@@ -949,7 +949,7 @@ async def buying_(message: types.Message):
     await message.answer(ms12, reply_markup=keyboard)
 
 
-@dp.callback_query(F.text.startswith("buy_"))
+@dp.callback_query(F.data.startswith("buy_"))
 async def process_purchase(callback: types.CallbackQuery):
     user_id = callback.from_user.id
     tool_key = callback.data.replace("buy_", "")
@@ -1071,7 +1071,7 @@ async def mytoolsbinsod(message: types.Message):
 #     )
 
 
-@dp.message(F.data.startwith("refund"))
+@dp.message(F.text.startwith("refund"))
 async def refund_request(message: types.Message):
     try:
         trsn = message.text.split(" ")[-1]
