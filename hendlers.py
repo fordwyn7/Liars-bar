@@ -967,7 +967,7 @@ async def process_purchase(callback: types.CallbackQuery):
         provider_token="TELEGRAM_STARS",
         currency="XTR",
         prices=[
-            LabeledPrice(label=f"{tool_key.replace('_', ' ').title()}", amount=price)
+            LabeledPrice(label=f"{tool_key.title()}", amount=price)
         ],
         start_parameter=f"buy_tool_{tool_key}",
     )
@@ -984,7 +984,7 @@ ADMIN_ID = 1155076760
 @dp.message(F.successful_payment)
 async def payment_success(message: types.Message):
     user_id = message.from_user.id
-    tool_key = message.successful_payment.invoice_payload.split("_")[-1]
+    tool_key = message.successful_payment.invoice_payload.split("buy_tool_")[-1]
     conn = sqlite3.connect("users_database.db")
     cursor = conn.cursor()
     cursor.execute(
@@ -1001,7 +1001,7 @@ async def payment_success(message: types.Message):
     conn.commit()
     conn.close()
     await message.answer(
-        f"✅ You have successfully purchased {tool_key.replace('_', ' ').title()}! 🎉",
+        f"✅ You have successfully purchased {tool_key.title()}! 🎉",
     )
     payment = message.successful_payment
     await message.answer(f"If you want to refund your purchase resend me this:\n\nrefund {payment.telegram_payment_charge_id}")
