@@ -1688,7 +1688,7 @@ async def ask_for_channel_id(message: Message, state: FSMContext):
                 kb = keyboard_uz
             else:
                 msg_text = text_end_en
-                kb = keyboard_uz
+                kb = keyboard_en
             await bot.send_message(
                 user_id, msg_text, reply_markup=kb, parse_mode="Markdown"
             )

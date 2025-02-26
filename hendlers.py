@@ -1071,10 +1071,10 @@ async def mytoolsbinsod(message: types.Message):
 #     )
 
 
-@dp.message(F.data.startwith("/refund"))
+@dp.message(F.data.startwith("refund"))
 async def refund_request(message: types.Message):
     try:
-        trsn = message.text.split("\n")[-1]
+        trsn = message.text.split(" ")[-1]
         user_id = int(message.from_user.id)
 
         await bot.refund_star_payment(
