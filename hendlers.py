@@ -1071,7 +1071,7 @@ async def mytoolsbinsod(message: types.Message):
 #     )
 
 
-@dp.message(F.text.startwith("refund"))
+@dp.message(F.text.startswith("refund"))
 async def refund_request(message: types.Message):
     try:
         trsn = message.text.split(" ")[-1]
