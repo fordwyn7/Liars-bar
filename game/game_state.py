@@ -144,7 +144,7 @@ async def remove_player_confirm(callback: types.CallbackQuery):
         for play in players:
             ln = get_user_language(play)
             if ln == "uz":
-                ms = f"O'yin holati yangilandi! ♻️\nBarcha o'yinchilarga yana to'liq kartalar tarqatiladi ✅\n Hozir {get_user_nfgame(get_current_turn_user_id(game_id))} ning yurish navbati."
+                ms = f"O'yin holati yangilandi! ♻️\nBarcha o'yinchilarga yana to'liq kartalar tarqatiladi ✅\nHozir {get_user_nfgame(get_current_turn_user_id(game_id))} ning yurish navbati."
             elif ln == "ru":
                 ms = f"Игра перезапущена! ♻️ \nВы все снова получаете полные карты ✅ \nCейчас ход {get_user_nfgame(get_current_turn_user_id(game_id))}"
             else:
@@ -812,7 +812,7 @@ async def handle_continue_or_liar(callback_query: types.CallbackQuery):
             for play in players:
                 ln = get_user_language(play)
                 if ln == "uz":
-                    ms = f"O'yin holati yangilandi! ♻️\nBarcha o'yinchilarga yana to'liq kartalar tarqatiladi ✅\n Hozir {get_user_nfgame(get_current_turn_user_id(game_id))} ning yurish navbati."
+                    ms = f"O'yin holati yangilandi! ♻️\nBarcha o'yinchilarga yana to'liq kartalar tarqatiladi ✅\nHozir {get_user_nfgame(get_current_turn_user_id(game_id))} ning yurish navbati."
                 elif ln == "ru":
                     ms = f"Игра перезапущена! ♻️ \nВы все снова получаете полные карты ✅ \nCейчас ход {get_user_nfgame(get_current_turn_user_id(game_id))}"
                 else:
@@ -1009,7 +1009,7 @@ async def handle_continue_or_liar(callback_query: types.CallbackQuery):
             if not is_player_dead(game_id, play):
                 ln = get_user_language(play)
                 if ln == "uz":
-                    ms = f"O'yin holati yangilandi! ♻️\nBarcha o'yinchilarga yana to'liq kartalar tarqatiladi ✅\n Hozir {get_user_nfgame(get_current_turn_user_id(game_id))} ning yurish navbati."
+                    ms = f"O'yin holati yangilandi! ♻️\nBarcha o'yinchilarga yana to'liq kartalar tarqatiladi ✅\nHozir {get_user_nfgame(get_current_turn_user_id(game_id))} ning yurish navbati."
                 elif ln == "ru":
                     ms = f"Игра перезапущена! ♻️ \nВы все снова получаете полные карты ✅ \nCейчас ход {get_user_nfgame(get_current_turn_user_id(game_id))}"
                 else:
@@ -1063,7 +1063,7 @@ async def handle_continue_or_liar(callback_query: types.CallbackQuery):
                 if not is_player_dead(game_id, play):
                     ln = get_user_language(play)
                     if ln == "uz":
-                        ms = f"O'yin holati yangilandi! ♻️\nBarcha o'yinchilarga yana to'liq kartalar tarqatiladi ✅\n Hozir {get_user_nfgame(get_current_turn_user_id(game_id))} ning yurish navbati."
+                        ms = f"O'yin holati yangilandi! ♻️\nBarcha o'yinchilarga yana to'liq kartalar tarqatiladi ✅\nHozir {get_user_nfgame(get_current_turn_user_id(game_id))} ning yurish navbati."
                     elif ln == "ru":
                         ms = f"Игра перезапущена! ♻️ \nВы все снова получаете полные карты ✅ \nCейчас ход {get_user_nfgame(get_current_turn_user_id(game_id))}"
                     else:

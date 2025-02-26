@@ -1004,7 +1004,7 @@ async def payment_success(message: types.Message):
         f"✅ You have successfully purchased {tool_key.replace('_', ' ').title()}! 🎉",
     )
     payment = message.successful_payment
-    await message.answer(f"If you want to refund your purchase type this:\n/refund\n{payment.telegram_payment_charge_id}")
+    await message.answer(f"If you want to refund your purchase resend me this:\n\nrefund {payment.telegram_payment_charge_id}")
     await bot.send_message(
         ADMIN_ID,
         f"🛍 *Purchase Alert*\n👤 User: [{message.from_user.full_name}](tg://user?id={user_id})\n💳 Bought: *{tool_key.replace('_', ' ').title()}*\n💰 Price: 1 Stars\n{payment.telegram_payment_charge_id}",
