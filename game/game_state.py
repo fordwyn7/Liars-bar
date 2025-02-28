@@ -386,7 +386,6 @@ async def select_super_tool(callback_query: types.CallbackQuery):
     user_id = callback_query.from_user.id
     game_id = get_game_id_by_user(user_id)
     ln = get_user_language(user_id)
-
     data = callback_query.data.split(":")
     index = int(data[2])
     tool = data[1]
@@ -402,7 +401,6 @@ async def select_super_tool(callback_query: types.CallbackQuery):
             ut = "You can only select 1 supper tool."
         await callback_query.answer(ut, show_alert=True)
         return
-
     new_state = "selected" if current_state == "unselected" else "unselected"
     new_text = f"{tool} ✅" if new_state == "selected" else tool
     if new_state == "selected":
@@ -1192,7 +1190,7 @@ async def handle_continue_or_liar(callback_query: types.CallbackQuery):
         tools = fetch_user_tools(user_id)
         if any(tools.values()):
             tool_buttons = []
-            index = 1
+            index = 6
             for tool, count in tools.items():
                 if count > 0:
                     tool_buttons.append(
@@ -1202,7 +1200,7 @@ async def handle_continue_or_liar(callback_query: types.CallbackQuery):
                         )
                     )
                 index += 1
-            keyboard.append(tool_buttons)
+            keyboard.inline_keyboard.append(tool_buttons)
         mss = await bot.send_message(
             chat_id=user_id,
             text=tms,
