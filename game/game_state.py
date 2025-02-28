@@ -1190,7 +1190,7 @@ async def handle_continue_or_liar(callback_query: types.CallbackQuery):
         tools = fetch_user_tools(user_id)
         if any(tools.values()):
             tool_buttons = []
-            index = 6
+            index = 5
             for tool, count in tools.items():
                 index += 1
                 if count > 0:
