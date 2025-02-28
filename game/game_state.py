@@ -552,7 +552,7 @@ async def send_cards(callback_query: types.CallbackQuery):
     ty = []
     await bot.send_message(1155076760, f"{selected_cards}")
     for i in selected_cards:
-        if len(i)> 1:
+        if len(i)> 2:
             await bot.send_message(1155076760, f"{i}, {len(i)}")
             ty.append(i)
             selected_cards.remove(i)
