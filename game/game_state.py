@@ -1210,7 +1210,7 @@ async def handle_continue_or_liar(callback_query: types.CallbackQuery):
             reply_markup=keyboard,
         )
         save_message(user_id, game_id, mss.message_id)
-
+    selected_tool.clear()
     await callback_query.answer()
 
 
