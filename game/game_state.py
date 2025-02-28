@@ -557,8 +557,9 @@ async def send_cards(callback_query: types.CallbackQuery):
             ty.append(i)
             selected_cards.remove(i)
             
-    tool_used = ty
+    tool_used = ty[0]
     if tool_used:
+            
             conn = sqlite3.connect("users_database.db")
             cursor = conn.cursor()
             cursor.execute(
@@ -569,7 +570,6 @@ async def send_cards(callback_query: types.CallbackQuery):
                 """,
                 (user_id,),
             )
-
             conn.commit()
             conn.close()
     selected_cards_count.clear()
