@@ -300,10 +300,11 @@ def get_player_cards(game_id, player_id):
             return result
         return []
 
-has_active_block = False
+
+has_active_block =  {}
 
 async def send_random_cards_to_players(game_id):
-    has_active_block = False
+    has_active_block.clear()
     players = get_all_players_in_game(game_id)
     for player_id in players:
         ln = get_user_language(player_id)
@@ -319,7 +320,7 @@ async def send_random_cards_to_players(game_id):
             tms = (
                 f"Endi yurish navbati sizda 🫵 \nBosh karta: {get_current_table(game_id)}\nSizning kartalaringiz: "
                 if is_turn
-                else "Sizning kartalaringiz. \nHozir {get_user_nfgame(get_current_turn_user_id(game_id))} ning yurish navbati."
+                else f"Sizning kartalaringiz. \nHozir {get_user_nfgame(get_current_turn_user_id(game_id))} ning yurish navbati."
             )
         elif ln == "ru":
             sca = "Oтправлять карты 🟣"
@@ -604,7 +605,7 @@ async def send_cards(callback_query: types.CallbackQuery):
         for p_id in get_all_players_in_game(game_id):
             ln = get_user_language(p_id)
             if ln == "uz":
-                message = f"O'yinchi {get_user_nfgame(user_id)} {get_user_nfgame(next_player_id)}ning yurishini o'tkazib yubordi."
+                message = f"O'yinchi {get_user_nfgame(user_id)} {get_user_nfgame(next_player_id)} ning yurishini o'tkazib yubordi."
             elif ln == "ru":
                 message = f"Игрок {get_user_nfgame(user_id)} пропустил ход {get_user_nfgame(next_player_id)}"
             else:
@@ -612,7 +613,7 @@ async def send_cards(callback_query: types.CallbackQuery):
             await bot.send_message(chat_id=p_id, text=message)
             await asyncio.sleep(2)
     if tool_used == "blocker":
-        has_active_block = True
+        has_active_block[1] = True
     if user_id_change:
         user_id = get_current_turn_user_id(game_id)
     for p_id in players:
@@ -662,7 +663,7 @@ async def send_cards(callback_query: types.CallbackQuery):
     if not has_active_block:
         keyboard.inline_keyboard[0].append(InlineKeyboardButton(text=gb1, callback_data="liar_game"))
     else:
-        has_active_block = False
+        has_active_block.clear()
     message = await bot.send_message(
         chat_id=next_player_id,
         text=mt,
