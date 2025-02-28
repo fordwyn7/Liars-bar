@@ -664,6 +664,7 @@ async def send_cards(callback_query: types.CallbackQuery):
             await asyncio.sleep(2)
     if tool_used == "blocker":
         has_active_block[1] = True
+    typ = user_id
     if user_id_change:
         user_id = next_player_id
     for p_id in players:
@@ -688,15 +689,15 @@ async def send_cards(callback_query: types.CallbackQuery):
     if ln == "uz":
         gb = "Davom ettirish 🚀"
         gb1 = "Yolg'on! 🙅‍♂️"
-        mt = f"{get_user_nfgame(user_id)} o'z yurishini qildi. 🌟\n"
+        mt = f"{get_user_nfgame(typ)} o'z yurishini qildi. 🌟\n"
     elif ln == "ru":
         gb = "продолжить 🚀"
         gb1 = "лжец 🙅‍♂️"
-        mt = f"{get_user_nfgame(user_id)} сделал свою очередь. 🌟"
+        mt = f"{get_user_nfgame(typ)} сделал свою очередь. 🌟"
     else:
         gb = "continue 🚀"
         gb1 = "liar 🙅‍♂️"
-        mt = f"{get_user_nfgame(user_id)} made his turn 🌟"
+        mt = f"{get_user_nfgame(typ)} made his turn 🌟"
     keyboard = InlineKeyboardMarkup(
         inline_keyboard=[
             [
@@ -716,11 +717,13 @@ async def send_cards(callback_query: types.CallbackQuery):
         reply_markup=keyboard,
     )
     message_id = message.message_id
+    selected_tool.clear()
     save_message(next_player_id, game_id, message_id)
 
 
 @dp.callback_query(lambda c: c.data in ["continue_game", "liar_game"])
 async def handle_continue_or_liar(callback_query: types.CallbackQuery):
+    selected_tool.clear()
     await bot.delete_message(
         callback_query.from_user.id, callback_query.message.message_id
     )
