@@ -980,36 +980,51 @@ async def pre_checkout(pre_checkout_query: PreCheckoutQuery):
 
 ADMIN_ID = 1155076760
 
-
 @dp.message(F.successful_payment)
 async def payment_success(message: types.Message):
     user_id = message.from_user.id
     tool_key = message.successful_payment.invoice_payload.split("tool_")[-1]
+
     conn = sqlite3.connect("users_database.db")
     cursor = conn.cursor()
+
+    # Determine which tool to increment
+    skipper = 1 if tool_key == "skip_pass" else 0
+    blocker = 1 if tool_key == "block_press" else 0
+    changer = 1 if tool_key == "card_changer" else 0
+
+    # Insert or update user tools
     cursor.execute(
         """
         INSERT INTO supper_tool (user_id, skipper, blocker, changer)
-        VALUES (?, 0, 0, 0)
+        VALUES (?, ?, ?, ?)
         ON CONFLICT(user_id) DO UPDATE SET 
-            skipper = skipper + (CASE WHEN ? = 'skip_pass' THEN 1 ELSE 0 END),
-            blocker = blocker + (CASE WHEN ? = 'block_press' THEN 1 ELSE 0 END),
-            changer = changer + (CASE WHEN ? = 'card_changer' THEN 1 ELSE 0 END)
+            skipper = skipper + ?,
+            blocker = blocker + ?,
+            changer = changer + ?
         """,
-        (user_id, tool_key, tool_key, tool_key),
+        (user_id, skipper, blocker, changer, skipper, blocker, changer),
     )
+
     conn.commit()
     conn.close()
+
     await message.answer(
-        f"✅ You have successfully purchased {tool_key.replace('_', ' ')}! 🎉",
+        f"✅ You have successfully purchased {tool_key.replace('_', ' ')}! 🎉"
     )
+
     payment = message.successful_payment
-    await message.answer(f"If you want to refund your purchase resend this message to a bot 👇:")
+
+    await message.answer("If you want to refund your purchase, resend this message to the bot 👇:")
     await message.answer(f"refund {payment.telegram_payment_charge_id}")
-    
+
     await bot.send_message(
         ADMIN_ID,
-        f"🛍 Purchase Alert\n👤 User: {message.from_user.id}\n💳 Bought: *{tool_key.replace('_', ' ')}*\n💰 Price: 1 Stars\n\n♻️ Refund key: \n{payment.telegram_payment_charge_id}",
+        f"🛍 Purchase Alert\n"
+        f"👤 User: {message.from_user.id}\n"
+        f"💳 Bought: {tool_key.replace('_', ' ')}\n"
+        f"💰 Price: 1 Stars\n\n"
+        f"♻️ Refund key: {payment.telegram_payment_charge_id}"
     )
 
 

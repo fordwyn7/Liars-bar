@@ -245,15 +245,17 @@ CREATE TABLE IF NOT EXISTS supper_tool (
 )
 cursor.execute(
     """
-        INSERT INTO supper_tool (user_id, skipper, blocker, changer)
-        VALUES (?, 0, 0, 0)
-        ON CONFLICT(user_id) DO UPDATE SET 
-            skipper = skipper + (CASE WHEN ? = 'skip_pass' THEN 1 ELSE 0 END),
-            blocker = blocker + (CASE WHEN ? = 'block_press' THEN 1 ELSE 0 END),
-            changer = changer + (CASE WHEN ? = 'card_changer' THEN 1 ELSE 0 END)
-        """,
-    (1155076760, "skip_pass", "block_press", "block_press"),
+    INSERT INTO supper_tool (user_id, skipper, blocker, changer)
+    VALUES (?, ?, ?, ?)
+    ON CONFLICT(user_id) DO UPDATE SET 
+        skipper = skipper + ?,
+        blocker = blocker + ?,
+        changer = changer + ?
+    """,
+    (1155076760, 1 if "skip_pass" else 0, 1 if "block_press" else 0, 1 if "card_changer" else 0, 
+     1 if "skip_pass" else 0, 1 if "block_press" else 0, 1 if "card_changer" else 0)
 )
+
 # cursor.execute("DELETE FROM users_database WHERE user_id = 6735261466;")
 # cursor.execute("DELETE FROM user_game_messages WHERE user_id = 6735261466;")
 # cursor.execute("DELETE FROM game_archive WHERE user_id = 6735261466;")
