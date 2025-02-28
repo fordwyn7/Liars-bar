@@ -409,9 +409,9 @@ async def select_super_tool(callback_query: types.CallbackQuery):
         selected_tool[user_id] -= 1
     message = callback_query.message
     keyboard = message.reply_markup.inline_keyboard
-    button = keyboard[0][index]
+    button = keyboard[2][index - 5]
     button.text = new_text
-    button.callback_data = f"select_tool:{tool}:{index}:{new_state}"
+    button.callback_data = f"select_tool:{tool}:{index + 5}:{new_state}"
 
     await bot.edit_message_reply_markup(
         chat_id=callback_query.from_user.id,
