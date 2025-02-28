@@ -306,6 +306,7 @@ has_active_block = {}
 
 async def send_random_cards_to_players(game_id):
     has_active_block.clear()
+    selected_cards_count.clear()
     players = get_all_players_in_game(game_id)
     for player_id in players:
         ln = get_user_language(player_id)
@@ -390,7 +391,7 @@ async def select_super_tool(callback_query: types.CallbackQuery):
     index = int(data[2])
     tool = data[1]
     current_state = data[3]
-    if current_state == "unselected" and selected_tool:
+    if current_state == "unselected" and len(selected_tool) > 0:
         if ln == "uz":
             ut = "Siz faqat 1 ta tanlay olasiz holos."
         elif ln == "ru":
@@ -554,7 +555,7 @@ async def send_cards(callback_query: types.CallbackQuery):
     ]
     tool_used = selected_tool.pop(user_id, None)
     if tool_used:
-        with sqlite3.connect("users_database.db") as conn:
+            conn = sqlite3.connect("users_database.db")
             cursor = conn.cursor()
             cursor.execute(
                 f"""
