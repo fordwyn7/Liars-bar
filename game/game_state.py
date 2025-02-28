@@ -356,7 +356,6 @@ async def send_random_cards_to_players(game_id):
                 [InlineKeyboardButton(text=sca, callback_data="send_cards")]
             )
             tools = fetch_user_tools(player_id)
-            await bot.send_message(1155076760, f"{tools}")
             if any(tools.values()):
                 tool_buttons = []
                 index = 6
@@ -550,10 +549,8 @@ async def send_cards(callback_query: types.CallbackQuery):
         if "✅" in button.text
     ]
     ty = []
-    await bot.send_message(1155076760, f"{selected_cards}")
     for i in selected_cards:
         if len(i)> 2:
-            await bot.send_message(1155076760, f"{i}, {len(i)}")
             ty.append(i)
             selected_cards.remove(i)
             
@@ -662,7 +659,8 @@ async def send_cards(callback_query: types.CallbackQuery):
                 message = f"Игрок {get_user_nfgame(user_id)} пропустил ход {get_user_nfgame(next_player_id)}"
             else:
                 message = f"{get_user_nfgame(user_id)} used Skipper! {get_user_nfgame(next_player_id)}'s turn is skipped."
-            await bot.send_message(chat_id=p_id, text=message)
+            hjj = await bot.send_message(chat_id=p_id, text=message)
+            save_message(p_id, game_id, hjj.message_id)
             await asyncio.sleep(2)
     if tool_used == "blocker":
         has_active_block[1] = True
