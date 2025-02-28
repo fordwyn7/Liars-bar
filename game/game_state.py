@@ -561,15 +561,14 @@ async def send_cards(callback_query: types.CallbackQuery):
         with sqlite3.connect("users_database.db") as conn:
             cursor = conn.cursor()
             cursor.execute(
-                """
+                f"""
                 UPDATE supper_tool
-                SET {} = {} - 1
+                SET {tool_used} = {tool_used} - 1
                 WHERE user_id = ?
-                """.format(
-                    tool_used, tool_used
-                ),
+                """,
                 (user_id,),
             )
+
             conn.commit()
             conn.close()
     selected_cards_count.clear()
@@ -1191,7 +1190,6 @@ async def handle_continue_or_liar(callback_query: types.CallbackQuery):
             + ([[addition_keyboard]])
         )
         tools = fetch_user_tools(user_id)
-        await bot.send_message(1155076760, f"{tools}")
         if any(tools.values()):
             tool_buttons = []
             index = 1
