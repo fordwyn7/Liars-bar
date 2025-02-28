@@ -413,14 +413,14 @@ async def select_super_tool(callback_query: types.CallbackQuery):
     keyboard = message.reply_markup.inline_keyboard
     button = keyboard[0][index]
     button.text = new_text
-    button.callback_data = f"select_card:{tool}:{index}:{new_state}"
+    button.callback_data = f"select_tool:{tool}:{index}:{new_state}"
 
     await bot.edit_message_reply_markup(
         chat_id=callback_query.from_user.id,
         message_id=callback_query.message.message_id,
         reply_markup=InlineKeyboardMarkup(inline_keyboard=keyboard),
     )
-    await callback_query.answer(f"Card {tool} is now {new_state}.")
+    await callback_query.answer(f"tool {tool} is now {new_state}.")
     if current_state == "selected":
         selected_tool[user_id] = tool
     else:
