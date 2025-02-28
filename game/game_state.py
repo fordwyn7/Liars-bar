@@ -301,7 +301,8 @@ def get_player_cards(game_id, player_id):
         return []
 
 
-has_active_block =  {}
+has_active_block = {}
+
 
 async def send_random_cards_to_players(game_id):
     has_active_block.clear()
@@ -314,7 +315,7 @@ async def send_random_cards_to_players(game_id):
         player_cards = pc[0].split(",")
         is_turn = is_user_turn(player_id, game_id)
         tools = fetch_user_tools(player_id)
-
+        await bot.send_message(1155076760, f"{tools}")
         if ln == "uz":
             sca = "Kartalarni tashlash 🟣"
             tms = (
@@ -357,14 +358,16 @@ async def send_random_cards_to_players(game_id):
             )
             if any(tools.values()):
                 tool_buttons = []
+                index = 1
                 for tool, count in tools.items():
                     if count > 0:
                         tool_buttons.append(
                             InlineKeyboardButton(
                                 text=tool.capitalize(),
-                                callback_data=f"select_tool:{tool}",
+                                callback_data=f"select_tool:{tool}:{index}:unselected",
                             )
                         )
+                    index += 1
                 keyboard.append(tool_buttons)
         await asyncio.sleep(2)
         message = await bot.send_message(
@@ -383,18 +386,49 @@ async def select_super_tool(callback_query: types.CallbackQuery):
     user_id = callback_query.from_user.id
     game_id = get_game_id_by_user(user_id)
     ln = get_user_language(user_id)
-    tool = callback_query.data.split(":")[1]
 
-    if user_id in selected_tool:
-        await callback_query.answer(
-            "You can only select one super tool per turn!", show_alert=True
-        )
+    data = callback_query.data.split(":")
+    index = int(data[2])
+    tool = data[1]
+    current_state = data[3]
+    if user_id not in selected_tool:
+        selected_tool[user_id] = 0
+    if current_state == "unselected" and selected_tool[user_id] > 0:
+        if ln == "uz":
+            ut = "Siz faqat 1 ta tanlay olasiz holos."
+        elif ln == "ru":
+            ut = "Вы можете выбрать не более 1."
+        else:
+            ut = "You can only select 1 supper tool."
+        await callback_query.answer(ut, show_alert=True)
         return
-    selected_tool[user_id] = tool
-    await callback_query.answer(f"{tool.capitalize()} selected ✅")
+
+    new_state = "selected" if current_state == "unselected" else "unselected"
+    new_text = f"{tool} ✅" if new_state == "selected" else tool
+    if new_state == "selected":
+        selected_tool[user_id] += 1
+    elif current_state == "selected":
+        selected_tool[user_id] -= 1
+    message = callback_query.message
+    keyboard = message.reply_markup.inline_keyboard
+    button = keyboard[0][index]
+    button.text = new_text
+    button.callback_data = f"select_card:{tool}:{index}:{new_state}"
+
+    await bot.edit_message_reply_markup(
+        chat_id=callback_query.from_user.id,
+        message_id=callback_query.message.message_id,
+        reply_markup=InlineKeyboardMarkup(inline_keyboard=keyboard),
+    )
+    await callback_query.answer(f"Card {tool} is now {new_state}.")
+    if current_state == "selected":
+        selected_tool[user_id] = tool
+    else:
+        selected_tool.clear()
 
 
 selected_cards_count = {}
+
 
 @dp.callback_query(lambda c: c.data.startswith("select_card"))
 async def toggle_card_selection(callback_query: types.CallbackQuery):
@@ -523,6 +557,21 @@ async def send_cards(callback_query: types.CallbackQuery):
         if "✅" in button.text
     ]
     tool_used = selected_tool.pop(user_id, None)
+    if tool_used:
+        with sqlite3.connect("users_database.db") as conn:
+            cursor = conn.cursor()
+            cursor.execute(
+                """
+                UPDATE supper_tool
+                SET {} = {} - 1
+                WHERE user_id = ?
+                """.format(
+                    tool_used, tool_used
+                ),
+                (user_id,),
+            )
+            conn.commit()
+            conn.close()
     selected_cards_count.clear()
     if selected_cards:
         await bot.delete_message(
@@ -567,7 +616,9 @@ async def send_cards(callback_query: types.CallbackQuery):
                 )
                 conn.commit()
         if tool_used == "changer":
-            insert_or_update_last_cards(game_id, [get_current_table(game_id)] * len(selected_cards))
+            insert_or_update_last_cards(
+                game_id, [get_current_table(game_id)] * len(selected_cards)
+            )
         else:
             insert_or_update_last_cards(game_id, selected_cards)
         update_current_turn(game_id)
@@ -661,7 +712,9 @@ async def send_cards(callback_query: types.CallbackQuery):
         ]
     )
     if not has_active_block:
-        keyboard.inline_keyboard[0].append(InlineKeyboardButton(text=gb1, callback_data="liar_game"))
+        keyboard.inline_keyboard[0].append(
+            InlineKeyboardButton(text=gb1, callback_data="liar_game")
+        )
     else:
         has_active_block.clear()
     message = await bot.send_message(
