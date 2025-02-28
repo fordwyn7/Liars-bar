@@ -404,7 +404,7 @@ async def select_super_tool(callback_query: types.CallbackQuery):
     if new_state == "selected":
         selected_tool[user_id] = tool
     elif current_state == "selected":
-        selected_tool[user_id].clear()
+        selected_tool.clear()
     message = callback_query.message
     keyboard = message.reply_markup.inline_keyboard
     button = keyboard[2][index - 6]

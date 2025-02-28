@@ -189,7 +189,7 @@ if count == 0:
 cursor.execute(
     """
 CREATE TABLE IF NOT EXISTS excludeds (
-    game_id TEXT NOT NULL,
+    game_id TEXT NOT NULL PRIMARY KEY,
     user_id INTEGER NOT NULL,
     number_of_excluded INTEGER DEFAULT 0,
     UNIQUE(game_id, user_id)
