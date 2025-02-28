@@ -613,7 +613,7 @@ async def send_cards(callback_query: types.CallbackQuery):
                 conn.commit()
         if tool_used == "changer":
             insert_or_update_last_cards(
-                game_id, [get_current_table(game_id)] * len(selected_cards)
+                game_id, [get_current_table(game_id).split()[-1]] * len(selected_cards)
             )
         else:
             insert_or_update_last_cards(game_id, selected_cards)
