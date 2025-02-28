@@ -390,9 +390,7 @@ async def select_super_tool(callback_query: types.CallbackQuery):
     index = int(data[2])
     tool = data[1]
     current_state = data[3]
-    if user_id not in selected_tool:
-        selected_tool[user_id] = 0
-    if current_state == "unselected" and selected_tool[user_id]:
+    if current_state == "unselected" and selected_tool:
         if ln == "uz":
             ut = "Siz faqat 1 ta tanlay olasiz holos."
         elif ln == "ru":
@@ -404,9 +402,9 @@ async def select_super_tool(callback_query: types.CallbackQuery):
     new_state = "selected" if current_state == "unselected" else "unselected"
     new_text = f"{tool} ✅" if new_state == "selected" else tool
     if new_state == "selected":
-        selected_tool[user_id] += 1
+        selected_tool[user_id] = tool
     elif current_state == "selected":
-        selected_tool[user_id] -= 1
+        selected_tool[user_id].clear()
     message = callback_query.message
     keyboard = message.reply_markup.inline_keyboard
     button = keyboard[2][index - 6]
@@ -420,7 +418,7 @@ async def select_super_tool(callback_query: types.CallbackQuery):
     )
     await callback_query.answer(f"tool {tool} is now {new_state}.")
     if current_state == "selected":
-        selected_tool[user_id] = 1
+        selected_tool[user_id] = tool
     else:
         selected_tool.clear()
 
