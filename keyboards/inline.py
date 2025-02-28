@@ -358,7 +358,11 @@ async def handle_stop_incomplete_games(callback_query: types.CallbackQuery):
         ms4,
         reply_markup=get_main_menu(callback_query.from_user.id),
     )
-    await delete_user_messages(game["game_id"], callback_query.from_user.id)
+    cre = get_game_creator_id(game["game_id"])
+    if callback_query.from_user.id == cre:
+        await delete_all_game_messages(game["game_id"])
+    else:
+        await delete_user_messages(game["game_id"], callback_query.from_user.id)
     await callback_query.answer()
 
 

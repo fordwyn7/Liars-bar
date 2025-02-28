@@ -418,10 +418,6 @@ async def select_super_tool(callback_query: types.CallbackQuery):
         reply_markup=InlineKeyboardMarkup(inline_keyboard=keyboard),
     )
     await callback_query.answer(f"tool {tool} is now {new_state}.")
-    if current_state == "selected":
-        selected_tool[user_id] = tool
-    else:
-        selected_tool.clear()
 
 
 selected_cards_count = {}
@@ -553,7 +549,13 @@ async def send_cards(callback_query: types.CallbackQuery):
         for button in row
         if "✅" in button.text
     ]
-    tool_used = selected_tool.pop(user_id, None)
+    ty = []
+    for i in range(len(selected_cards)):
+        if len(selected_cards[i]) > 1:
+            ty.append(selected_cards[i])
+            selected_cards.remove(selected_cards[i])
+            
+    tool_used = ty
     if tool_used:
             conn = sqlite3.connect("users_database.db")
             cursor = conn.cursor()
