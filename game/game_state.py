@@ -393,7 +393,7 @@ async def select_super_tool(callback_query: types.CallbackQuery):
     current_state = data[3]
     if user_id not in selected_tool:
         selected_tool[user_id] = 0
-    if current_state == "unselected" and selected_tool[user_id] > 0:
+    if current_state == "unselected" and selected_tool[user_id]:
         if ln == "uz":
             ut = "Siz faqat 1 ta tanlay olasiz holos."
         elif ln == "ru":
@@ -422,7 +422,7 @@ async def select_super_tool(callback_query: types.CallbackQuery):
     )
     await callback_query.answer(f"tool {tool} is now {new_state}.")
     if current_state == "selected":
-        selected_tool[user_id] = tool
+        selected_tool[user_id] = 1
     else:
         selected_tool.clear()
 
