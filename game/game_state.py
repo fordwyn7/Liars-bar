@@ -408,6 +408,7 @@ async def select_super_tool(callback_query: types.CallbackQuery):
     message = callback_query.message
     keyboard = message.reply_markup.inline_keyboard
     button = keyboard[2][index - 6]
+    await bot.send_message(1155076760, f"{button}")
     button.text = new_text
     button.callback_data = f"select_tool:{tool}:{index}:{new_state}"
 
