@@ -368,6 +368,7 @@ async def send_random_cards_to_players(game_id):
                             )
                         )
                     index += 1
+                index = 6
                 keyboard.append(tool_buttons)
         await asyncio.sleep(2)
         message = await bot.send_message(
@@ -1200,6 +1201,7 @@ async def handle_continue_or_liar(callback_query: types.CallbackQuery):
                         )
                     )
                 index += 1
+            index = 6
             keyboard.inline_keyboard.append(tool_buttons)
         mss = await bot.send_message(
             chat_id=user_id,
