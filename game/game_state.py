@@ -360,8 +360,8 @@ async def send_random_cards_to_players(game_id):
                 tool_buttons = []
                 inf = 5
                 for tool, count in tools.items():
-                    inf += 1
                     if count > 0:
+                        inf += 1
                         tool_buttons.append(
                             InlineKeyboardButton(
                                 text=tool.capitalize(),
@@ -1192,8 +1192,8 @@ async def handle_continue_or_liar(callback_query: types.CallbackQuery):
             tool_buttons = []
             inf = 5
             for tool, count in tools.items():
-                inf += 1
                 if count > 0:
+                    inf += 1
                     tool_buttons.append(
                         InlineKeyboardButton(
                             text=tool.capitalize(),
