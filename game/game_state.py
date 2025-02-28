@@ -314,8 +314,6 @@ async def send_random_cards_to_players(game_id):
         pc = get_player_cards(game_id, player_id)
         player_cards = pc[0].split(",")
         is_turn = is_user_turn(player_id, game_id)
-        tools = fetch_user_tools(player_id)
-        await bot.send_message(1155076760, f"{tools}")
         if ln == "uz":
             sca = "Kartalarni tashlash 🟣"
             tms = (
@@ -356,6 +354,8 @@ async def send_random_cards_to_players(game_id):
             keyboard.append(
                 [InlineKeyboardButton(text=sca, callback_data="send_cards")]
             )
+            tools = fetch_user_tools(player_id)
+            await bot.send_message(1155076760, f"{tools}")
             if any(tools.values()):
                 tool_buttons = []
                 index = 1
@@ -1190,6 +1190,21 @@ async def handle_continue_or_liar(callback_query: types.CallbackQuery):
             ]
             + ([[addition_keyboard]])
         )
+        tools = fetch_user_tools(user_id)
+        await bot.send_message(1155076760, f"{tools}")
+        if any(tools.values()):
+            tool_buttons = []
+            index = 1
+            for tool, count in tools.items():
+                if count > 0:
+                    tool_buttons.append(
+                        InlineKeyboardButton(
+                            text=tool.capitalize(),
+                            callback_data=f"select_tool:{tool}:{index}:unselected",
+                        )
+                    )
+                index += 1
+            keyboard.append(tool_buttons)
         mss = await bot.send_message(
             chat_id=user_id,
             text=tms,
