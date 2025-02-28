@@ -358,8 +358,9 @@ async def send_random_cards_to_players(game_id):
             tools = fetch_user_tools(player_id)
             if any(tools.values()):
                 tool_buttons = []
-                index = 6
+                index = 5
                 for tool, count in tools.items():
+                    index += 1
                     if count > 0:
                         tool_buttons.append(
                             InlineKeyboardButton(
@@ -367,8 +368,6 @@ async def send_random_cards_to_players(game_id):
                                 callback_data=f"select_tool:{tool}:{index}:unselected",
                             )
                         )
-                    index += 1
-                index = 6
                 keyboard.append(tool_buttons)
         await asyncio.sleep(2)
         message = await bot.send_message(
@@ -1193,6 +1192,7 @@ async def handle_continue_or_liar(callback_query: types.CallbackQuery):
             tool_buttons = []
             index = 6
             for tool, count in tools.items():
+                index += 1
                 if count > 0:
                     tool_buttons.append(
                         InlineKeyboardButton(
@@ -1200,8 +1200,6 @@ async def handle_continue_or_liar(callback_query: types.CallbackQuery):
                             callback_data=f"select_tool:{tool}:{index}:unselected",
                         )
                     )
-                index += 1
-            index = 6
             keyboard.inline_keyboard.append(tool_buttons)
         mss = await bot.send_message(
             chat_id=user_id,
