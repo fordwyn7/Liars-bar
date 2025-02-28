@@ -358,7 +358,7 @@ async def send_random_cards_to_players(game_id):
             await bot.send_message(1155076760, f"{tools}")
             if any(tools.values()):
                 tool_buttons = []
-                index = 1
+                index = 6
                 for tool, count in tools.items():
                     if count > 0:
                         tool_buttons.append(
