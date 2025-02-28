@@ -654,6 +654,7 @@ async def send_cards(callback_query: types.CallbackQuery):
         update_current_turn(game_id)
         user_id_change = True
         for p_id in get_all_players_in_game(game_id):
+            # if p_id != user
             ln = get_user_language(p_id)
             if ln == "uz":
                 message = f"O'yinchi {get_user_nfgame(user_id)} {get_user_nfgame(next_player_id)} ning yurishini o'tkazib yubordi."
@@ -666,7 +667,7 @@ async def send_cards(callback_query: types.CallbackQuery):
     if tool_used == "blocker":
         has_active_block[1] = True
     if user_id_change:
-        user_id = get_current_turn_user_id(game_id)
+        user_id = next_player_id
     for p_id in players:
         if not p_id:
             continue
