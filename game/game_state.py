@@ -690,20 +690,14 @@ async def send_cards(callback_query: types.CallbackQuery):
         gb = "Davom ettirish 🚀"
         gb1 = "Yolg'on! 🙅‍♂️"
         mt = f"{get_user_nfgame(user_id)} o'z yurishini qildi. 🌟\n"
-        if has_active_block:
-            mt += f"Oldingi o'yinchi sizni bir marttalik uchun blokaldi shuning uchun siz bu yurishda 'Yolg'on! 🙅‍♂️' tugamsini bosa olmaysiz"
     elif ln == "ru":
         gb = "продолжить 🚀"
         gb1 = "лжец 🙅‍♂️"
         mt = f"{get_user_nfgame(user_id)} сделал свою очередь. 🌟"
-        if has_active_block:
-            mt += f"Предыдущий игрок заблокировал вас, поэтому на этот раз вы не сможете нажать кнопку 'лжец 🙅‍♂️'."
     else:
         gb = "continue 🚀"
         gb1 = "liar 🙅‍♂️"
         mt = f"{get_user_nfgame(user_id)} made his turn 🌟"
-        if has_active_block:
-            mt += f"The previous player blocked you, so you can't press the 'liar 🙅‍♂️' button this time."
     keyboard = InlineKeyboardMarkup(
         inline_keyboard=[
             [
