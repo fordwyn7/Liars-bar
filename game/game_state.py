@@ -358,14 +358,14 @@ async def send_random_cards_to_players(game_id):
             tools = fetch_user_tools(player_id)
             if any(tools.values()):
                 tool_buttons = []
-                index = 5
+                inf = 5
                 for tool, count in tools.items():
-                    index += 1
+                    inf += 1
                     if count > 0:
                         tool_buttons.append(
                             InlineKeyboardButton(
                                 text=tool.capitalize(),
-                                callback_data=f"select_tool:{tool}:{index}:unselected",
+                                callback_data=f"select_tool:{tool}:{inf}:unselected",
                             )
                         )
                 keyboard.append(tool_buttons)
@@ -1190,14 +1190,14 @@ async def handle_continue_or_liar(callback_query: types.CallbackQuery):
         tools = fetch_user_tools(user_id)
         if any(tools.values()):
             tool_buttons = []
-            index = 5
+            inf = 5
             for tool, count in tools.items():
-                index += 1
+                inf += 1
                 if count > 0:
                     tool_buttons.append(
                         InlineKeyboardButton(
                             text=tool.capitalize(),
-                            callback_data=f"select_tool:{tool}:{index}:unselected",
+                            callback_data=f"select_tool:{tool}:{inf}:unselected",
                         )
                     )
             keyboard.inline_keyboard.append(tool_buttons)
