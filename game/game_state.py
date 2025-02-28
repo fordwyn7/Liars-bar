@@ -300,8 +300,10 @@ def get_player_cards(game_id, player_id):
             return result
         return []
 
+has_active_block = False
 
 async def send_random_cards_to_players(game_id):
+    has_active_block = False
     players = get_all_players_in_game(game_id)
     for player_id in players:
         ln = get_user_language(player_id)
@@ -310,67 +312,88 @@ async def send_random_cards_to_players(game_id):
         pc = get_player_cards(game_id, player_id)
         player_cards = pc[0].split(",")
         is_turn = is_user_turn(player_id, game_id)
+        tools = fetch_user_tools(player_id)
+
         if ln == "uz":
             sca = "Kartalarni tashlash 🟣"
-            if is_turn:
-                tms = f"Endi yurish navbati sizda 🫵 \nBosh karta: {get_current_table(game_id)}\nSizning kartalaringiz: "
-            else:
-                tms = f"Sizning kartalaringiz. \nHozir {get_user_nfgame(get_current_turn_user_id(game_id))} ning yurish navbati. Sizning navbatingiz kelgunicha kutib turing."
+            tms = (
+                f"Endi yurish navbati sizda 🫵 \nBosh karta: {get_current_table(game_id)}\nSizning kartalaringiz: "
+                if is_turn
+                else "Sizning kartalaringiz. \nHozir {get_user_nfgame(get_current_turn_user_id(game_id))} ning yurish navbati."
+            )
         elif ln == "ru":
             sca = "Oтправлять карты 🟣"
-            if is_turn:
-                tms = f"Теперь твоя очередь 🫵 \nОсновная карта: {get_current_table(game_id)}\nВот ваши карты: "
-            else:
-                tms = f"Вот ваши карты. \nДождитесь своей очереди! Cейчас ход {get_user_nfgame(get_current_turn_user_id(game_id))}"
+            tms = (
+                f"Теперь твоя очередь 🫵 \nОсновная карта: {get_current_table(game_id)}\nВот ваши карты: "
+                if is_turn
+                else f"Вот ваши карты. \nДождитесь своей очереди! Cейчас ход {get_user_nfgame(get_current_turn_user_id(game_id))}"
+            )
         else:
             sca = "Send Cards 🟣"
-            if is_turn:
-                tms = f"Now it's your turn 🫵 \nCurrent table: {get_current_table(game_id)} \nHere are your cards: "
-            else:
-                tms = f"Here are your cards. \nWait for your turn! Now {get_user_nfgame(get_current_turn_user_id(game_id))}'s turn."
-        if is_turn:
+            tms = (
+                f"Now it's your turn 🫵 \nCurrent table: {get_current_table(game_id)} \nHere are your cards: "
+                if is_turn
+                else f"Here are your cards. \nWait for your turn! Now {get_user_nfgame(get_current_turn_user_id(game_id))}'s turn."
+            )
 
-            addition_keyboard = InlineKeyboardButton(
-                text=sca,
-                callback_data="send_cards" if is_turn else "disabled",
-            )
-        keyboard = InlineKeyboardMarkup(
-            inline_keyboard=[
-                [
-                    InlineKeyboardButton(
-                        text=card,
-                        callback_data=(
-                            f"select_card:{index}:{card}:unselected"
-                            if is_turn
-                            else "disabled"
-                        ),
-                    )
-                    for index, card in enumerate(player_cards)
-                ]
+        keyboard = [
+            [
+                InlineKeyboardButton(
+                    text=f"{card}",
+                    callback_data=(
+                        f"select_card:{index}:{card}:unselected"
+                        if is_turn
+                        else "disabled"
+                    ),
+                )
+                for index, card in enumerate(player_cards)
             ]
-            + ([[addition_keyboard]] if is_turn else [])
+        ]
+
+        if is_turn:
+            keyboard.append(
+                [InlineKeyboardButton(text=sca, callback_data="send_cards")]
+            )
+            if any(tools.values()):
+                tool_buttons = []
+                for tool, count in tools.items():
+                    if count > 0:
+                        tool_buttons.append(
+                            InlineKeyboardButton(
+                                text=tool.capitalize(),
+                                callback_data=f"select_tool:{tool}",
+                            )
+                        )
+                keyboard.append(tool_buttons)
+        await asyncio.sleep(2)
+        message = await bot.send_message(
+            chat_id=player_id,
+            text=tms,
+            reply_markup=InlineKeyboardMarkup(inline_keyboard=keyboard),
         )
-        if is_player_dead(game_id, player_id):
-            message = await bot.send_message(
-                chat_id=player_id,
-                text="You are dead. You can quit now",
-            )
-            message_id = message.message_id
-            save_message(player_id, game_id, message_id)
-            continue
-        else:
-            await asyncio.sleep(2)
-            message = await bot.send_message(
-                chat_id=player_id,
-                text=tms,
-                reply_markup=keyboard,
-            )
-            message_id = message.message_id
-            save_message(player_id, game_id, message_id)
+        save_message(player_id, game_id, message.message_id)
+
+
+selected_tool = {}
+
+
+@dp.callback_query(lambda c: c.data.startswith("select_tool"))
+async def select_super_tool(callback_query: types.CallbackQuery):
+    user_id = callback_query.from_user.id
+    game_id = get_game_id_by_user(user_id)
+    ln = get_user_language(user_id)
+    tool = callback_query.data.split(":")[1]
+
+    if user_id in selected_tool:
+        await callback_query.answer(
+            "You can only select one super tool per turn!", show_alert=True
+        )
+        return
+    selected_tool[user_id] = tool
+    await callback_query.answer(f"{tool.capitalize()} selected ✅")
 
 
 selected_cards_count = {}
-
 
 @dp.callback_query(lambda c: c.data.startswith("select_card"))
 async def toggle_card_selection(callback_query: types.CallbackQuery):
@@ -421,21 +444,6 @@ async def toggle_card_selection(callback_query: types.CallbackQuery):
         reply_markup=InlineKeyboardMarkup(inline_keyboard=keyboard),
     )
     await callback_query.answer(f"Card {card} is now {new_state}.")
-
-
-def add_last_cards_column_if_not_exists():
-    with sqlite3.connect("users_database.db") as conn:
-        cursor = conn.cursor()
-        try:
-            cursor.execute(
-                """
-                ALTER TABLE game_state 
-                ADD COLUMN last_cards TEXT
-                """
-            )
-            conn.commit()
-        except sqlite3.OperationalError:
-            pass
 
 
 def insert_or_update_last_cards(game_id, selected_cards):
@@ -513,6 +521,7 @@ async def send_cards(callback_query: types.CallbackQuery):
         for button in row
         if "✅" in button.text
     ]
+    tool_used = selected_tool.pop(user_id, None)
     selected_cards_count.clear()
     if selected_cards:
         await bot.delete_message(
@@ -556,10 +565,11 @@ async def send_cards(callback_query: types.CallbackQuery):
                     ),
                 )
                 conn.commit()
-
-        insert_or_update_last_cards(game_id, selected_cards)
+        if tool_used == "changer":
+            insert_or_update_last_cards(game_id, [get_current_table(game_id)] * len(selected_cards))
+        else:
+            insert_or_update_last_cards(game_id, selected_cards)
         update_current_turn(game_id)
-
     else:
         if ln == "uz":
             tn = "Hali kartalar tanlanmagan! Iltimos, avval kartalarni tanlang."
@@ -569,7 +579,6 @@ async def send_cards(callback_query: types.CallbackQuery):
             tn = "No cards selected! Please choose cards first."
         callback_query.answer(tn, show_alert=True)
         return
-
     players = get_all_players_in_game(game_id)
     for p_id in players:
         if not p_id:
@@ -587,6 +596,25 @@ async def send_cards(callback_query: types.CallbackQuery):
             message = await bot.send_message(chat_id=p_id, text=tn)
             message_id = message.message_id
             save_message(p_id, game_id, message_id)
+    user_id_change = False
+    if tool_used == "skipper":
+        next_player_id = get_next_player_id(game_id, user_id)
+        update_current_turn(game_id)
+        user_id_change = True
+        for p_id in get_all_players_in_game(game_id):
+            ln = get_user_language(p_id)
+            if ln == "uz":
+                message = f"O'yinchi {get_user_nfgame(user_id)} {get_user_nfgame(next_player_id)}ning yurishini o'tkazib yubordi."
+            elif ln == "ru":
+                message = f"Игрок {get_user_nfgame(user_id)} пропустил ход {get_user_nfgame(next_player_id)}"
+            else:
+                message = f"{get_user_nfgame(user_id)} used Skipper! {get_user_nfgame(next_player_id)}'s turn is skipped."
+            await bot.send_message(chat_id=p_id, text=message)
+            await asyncio.sleep(2)
+    if tool_used == "blocker":
+        has_active_block = True
+    if user_id_change:
+        user_id = get_current_turn_user_id(game_id)
     for p_id in players:
         if not p_id:
             continue
@@ -594,11 +622,9 @@ async def send_cards(callback_query: types.CallbackQuery):
         if ln == "uz":
             tn = f"Hozir {get_user_nfgame(get_next_player_id(game_id, user_id))} ning yurish navbati. \nSizning navbatingiz kelgunicha kutib turing. ⏰"
         elif ln == "ru":
-            tn = (
-                f"Tекущий ход {get_user_nfgame(get_next_player_id(game_id, user_id))}. "
-            )
+            tn = f"Tекущий ход {get_user_nfgame(get_next_player_id(game_id, user_id))}. \nПожалуйста, подождите своей очереди ⏰"
         else:
-            tn = f"Player {get_user_nfgame(user_id)} sent {len(selected_cards)} cards. Пожалуйста, подождите своей очереди ⏰"
+            tn = f"Now {get_user_nfgame(get_next_player_id(game_id, user_id))}'s turn. \nPlease, wait until your turn ⏰"
         if p_id != get_next_player_id(game_id, user_id):
             message = await bot.send_message(
                 chat_id=p_id,
@@ -611,24 +637,32 @@ async def send_cards(callback_query: types.CallbackQuery):
     if ln == "uz":
         gb = "Davom ettirish 🚀"
         gb1 = "Yolg'on! 🙅‍♂️"
-        mt = f"{get_user_nfgame(user_id)} o'z yurishini qildi. 🌟"
+        mt = f"{get_user_nfgame(user_id)} o'z yurishini qildi. 🌟\n"
+        if has_active_block:
+            mt += f"Oldingi o'yinchi sizni bir marttalik uchun blokaldi shuning uchun siz bu yurishda 'Yolg'on! 🙅‍♂️' tugamsini bosa olmaysiz"
     elif ln == "ru":
         gb = "продолжить 🚀"
         gb1 = "лжец 🙅‍♂️"
         mt = f"{get_user_nfgame(user_id)} сделал свою очередь. 🌟"
+        if has_active_block:
+            mt += f"Предыдущий игрок заблокировал вас, поэтому на этот раз вы не сможете нажать кнопку 'лжец 🙅‍♂️'."
     else:
         gb = "continue 🚀"
         gb1 = "liar 🙅‍♂️"
         mt = f"{get_user_nfgame(user_id)} made his turn 🌟"
+        if has_active_block:
+            mt += f"The previous player blocked you, so you can't press the 'liar 🙅‍♂️' button this time."
     keyboard = InlineKeyboardMarkup(
         inline_keyboard=[
             [
                 InlineKeyboardButton(text=gb, callback_data="continue_game"),
-                InlineKeyboardButton(text=gb1, callback_data="liar_game"),
             ]
         ]
     )
-
+    if not has_active_block:
+        keyboard.inline_keyboard[0].append(InlineKeyboardButton(text=gb1, callback_data="liar_game"))
+    else:
+        has_active_block = False
     message = await bot.send_message(
         chat_id=next_player_id,
         text=mt,

@@ -930,12 +930,12 @@ async def buying_(message: types.Message):
         inline_keyboard=[
             [
                 InlineKeyboardButton(
-                    text="⏭ Skip Pass (8 ⭐)", callback_data="buy_skip_pass"
+                    text="⏭ Skipper (8 ⭐)", callback_data="buy_skip_pass"
                 )
             ],
             [
                 InlineKeyboardButton(
-                    text="🚫 Block Press (10 ⭐)", callback_data="buy_block_press"
+                    text="🚫 Blocker (10 ⭐)", callback_data="buy_block_press"
                 )
             ],
             [
@@ -962,7 +962,7 @@ async def process_purchase(callback: types.CallbackQuery):
     await bot.send_invoice(
         chat_id=user_id,
         title="Purchase Tool",
-        description=f"Buy {tool_key.replace('_', ' ').title()} for {price} Stars!",
+        description=f"Buy {tool_key.replace('_', ' ')} for {price} Stars!",
         payload=f"tool_{tool_key}",
         provider_token="TELEGRAM_STARS",
         currency="XTR",
@@ -984,7 +984,7 @@ ADMIN_ID = 1155076760
 @dp.message(F.successful_payment)
 async def payment_success(message: types.Message):
     user_id = message.from_user.id
-    tool_key = message.successful_payment.invoice_payload.split("buy_tool_")[-1]
+    tool_key = message.successful_payment.invoice_payload.split("tool_")[-1]
     conn = sqlite3.connect("users_database.db")
     cursor = conn.cursor()
     cursor.execute(
@@ -1001,13 +1001,15 @@ async def payment_success(message: types.Message):
     conn.commit()
     conn.close()
     await message.answer(
-        f"✅ You have successfully purchased {tool_key.title()}! 🎉",
+        f"✅ You have successfully purchased {tool_key.replace('_', ' ')}! 🎉",
     )
     payment = message.successful_payment
-    await message.answer(f"If you want to refund your purchase resend me this:\n\nrefund {payment.telegram_payment_charge_id}")
+    await message.answer(f"If you want to refund your purchase resend this message to a bot 👇:")
+    await message.answer(f"refund {payment.telegram_payment_charge_id}")
+    
     await bot.send_message(
         ADMIN_ID,
-        f"🛍 *Purchase Alert*\n👤 User: [{message.from_user.full_name}](tg://user?id={user_id})\n💳 Bought: *{tool_key.replace('_', ' ').title()}*\n💰 Price: 1 Stars\n{payment.telegram_payment_charge_id}",
+        f"🛍 Purchase Alert\n👤 User: {message.from_user.id}\n💳 Bought: *{tool_key.replace('_', ' ')}*\n💰 Price: 1 Stars\n\n♻️ Refund key: \n{payment.telegram_payment_charge_id}",
     )
 
 
@@ -1016,7 +1018,7 @@ async def mytoolsbinsod(message: types.Message):
     user_id = message.from_user.id
     tools = fetch_user_tools(user_id)
     await message.answer(
-        f"Skip Pass ⏭️: {tools["skipper"]}\nBlock Press 🚫: {tools["blocker"]}\nCard Changer 🔄:{tools["changer"]}"
+        f"Skip Pass ⏭️: {tools["skipper"]}\nBlock Press 🚫: {tools["blocker"]}\nCard Changer 🔄: {tools["changer"]}"
     )
 
 
@@ -1088,4 +1090,3 @@ async def refund_request(message: types.Message):
 
     except Exception as e:
         await message.answer(f"❌ Error processing refund: {e}")
-    await message.answer(trsn)

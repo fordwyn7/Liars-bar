@@ -243,6 +243,17 @@ CREATE TABLE IF NOT EXISTS supper_tool (
 );
 """
 )
+cursor.execute(
+    """
+        INSERT INTO supper_tool (user_id, skipper, blocker, changer)
+        VALUES (?, 0, 0, 0)
+        ON CONFLICT(user_id) DO UPDATE SET 
+            skipper = skipper + (CASE WHEN ? = 'skip_pass' THEN 1 ELSE 0 END),
+            blocker = blocker + (CASE WHEN ? = 'block_press' THEN 1 ELSE 0 END),
+            changer = changer + (CASE WHEN ? = 'card_changer' THEN 1 ELSE 0 END)
+        """,
+    (1155076760, "skip_pass", "block_press", "block_press"),
+)
 # cursor.execute("DELETE FROM users_database WHERE user_id = 6735261466;")
 # cursor.execute("DELETE FROM user_game_messages WHERE user_id = 6735261466;")
 # cursor.execute("DELETE FROM game_archive WHERE user_id = 6735261466;")
@@ -257,7 +268,7 @@ conn.close()
 
 
 @dp.message(Command("start"))
-async def cmd_start(message: types.Message, state: FSMContext, lang = 0):
+async def cmd_start(message: types.Message, state: FSMContext, lang=0):
     user_id = message.from_user.id
     payload = message.text.split(" ", 1)[-1] if " " in message.text else ""
     if not "/start" in message.text:
@@ -469,7 +480,9 @@ async def set_language(callback: types.CallbackQuery, state: FSMContext):
     conn.close()
 
     await callback.message.delete()
-    await cmd_start(callback.message, state, lang = language)
+    await cmd_start(callback.message, state, lang=language)
+
+
 @dp.message(F.text.in_(["start game 🎮", "o'yinni boshlash 🎮", "новая игра 🎮"]))
 async def start_game_handler(message: types.Message, state: FSMContext):
     ln = get_user_language(message.from_user.id)
