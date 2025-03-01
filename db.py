@@ -2159,3 +2159,26 @@ def fetch_user_tools(user_id):
         "blocker": tools[1] if tools else 0,
         "changer": tools[2] if tools else 0
     }
+
+
+def get_tool_prices():
+    conn = sqlite3.connect("users_database.db")
+    cursor = conn.cursor()
+    
+    cursor.execute("SELECT changer, blocker, skipper FROM shop_prices LIMIT 1;")
+    result = cursor.fetchone()
+    
+    conn.close()
+    
+    if result:
+        return {
+            "card_changer": result[0],
+            "block_press": result[1],
+            "skip_pass": result[2],
+        }
+    else:
+        return {
+            "card_changer": 5,
+            "block_press": 5,
+            "skip_pass": 5,
+        }

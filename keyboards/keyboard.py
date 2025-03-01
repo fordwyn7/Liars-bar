@@ -274,7 +274,7 @@ shop_settings_buttons = ReplyKeyboardMarkup(
     keyboard=[
         [
             KeyboardButton(text="add tool to user ➕"),
-            KeyboardButton(text="coming soon ..."),
+            KeyboardButton(text="change prices ♻️"),
         ],
         [
             KeyboardButton(text="back to admin panel 🔙"),

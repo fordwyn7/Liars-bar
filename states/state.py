@@ -94,3 +94,6 @@ class ADDtool(StatesGroup):
     idorusername = State()
     toolchoose = State()
     
+class PriceUpdate(StatesGroup):
+    waiting_for_price = State()
+    

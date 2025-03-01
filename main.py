@@ -182,6 +182,15 @@ CREATE TABLE IF NOT EXISTS game_coin_table (
 )
 """
 )
+cursor.execute(
+    """
+CREATE TABLE IF NOT EXISTS shop_prices (
+    changer INTEGER DEFAULT 5,
+    blocker INTEGER DEFAULT 5,
+    skipper INTEGER DEFAULT 5
+)
+"""
+)
 cursor.execute("SELECT COUNT(*) FROM unity_coin_referral")
 count = cursor.fetchone()[0]
 if count == 0:

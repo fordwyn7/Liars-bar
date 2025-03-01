@@ -1733,9 +1733,13 @@ async def add_tool_states(message: types.Message, state: FSMContext):
     else:
         if not username.isdigit():
             username = get_id_by_nfgame(message.text)
-        await state.update_data(user_id = username)
-        await message.answer("choose a tool from below that you want to give: ", reply_markup=choose_tools_to_add)
+        await state.update_data(user_id=username)
+        await message.answer(
+            "choose a tool from below that you want to give: ",
+            reply_markup=choose_tools_to_add,
+        )
         await state.set_state(ADDtool.toolchoose)
+
 
 @dp.message(ADDtool.toolchoose)
 async def add_tool_states2(message: types.Message, state: FSMContext):
@@ -1747,7 +1751,9 @@ async def add_tool_states2(message: types.Message, state: FSMContext):
         return
     tools = ["skip 🪓", "block ⛔️", "change 🔄"]
     if not (message.text in tools):
-        await message.answer("please, enter a correct tool", reply_markup=choose_tools_to_add) 
+        await message.answer(
+            "please, enter a correct tool", reply_markup=choose_tools_to_add
+        )
     else:
         data = await state.get_data()
         user_id = data["user_id"]
@@ -1770,6 +1776,74 @@ async def add_tool_states2(message: types.Message, state: FSMContext):
         )
         conn.commit()
         conn.close()
-        await message.answer(f"You have successfully gave a {tool_key} to a user {get_user_nfgame(user_id)} ✅", reply_markup=admin_panel_button)
+        await message.answer(
+            f"You have successfully gave a {tool_key} to a user {get_user_nfgame(user_id)} ✅",
+            reply_markup=admin_panel_button,
+        )
         await state.clear()
-        
+
+
+@dp.message(F.text == "change prices ♻️")
+@admin_required()
+async def change_prices_start(message: types.Message):
+    keyboard = InlineKeyboardMarkup(
+        inline_keyboard=[
+            [
+                InlineKeyboardButton(
+                    text="Changer 🪓", callback_data="change_price:changer"
+                ),
+                InlineKeyboardButton(
+                    text="blocker ⛔️", callback_data="change_price:blocker"
+                ),
+                InlineKeyboardButton(
+                    text="skiper 🔄", callback_data="change_price:skipper"
+                ),
+            ],
+        ]
+    )
+    await message.answer(
+        "Select which tool's price you want to change:", reply_markup=keyboard
+    )
+
+
+@dp.callback_query(lambda c: c.data.startswith("change_price"))
+async def ask_for_new_price(callback_query: types.CallbackQuery, state: FSMContext):
+    tool = callback_query.data.split(":")[1]
+    tool_name = {
+        "changer": "🔄 Card Changer",
+        "blocker": "🚫 Block Press",
+        "skipper": "⏭ Skip Pass",
+    }.get(tool, "Unknown")
+
+    await state.update_data(tool=tool)
+    await state.set_state(PriceUpdate.waiting_for_price)
+    await callback_query.message.answer(f"Enter the new price for {tool_name}:", reply_markup=back_to_admin_panel)
+    await callback_query.answer()
+
+
+@dp.message(PriceUpdate.waiting_for_price)
+async def update_price(message: types.Message, state: FSMContext):
+    if message.text == "back to admin panel 🔙":
+        await message.answer(
+            "You are in admin panel 👇", reply_markup=admin_panel_button
+        )
+        await state.clear()
+        return
+    if not message.text.isdigit():
+        await message.answer("Please enter a valid number.")
+    else:
+        data = await state.get_data()
+        tool = data["tool"]
+        new_price = int(message.text)
+        conn = sqlite3.connect("users_database.db")
+        cursor = conn.cursor()
+        if tool == "skipper":
+            cursor.execute(f"UPDATE shop_prices SET skipper = ?", (new_price,))
+        elif tool == "blocker":
+            cursor.execute(f"UPDATE shop_prices SET blocker = ?", (new_price,))
+        else:
+            cursor.execute(f"UPDATE shop_prices SET changer = ?", (new_price,))
+        conn.commit()
+        conn.close()
+        await state.clear()
+        await message.answer(f"Price updated successfully! ✅")

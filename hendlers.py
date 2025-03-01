@@ -915,19 +915,19 @@ async def buying_(message: types.Message):
     if ln == "uz":
         ms12 = (
             "🛒 Liar's Fortune do'koni ga xush kelibsiz!\n\n"
-            "🎲 O'zingizga kerakli narsalarni harid qiling va ulardan o'yinda foydalanishdan zavqlaning, yoki ko'proq pul ishlash imkoniyatingizni oshiring. 🛍😊"
+            "🎲 O'zingizga kerakli narsalarni harid qiling va ulardan o'yinda foydalanishdan zavqlaning, yoki ko'proq pul ishlash imkoniyatingizni oshiring. 🛍😊\n\nHozirda mavjud mahsulotlar 👇"
         )
 
     elif ln == "ru":
         ms12 = (
             "🛒 Добро пожаловать в магазин Liar's Fortune!\n\n"
-            "🎲 Купите инструменты и наслаждайтесь их использованием в игре или увеличьте свои шансы заработать больше. 🛍😊"
+            "🎲 Купите инструменты и наслаждайтесь их использованием в игре или увеличьте свои шансы заработать больше. 🛍😊\nТекущие доступные продукты 👇"
         )
 
     else:
         ms12 = (
             "🛒 Welcome to the *Liar's Fortune Shop*!\n\n"
-            "🎲 Buy tools and enjoy using them in a game or increase your chance to earn more. 🛍😊 "
+            "🎲 Buy tools and enjoy using them in a game or increase your chance to earn more. 🛍😊\nCurrently available products 👇"
         )
 
     keyboard = InlineKeyboardMarkup(
@@ -949,8 +949,7 @@ async def buying_(message: types.Message):
 async def process_purchase(callback: types.CallbackQuery):
     user_id = callback.from_user.id
     tool_key = callback.data.replace("buy_", "")
-
-    price = TOOL_PRICES[tool_key]
+    price = get_tool_prices()[tool_key]
     ln = get_user_language(user_id)
     toolname = ""
     if tool_key == "skip_pass":
