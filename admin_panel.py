@@ -1809,15 +1809,10 @@ async def change_prices_start(message: types.Message):
 @dp.callback_query(lambda c: c.data.startswith("chane_price"))
 async def ask_for_new_price(callback_query: types.CallbackQuery, state: FSMContext):
     tool = callback_query.data.split(":")[1]
-    tool_name = {
-        "changer": "🔄 Card Changer",
-        "blocker": "🚫 Block Press",
-        "skipper": "⏭ Skip Pass",
-    }.get(tool, "Unknown")
-
+    tyt = get_tool_prices()
     await state.update_data(tool=tool)
     await state.set_state(PriceUpdate.waiting_for_price)
-    await callback_query.message.answer(f"Enter the new price for {tool_name}:", reply_markup=back_to_admin_panel)
+    await callback_query.message.answer(f"Enter the new price for {tool}\nOld price was: {tyt[f"{tool}"]}", reply_markup=back_to_admin_panel)
     await callback_query.answer()
 
 
@@ -1846,4 +1841,4 @@ async def update_price(message: types.Message, state: FSMContext):
         conn.commit()
         conn.close()
         await state.clear()
-        await message.answer(f"Price updated successfully! ✅")
+        await message.answer(f"Price updated successfully! ✅", reply_markup=admin_panel_button)
