@@ -1810,9 +1810,15 @@ async def change_prices_start(message: types.Message):
 async def ask_for_new_price(callback_query: types.CallbackQuery, state: FSMContext):
     tool = callback_query.data.split(":")[1]
     tyt = get_tool_prices()
+    if tool == "changer":
+        tyt = tyt["card_changer"]
+    elif tool == "skipper":
+        tyt = tyt["skip_pass"]
+    else:
+        tyt = tyt["block_press"]
     await state.update_data(tool=tool)
     await state.set_state(PriceUpdate.waiting_for_price)
-    await callback_query.message.answer(f"Enter the new price for {tool}\nOld price was: {tyt[f"{tool}"]}", reply_markup=back_to_admin_panel)
+    await callback_query.message.answer(f"Enter the new price for {tool}\nOld price was: {tyt}", reply_markup=back_to_admin_panel)
     await callback_query.answer()
 
 
