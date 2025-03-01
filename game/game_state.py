@@ -562,7 +562,12 @@ async def send_cards(callback_query: types.CallbackQuery):
             
     tool_used = ty
     if tool_used:
-            tool_used = tool_used[0]
+            hh = {
+                "🔄" : "changer",
+                "⛔️": "blocker",
+                "🪓": "skipper"
+            }
+            tool_used = hh[tool_used[0]]
             conn = sqlite3.connect("users_database.db")
             cursor = conn.cursor()
             cursor.execute(
