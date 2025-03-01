@@ -914,37 +914,37 @@ async def buying_(message: types.Message):
 
     if ln == "uz":
         ms12 = (
-            "🛒 *Liar's Bar do'koni*ga xush kelibsiz!\n\n"
-            "🎲 *Vositalarni xarid qiling va har bir o‘yinda g‘alaba qozonish imkoniyatingizni oshiring!*"
+            "🛒 Liar's Fortune do'koni ga xush kelibsiz!\n\n"
+            "🎲 O'zingizga kerakli narsalarni harid qiling va ulardan o'yinda foydalanishdan zavqlaning, yoki ko'proq pul ishlash imkoniyatingizni oshiring. 🛒😊"
         )
 
     elif ln == "ru":
         ms12 = (
-            "🛒 Добро пожаловать в *магазин Liar's Bar*!\n\n"
-            "🎲 *Покупайте инструменты и увеличивайте свои шансы на победу в каждой игре!*"
+            "🛒 Добро пожаловать в магазин Liar's Fortune!\n\n"
+            "🎲 Купите инструменты и наслаждайтесь их использованием в игре или увеличьте свои шансы заработать больше. 🛒😊"
         )
 
     else:
         ms12 = (
-            "🛒 Welcome to the *Liar's Bar Shop*!\n\n"
-            "🎲 *Buy tools and increase your chances to win in each game!*"
+            "🛒 Welcome to the *Liar's Fortune Shop*!\n\n"
+            "🎲 Buy tools and enjoy using them in a game or increase your chance to earn more. 🛒😊 "
         )
 
     keyboard = InlineKeyboardMarkup(
         inline_keyboard=[
             [
                 InlineKeyboardButton(
-                    text="⏭ Skipper (8 ⭐)", callback_data="buy_skip_pass"
+                    text="skip 🪓 (8 ⭐)", callback_data="buy_skip_pass"
                 )
             ],
             [
                 InlineKeyboardButton(
-                    text="🚫 Blocker (10 ⭐)", callback_data="buy_block_press"
+                    text="block ⛔️ (10 ⭐)", callback_data="buy_block_press"
                 )
             ],
             [
                 InlineKeyboardButton(
-                    text="🔄 Card Changer (9 ⭐)", callback_data="buy_card_changer"
+                    text="change 🔄 (9 ⭐)", callback_data="buy_card_changer"
                 )
             ],
         ]
@@ -958,15 +958,47 @@ async def process_purchase(callback: types.CallbackQuery):
     user_id = callback.from_user.id
     tool_key = callback.data.replace("buy_", "")
 
-    if tool_key not in TOOL_PRICES:
-        return await callback.answer("❌ Invalid selection.", show_alert=True)
-
     price = TOOL_PRICES[tool_key]
-
+    ln = get_user_language(user_id)
+    toolname = ""
+    if tool_key == "skip_pass":
+        toolname = "skip 🪓"
+        if ln == "uz":
+            vazifa = "Keyingi o'yinchining navbatini o'tkazib yuboradi ✔️"
+        elif ln == "ru":
+            vazifa = "Пропускает ход следующего игрока ✔️"
+        else:
+            vazifa = "Skips the next player's turn ✔️"
+    elif tool_key == "block_press":
+        toolname = "block ⛔️"
+        if ln == "uz":
+            vazifa = "Keyingi o'yinchi sizni yolg'onchi deb topa olmaydi ✔️"
+        elif ln == "ru":
+            vazifa = "Следующий игрок не сможет признать тебя лжецом ✔️"
+        else:
+            vazifa = "The next player can't press a liar ✔️"
+            
+    else:
+        toolname = "change 🔄"
+        if ln == "uz":
+            vazifa = "Tashlangan barcha kartalarni bosh karta bilan bir xil ko'rinishga keltirib beradi ✔️"
+        elif ln == "ru":
+            vazifa = "Делает все отправленные карты такими же, как и основная карта ✔️"
+        else:
+            vazifa = "Changes all sent cards to a table card ✔️"
+    if ln == "uz":
+        purtit = "Xarid"
+        desc = f"🛍 Mahsulot: {toolname}\n💰 Narxi: {price} star ⭐️\n🎭 Vazifasi: {vazifa}\n🕐 Foydalanish: Kartani tashlashdan oldin aktiv (✅) holatda bo'lishi kerak.\n\nSotib olish uchun quidagi tugmani bosing. 👇"
+    elif ln == "ru":
+        purtit = "Покупка"
+        desc = f"🛍 Продукт: {toolname}\n💰 Цена: {price} star ⭐️\n🎭 Задача: {vazifa}\n🕐 Использование: Перед отправкой карты должны быть активны (✅).\n\nДля покупки нажмите на кнопка ниже. 👇"
+    else:
+        purtit = "Purchase"
+        desc = f"🛍 Item: {toolname}\n💰 Price: {price} star ⭐️\n🎭 Task: {vazifa}\n🕐 Usage: It has to be activated before sending cards\n\nPress the button below to purchase. 👇"
     await bot.send_invoice(
         chat_id=user_id,
-        title="Purchase Tool",
-        description=f"Buy {tool_key.replace('_', ' ')} for {price} Stars!",
+        title=purtit,
+        description=desc,
         payload=f"tool_{tool_key}",
         provider_token="TELEGRAM_STARS",
         currency="XTR",
