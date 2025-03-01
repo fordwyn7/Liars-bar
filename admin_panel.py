@@ -1790,13 +1790,13 @@ async def change_prices_start(message: types.Message):
         inline_keyboard=[
             [
                 InlineKeyboardButton(
-                    text="Changer 🪓", callback_data="change_price:changer"
+                    text="Changer 🔄", callback_data="change_price:changer"
                 ),
                 InlineKeyboardButton(
                     text="blocker ⛔️", callback_data="change_price:blocker"
                 ),
                 InlineKeyboardButton(
-                    text="skiper 🔄", callback_data="change_price:skipper"
+                    text="skiper 🪓", callback_data="change_price:skipper"
                 ),
             ],
         ]
@@ -1838,11 +1838,11 @@ async def update_price(message: types.Message, state: FSMContext):
         conn = sqlite3.connect("users_database.db")
         cursor = conn.cursor()
         if tool == "skipper":
-            cursor.execute(f"UPDATE shop_prices SET skipper = ?", (new_price,))
+            cursor.execute(f"UPDATE shop_prices SET skipper = ? WHERE rowid = 1", (new_price,))
         elif tool == "blocker":
-            cursor.execute(f"UPDATE shop_prices SET blocker = ?", (new_price,))
+            cursor.execute(f"UPDATE shop_prices SET blocker = ? WHERE rowid = 1", (new_price,))
         else:
-            cursor.execute(f"UPDATE shop_prices SET changer = ?", (new_price,))
+            cursor.execute(f"UPDATE shop_prices SET changer = ? WHERE rowid = 1", (new_price,))
         conn.commit()
         conn.close()
         await state.clear()

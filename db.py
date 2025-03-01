@@ -2165,7 +2165,6 @@ def get_tool_prices():
     conn = sqlite3.connect("users_database.db")
     cursor = conn.cursor()
 
-    # Ensure the table has at least one row
     cursor.execute("SELECT COUNT(*) FROM shop_prices")
     count = cursor.fetchone()[0]
 
@@ -2173,13 +2172,12 @@ def get_tool_prices():
         cursor.execute("INSERT INTO shop_prices (changer, blocker, skipper) VALUES (3, 3, 3)")
         conn.commit()
 
-    # Fetch the values
-    cursor.execute("SELECT changer, blocker, skipper FROM shop_prices")
+    cursor.execute("SELECT changer, blocker, skipper FROM shop_prices LIMIT 1")
     result = cursor.fetchone()
     conn.close()
-
     return {
         "card_changer": result[0],
         "block_press": result[1],
         "skip_pass": result[2],
     }
+
