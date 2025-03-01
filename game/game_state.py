@@ -371,7 +371,7 @@ async def send_random_cards_to_players(game_id):
                         tool_buttons.append(
                             InlineKeyboardButton(
                                 text=ty,
-                                callback_data=f"select_tool:{tool}:{inf}:unselected",
+                                callback_data=f"select_tool:{ty}:{inf}:unselected",
                             )
                         )
                 keyboard.append(tool_buttons)
