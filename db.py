@@ -2164,20 +2164,22 @@ def fetch_user_tools(user_id):
 def get_tool_prices():
     conn = sqlite3.connect("users_database.db")
     cursor = conn.cursor()
-    
-    cursor.execute("SELECT changer, blocker, skipper FROM shop_prices LIMIT 1;")
+
+    # Ensure the table has at least one row
+    cursor.execute("SELECT COUNT(*) FROM shop_prices")
+    count = cursor.fetchone()[0]
+
+    if count == 0:
+        cursor.execute("INSERT INTO shop_prices (changer, blocker, skipper) VALUES (3, 3, 3)")
+        conn.commit()
+
+    # Fetch the values
+    cursor.execute("SELECT changer, blocker, skipper FROM shop_prices")
     result = cursor.fetchone()
     conn.close()
-    
-    if result:
-        return {
-            "card_changer": result[0],
-            "block_press": result[1],
-            "skip_pass": result[2],
-        }
-    else:
-        return {
-            "card_changer": 4,
-            "block_press": 4,
-            "skip_pass": 4,
-        }
+
+    return {
+        "card_changer": result[0],
+        "block_press": result[1],
+        "skip_pass": result[2],
+    }
