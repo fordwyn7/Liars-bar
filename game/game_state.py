@@ -1213,7 +1213,7 @@ async def handle_continue_or_liar(callback_query: types.CallbackQuery):
                     tool_buttons.append(
                         InlineKeyboardButton(
                             text=ty,
-                            callback_data=f"select_tool:{tool}:{inf}:unselected",
+                            callback_data=f"select_tool:{ty}:{inf}:unselected",
                         )
                     )
             keyboard.inline_keyboard.append(tool_buttons)
