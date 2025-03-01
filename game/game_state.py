@@ -716,7 +716,7 @@ async def send_cards(callback_query: types.CallbackQuery):
             ]
         ]
     )
-    if not has_active_block:
+    if not has_active_block and typ == user_id:
         keyboard.inline_keyboard[0].append(
             InlineKeyboardButton(text=gb1, callback_data="liar_game")
         )
