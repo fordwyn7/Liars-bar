@@ -1733,7 +1733,7 @@ async def add_tool_states(message: types.Message, state: FSMContext):
     else:
         if not username.isdigit():
             username = get_id_by_nfgame(message.text)
-        await state.set_data(user_id = username)
+        await state.update_data(user_id = username)
         await message.answer("choose a tool from below that you want to give: ", reply_markup=choose_tools_to_add)
         await state.set_state(ADDtool.toolchoose)
 
