@@ -323,6 +323,7 @@ async def handle_stop_incomplete_games(callback_query: types.CallbackQuery):
             delete_game(game["game_id"])
             for player_id in players:
                 delete_user_from_all_games(player_id)
+                await delete_user_messages(game["game_id"], player_id)
                 ln = get_user_language(player_id)
                 if ln == "uz":
                     ms2 = "O'yin yaratuvchisi tomonidan to'xtatildi."
@@ -358,8 +359,7 @@ async def handle_stop_incomplete_games(callback_query: types.CallbackQuery):
         ms4,
         reply_markup=get_main_menu(callback_query.from_user.id),
     )
-    cre = get_game_creator_id(game["game_id"])
-    if callback_query.from_user.id == cre:
+    if callback_query.from_user.id == creator_id:
         await delete_all_game_messages(game["game_id"])
     else:
         await delete_user_messages(game["game_id"], callback_query.from_user.id)
