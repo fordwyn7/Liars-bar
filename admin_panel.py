@@ -1790,13 +1790,13 @@ async def change_prices_start(message: types.Message):
         inline_keyboard=[
             [
                 InlineKeyboardButton(
-                    text="Changer 🔄", callback_data="change_price:changer"
+                    text="Changer 🔄", callback_data="chane_price:changer"
                 ),
                 InlineKeyboardButton(
-                    text="blocker ⛔️", callback_data="change_price:blocker"
+                    text="blocker ⛔️", callback_data="chane_price:blocker"
                 ),
                 InlineKeyboardButton(
-                    text="skiper 🪓", callback_data="change_price:skipper"
+                    text="skiper 🪓", callback_data="chane_price:skipper"
                 ),
             ],
         ]
@@ -1806,7 +1806,7 @@ async def change_prices_start(message: types.Message):
     )
 
 
-@dp.callback_query(lambda c: c.data.startswith("change_price"))
+@dp.callback_query(lambda c: c.data.startswith("chane_price"))
 async def ask_for_new_price(callback_query: types.CallbackQuery, state: FSMContext):
     tool = callback_query.data.split(":")[1]
     tool_name = {
