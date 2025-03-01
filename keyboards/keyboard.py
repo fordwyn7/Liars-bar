@@ -263,11 +263,26 @@ admin_panel_button = ReplyKeyboardMarkup(
             KeyboardButton(text="🔗 channels"),
         ],
         [
+            KeyboardButton(text="🛒 shop"),
             KeyboardButton(text="🔙 main menu"),
         ],
     ],
     resize_keyboard=True,
 )
+
+shop_settings_buttons = ReplyKeyboardMarkup(
+    keyboard=[
+        [
+            KeyboardButton(text="add tool to user ➕"),
+            KeyboardButton(text="coming soon ..."),
+        ],
+        [
+            KeyboardButton(text="back to admin panel 🔙"),
+        ],
+    ],
+    resize_keyboard=True,
+)
+
 
 channels_show_keyboards = ReplyKeyboardMarkup(
     keyboard=[
@@ -462,6 +477,20 @@ back_to_tournaments_button = ReplyKeyboardMarkup(
     keyboard=[
         [
             KeyboardButton(text="back to tournaments panel 🔙"),
+        ],
+    ],
+    resize_keyboard=True,
+)
+
+choose_tools_to_add = ReplyKeyboardMarkup(
+    keyboard=[
+        [
+            KeyboardButton(text="skip 🪓"),
+            KeyboardButton(text="block ⛔️"),
+            KeyboardButton(text="change 🔄"),
+        ],
+        [
+            KeyboardButton(text="back to admin panel 🔙"),
         ],
     ],
     resize_keyboard=True,

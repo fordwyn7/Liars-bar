@@ -361,10 +361,16 @@ async def send_random_cards_to_players(game_id):
                 inf = 5
                 for tool, count in tools.items():
                     if count > 0:
+                        if tool == "skipper":
+                            ty = "🪓"
+                        elif tool == "blocker":
+                            ty = "⛔️"
+                        else:
+                            ty = "🔄"
                         inf += 1
                         tool_buttons.append(
                             InlineKeyboardButton(
-                                text=tool.capitalize(),
+                                text=ty,
                                 callback_data=f"select_tool:{tool}:{inf}:unselected",
                             )
                         )
@@ -550,7 +556,7 @@ async def send_cards(callback_query: types.CallbackQuery):
     ]
     ty = []
     for i in selected_cards:
-        if len(i)> 2:
+        if i in ["🔄", "⛔️", "🪓"]:
             ty.append(i)
             selected_cards.remove(i)
             
@@ -1192,10 +1198,16 @@ async def handle_continue_or_liar(callback_query: types.CallbackQuery):
             inf = 5
             for tool, count in tools.items():
                 if count > 0:
+                    if tool == "skipper":
+                        ty = "🪓"
+                    elif tool == "blocker":
+                        ty = "⛔️"
+                    else:
+                        ty = "🔄"
                     inf += 1
                     tool_buttons.append(
                         InlineKeyboardButton(
-                            text=tool.capitalize(),
+                            text=ty,
                             callback_data=f"select_tool:{tool}:{inf}:unselected",
                         )
                     )

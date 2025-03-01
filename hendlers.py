@@ -449,6 +449,7 @@ async def my_cabinet(message: types.Message):
     cursor.execute("SELECT COUNT(*) FROM game_archive WHERE user_id = ?", (user_id,))
     games_played = cursor.fetchone()[0]
     conn.close()
+    tools = fetch_user_tools(user_id)
     ln = get_user_language(message.from_user.id)
     if ln == "uz":
         user_cabinet_message = (
@@ -457,7 +458,8 @@ async def my_cabinet(message: types.Message):
             f"🗓 Ro'yhatdan o'tgan sana: {registration_date}\n"
             f"🎮 O'ynagan o'yinlari soni: {games_played}\n"
             f"👥 Referallari soni: {get_number_of_referrals(message.from_user.id)}\n"
-            f"💰 Unity Coinlari: {unity_coins}\n"
+            f"💰 Unity Coinlari: {unity_coins}\n\n"
+            f"🔗 super jihozlar:\nskip 🪓: {tools["skipper"]}\nblock ⛔️: {tools["blocker"]}\nchange 🔄: {tools["changer"]}"
         )
     elif ln == "ru":
         user_cabinet_message = (
@@ -467,6 +469,7 @@ async def my_cabinet(message: types.Message):
             f"🎮 Сыграно игр: {games_played}\n"
             f"👥 рефералы: {get_number_of_referrals(message.from_user.id)}\n"
             f"💰 Unity Coins: {unity_coins}\n"
+            f"🔗 супер инструменты:\nskip 🪓: {tools["skipper"]}\nblock ⛔️: {tools["blocker"]}\nchange 🔄: {tools["changer"]}"
         )
     else:
         user_cabinet_message = (
@@ -476,6 +479,7 @@ async def my_cabinet(message: types.Message):
             f"🎮 Games Played: {games_played}\n"
             f"👥 referrals: {get_number_of_referrals(message.from_user.id)}\n"
             f"💰 Unity Coins: {unity_coins}\n"
+            f"🔗 super tools:\nskip 🪓: {tools["skipper"]}\nblock ⛔️: {tools["blocker"]}\nchange 🔄: {tools["changer"]}"
         )
     await message.answer(user_cabinet_message)
 
@@ -590,7 +594,7 @@ async def show_tournaments_menu(message: types.Message):
                 f"🗓 Boshlanish vaqti: {tournament['start_time']}\n"
                 f"🏁 Tugash vaqti: {tournament['end_time']}\n\n"
                 f"🏆 Sovrin: \n{tournament['prize']}\n\n"
-                f"📢 Turnir boshlanishi bilan barcha qoshilish uchun link oladi, shuning uchun osha payt online bo'ling ❗️❗️❗️*\n"
+                f"📢 Turnir boshlanishi bilan barcha qoshilish uchun link oladi, shuning uchun osha payt online bo'ling ❗️❗️❗️\n"
             )
         elif ln == "ru":
             response = (
@@ -598,7 +602,7 @@ async def show_tournaments_menu(message: types.Message):
                 f"🗓 Время начала: {tournament['start_time']}\n"
                 f"🏁 Время окончания: {tournament['end_time']}\n\n"
                 f"🏆 Приз: \n{tournament['prize']}\n\n"
-                f"📢 Перед началом турнира все получат уведомление о возможности присоединиться. Так что будьте в это время онлайн. ❗️❗️❗️*\n"
+                f"📢 Перед началом турнира все получат уведомление о возможности присоединиться. Так что будьте в это время онлайн. ❗️❗️❗️\n"
             )
         else:
             response = (
@@ -606,7 +610,7 @@ async def show_tournaments_menu(message: types.Message):
                 f"🗓 Starts: {tournament['start_time']}\n"
                 f"🏁 Ends: {tournament['end_time']}\n\n"
                 f"🏆 Prize: \n{tournament['prize']}\n\n"
-                f"📢 Before the tournament begins, everyone will receive a notification to join. So be online at that time ❗️❗️❗️*\n"
+                f"📢 Before the tournament begins, everyone will receive a notification to join. So be online at that time ❗️❗️❗️\n"
             )
     await message.answer(
         response,
@@ -987,14 +991,11 @@ async def payment_success(message: types.Message):
 
     conn = sqlite3.connect("users_database.db")
     cursor = conn.cursor()
-
-    # Determine which tool to increment
     skipper = 1 if tool_key == "skip_pass" else 0
     blocker = 1 if tool_key == "block_press" else 0
     changer = 1 if tool_key == "card_changer" else 0
-
-    # Insert or update user tools
-    cursor.execute(
+    
+    cursor.execute( 
         """
         INSERT INTO supper_tool (user_id, skipper, blocker, changer)
         VALUES (?, ?, ?, ?)
@@ -1027,14 +1028,6 @@ async def payment_success(message: types.Message):
         f"♻️ Refund key: {payment.telegram_payment_charge_id}"
     )
 
-
-@dp.message(F.text.in_(["my tools", "mening qurollarim"]))
-async def mytoolsbinsod(message: types.Message):
-    user_id = message.from_user.id
-    tools = fetch_user_tools(user_id)
-    await message.answer(
-        f"Skip Pass ⏭️: {tools["skipper"]}\nBlock Press 🚫: {tools["blocker"]}\nCard Changer 🔄: {tools["changer"]}"
-    )
 
 
 # CARD_PRICES = {

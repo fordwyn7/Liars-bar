@@ -1694,3 +1694,82 @@ async def ask_for_channel_id(message: Message, state: FSMContext):
             )
         except Exception:
             continue
+
+
+@dp.message(F.text == "🛒 shop")
+@admin_required()
+async def admin_shop_settings(message: Message, state: FSMContext):
+    await message.answer(
+        "Choose one of these options 👇", reply_markup=shop_settings_buttons
+    )
+
+
+@dp.message(F.text == "add tool to user ➕")
+@admin_required()
+async def add_tool_to_a_user(message: Message, state: FSMContext):
+    await message.answer(
+        f"Please enter the ID or Username of a user ✍️", reply_markup=back_to_admin_panel
+    )
+    await state.set_state(ADDtool.idorusername)
+
+
+@dp.message(ADDtool.idorusername)
+async def add_tool_states(message: types.Message, state: FSMContext):
+    if message.text == "back to admin panel 🔙":
+        await message.answer(
+            "You are in admin panel 👇", reply_markup=admin_panel_button
+        )
+        await state.clear()
+        return
+    username = message.text
+
+    if not (
+        username.isdigit() and get_user_nfgame(username) or get_id_by_nfgame(username)
+    ):
+        await message.answer(
+            "❌ Please send a valid user ID or username",
+            reply_markup=back_to_admin_panel,
+        )
+    else:
+        if not username.isdigit():
+            username = get_id_by_nfgame(message.text)
+        await state.set_data(user_id = username)
+        await message.answer("choose a tool from below that you want to give: ", reply_markup=choose_tools_to_add)
+        await state.set_state(ADDtool.toolchoose)
+
+@dp.message(ADDtool.toolchoose)
+async def add_tool_states2(message: types.Message, state: FSMContext):
+    if message.text == "back to admin panel 🔙":
+        await message.answer(
+            "You are in admin panel 👇", reply_markup=admin_panel_button
+        )
+        await state.clear()
+        return
+    tools = ["skip 🪓", "block ⛔️", "change 🔄"]
+    if not (message.text in tools):
+        await message.answer("please, enter a correct tool", reply_markup=choose_tools_to_add) 
+    else:
+        data = await state.get_data()
+        user_id = data["user_id"]
+        tool_key = message.text
+        skipper = 1 if tool_key == "skip 🪓" else 0
+        blocker = 1 if tool_key == "block ⛔️" else 0
+        changer = 1 if tool_key == "change 🔄" else 0
+        conn = sqlite3.connect("users_database.db")
+        cursor = conn.cursor()
+        cursor.execute(
+            """
+            INSERT INTO supper_tool (user_id, skipper, blocker, changer)
+            VALUES (?, ?, ?, ?)
+            ON CONFLICT(user_id) DO UPDATE SET 
+                skipper = skipper + ?,
+                blocker = blocker + ?,
+                changer = changer + ?
+            """,
+            (user_id, skipper, blocker, changer, skipper, blocker, changer),
+        )
+        conn.commit()
+        conn.close()
+        await message.answer(f"You have successfully gave a {tool_key} to a user {get_user_nfgame(user_id)} ✅", reply_markup=admin_panel_button)
+        await state.clear()
+        

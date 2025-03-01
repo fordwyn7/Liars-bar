@@ -89,3 +89,8 @@ class waitforcoinamount(StatesGroup):
     
 class AddChannelState(StatesGroup):
     waiting_for_channel_id = State()
+    
+class ADDtool(StatesGroup):
+    idorusername = State()
+    toolchoose = State()
+    
