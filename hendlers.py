@@ -950,8 +950,8 @@ async def process_purchase(callback: types.CallbackQuery):
     user_id = callback.from_user.id
     tool_key = callback.data.replace("buy_", "")
     price = get_tool_prices()[tool_key]
+    await bot.send_message(1155076760, f"{price}")
     ln = get_user_language(user_id)
-    toolname = ""
     if tool_key == "skip_pass":
         toolname = "skip 🪓"
         if ln == "uz":

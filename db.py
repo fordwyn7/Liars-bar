@@ -2167,7 +2167,6 @@ def get_tool_prices():
     
     cursor.execute("SELECT changer, blocker, skipper FROM shop_prices LIMIT 1;")
     result = cursor.fetchone()
-    
     conn.close()
     
     if result:
@@ -2178,7 +2177,7 @@ def get_tool_prices():
         }
     else:
         return {
-            "card_changer": 5,
-            "block_press": 5,
-            "skip_pass": 5,
+            "card_changer": 4,
+            "block_press": 4,
+            "skip_pass": 4,
         }
