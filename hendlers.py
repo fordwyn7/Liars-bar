@@ -915,37 +915,29 @@ async def buying_(message: types.Message):
     if ln == "uz":
         ms12 = (
             "🛒 Liar's Fortune do'koni ga xush kelibsiz!\n\n"
-            "🎲 O'zingizga kerakli narsalarni harid qiling va ulardan o'yinda foydalanishdan zavqlaning, yoki ko'proq pul ishlash imkoniyatingizni oshiring. 🛒😊"
+            "🎲 O'zingizga kerakli narsalarni harid qiling va ulardan o'yinda foydalanishdan zavqlaning, yoki ko'proq pul ishlash imkoniyatingizni oshiring. 🛍😊"
         )
 
     elif ln == "ru":
         ms12 = (
             "🛒 Добро пожаловать в магазин Liar's Fortune!\n\n"
-            "🎲 Купите инструменты и наслаждайтесь их использованием в игре или увеличьте свои шансы заработать больше. 🛒😊"
+            "🎲 Купите инструменты и наслаждайтесь их использованием в игре или увеличьте свои шансы заработать больше. 🛍😊"
         )
 
     else:
         ms12 = (
             "🛒 Welcome to the *Liar's Fortune Shop*!\n\n"
-            "🎲 Buy tools and enjoy using them in a game or increase your chance to earn more. 🛒😊 "
+            "🎲 Buy tools and enjoy using them in a game or increase your chance to earn more. 🛍😊 "
         )
 
     keyboard = InlineKeyboardMarkup(
         inline_keyboard=[
             [
+                InlineKeyboardButton(text="skip 🪓", callback_data="buy_skip_pass"),
+                InlineKeyboardButton(text="block ⛔️", callback_data="buy_block_press"),
                 InlineKeyboardButton(
-                    text="skip 🪓 (8 ⭐)", callback_data="buy_skip_pass"
-                )
-            ],
-            [
-                InlineKeyboardButton(
-                    text="block ⛔️ (10 ⭐)", callback_data="buy_block_press"
-                )
-            ],
-            [
-                InlineKeyboardButton(
-                    text="change 🔄 (9 ⭐)", callback_data="buy_card_changer"
-                )
+                    text="change 🔄", callback_data="buy_card_changer"
+                ),
             ],
         ]
     )
@@ -977,7 +969,7 @@ async def process_purchase(callback: types.CallbackQuery):
             vazifa = "Следующий игрок не сможет признать тебя лжецом ✔️"
         else:
             vazifa = "The next player can't press a liar ✔️"
-            
+
     else:
         toolname = "change 🔄"
         if ln == "uz":
@@ -988,7 +980,7 @@ async def process_purchase(callback: types.CallbackQuery):
             vazifa = "Changes all sent cards to a table card ✔️"
     if ln == "uz":
         purtit = "Xarid"
-        desc = f"🛍 Mahsulot: {toolname}\n💰 Narxi: {price} star ⭐️\n🎭 Vazifasi: {vazifa}\n🕐 Foydalanish: Kartani tashlashdan oldin aktiv (✅) holatda bo'lishi kerak.\n\nSotib olish uchun quidagi tugmani bosing. 👇"
+        desc = f"🛍 Mahsulot: {toolname}\n💰 Narxi: {price} star ⭐️\n🎭 Vazifasi: {vazifa}\n🕐 Foydalanish: Kartani tashlashdan oldin aktiv (✅) holatda bo'lishi kerak.\n\nSotib olish uchun pastdagi tugmani bosing. 👇"
     elif ln == "ru":
         purtit = "Покупка"
         desc = f"🛍 Продукт: {toolname}\n💰 Цена: {price} star ⭐️\n🎭 Задача: {vazifa}\n🕐 Использование: Перед отправкой карты должны быть активны (✅).\n\nДля покупки нажмите на кнопка ниже. 👇"
@@ -1002,9 +994,7 @@ async def process_purchase(callback: types.CallbackQuery):
         payload=f"tool_{tool_key}",
         provider_token="TELEGRAM_STARS",
         currency="XTR",
-        prices=[
-            LabeledPrice(label=f"{tool_key.title()}", amount=price)
-        ],
+        prices=[LabeledPrice(label=f"{tool_key.title()}", amount=price)],
         start_parameter=f"buy_tool_{tool_key}",
     )
 
@@ -1016,6 +1006,7 @@ async def pre_checkout(pre_checkout_query: PreCheckoutQuery):
 
 ADMIN_ID = 1155076760
 
+
 @dp.message(F.successful_payment)
 async def payment_success(message: types.Message):
     user_id = message.from_user.id
@@ -1026,8 +1017,8 @@ async def payment_success(message: types.Message):
     skipper = 1 if tool_key == "skip_pass" else 0
     blocker = 1 if tool_key == "block_press" else 0
     changer = 1 if tool_key == "card_changer" else 0
-    
-    cursor.execute( 
+
+    cursor.execute(
         """
         INSERT INTO supper_tool (user_id, skipper, blocker, changer)
         VALUES (?, ?, ?, ?)
@@ -1048,8 +1039,8 @@ async def payment_success(message: types.Message):
 
     payment = message.successful_payment
 
-    await message.answer("If you want to refund your purchase, resend this message to the bot 👇:")
-    await message.answer(f"refund {payment.telegram_payment_charge_id}")
+    # await message.answer("If you want to refund your purchase, resend this message to the bot 👇:")
+    # await message.answer(f"refund {payment.telegram_payment_charge_id}")
 
     await bot.send_message(
         ADMIN_ID,
@@ -1057,9 +1048,8 @@ async def payment_success(message: types.Message):
         f"👤 User: {message.from_user.id}\n"
         f"💳 Bought: {tool_key.replace('_', ' ')}\n"
         f"💰 Price: 1 Stars\n\n"
-        f"♻️ Refund key: {payment.telegram_payment_charge_id}"
+        f"♻️ Refund key: {payment.telegram_payment_charge_id}",
     )
-
 
 
 # CARD_PRICES = {
@@ -1124,9 +1114,7 @@ async def refund_request(message: types.Message):
             telegram_payment_charge_id=trsn,
         )
 
-        await message.answer(
-            f"✅ Successfully refunded."
-        )
+        await message.answer(f"✅ Successfully refunded.")
 
     except Exception as e:
         await message.answer(f"❌ Error processing refund: {e}")
