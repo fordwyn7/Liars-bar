@@ -973,22 +973,13 @@ async def process_purchase(callback: types.CallbackQuery):
     if ln == "uz":
         purtit = "Xarid"
         desc = (
-            f"🛍 Mahsulot*: {toolname}\n"
+            f"🛍 Mahsulot: {toolname}\n"
             f"💰 Narxi: {price} star ⭐️\n"
             f"🎭 Vazifasi: {vazifa}\n"
             f"🕐 Foydalanish: Kartani tashlashdan oldin aktiv (✅) holatda bo'lishi kerak.\n\n"
             f"Sotib olish uchun pastdagi tugmani bosing. 👇"
         )
-    elif ln == "ru":
-        purtit = "Покупка"
-        desc = (
-            f"🛍 Продукт: {toolname}\n"
-            f"💰 Цена: {price} star ⭐️\n"
-            f"🎭 Задача: {vazifa}\n"
-            f"🕐 Использование: Перед отправкой карты должны быть активны (✅).\n\n"
-            f"Для покупки нажмите на кнопку ниже. 👇"
-        )
-    else:
+    elif ln == "en":
         purtit = "Purchase"
         desc = (
             f"🛍 Item: {toolname}\n"
@@ -996,6 +987,15 @@ async def process_purchase(callback: types.CallbackQuery):
             f"🎭 Task: {vazifa}\n"
             f"🕐 Usage: It has to be activated before sending cards.\n\n"
             f"Press the button below to purchase. 👇"
+        )
+    else:
+        purtit = "Покупка"
+        desc = (
+            f"🛍 Продукт: {toolname}\n"
+            f"💰 Цена: {price} star ⭐️\n"
+            f"🎭 Задача: {vazifa}\n"
+            f"🕐 Использование: Перед отправкой карты должны быть активны (✅).\n\n"
+            f"Для покупки нажмите на кнопку ниже. 👇"
         )
     await bot.send_invoice(
         chat_id=user_id,
