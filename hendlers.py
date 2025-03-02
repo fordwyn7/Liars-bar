@@ -973,28 +973,28 @@ async def process_purchase(callback: types.CallbackQuery):
     if ln == "uz":
         purtit = "Xarid"
         desc = (
-            f"🛍 *Mahsulot*: {toolname}\\n"
-            f"💰 *Narxi*: {price} star ⭐️\\n"
-            f"🎭 *Vazifasi*: {vazifa}\\n"
-            f"🕐 *Foydalanish*: Kartani tashlashdan oldin aktiv (✅) holatda bo'lishi kerak.\\n\\n"
+            f"🛍 Mahsulot*: {toolname}\n"
+            f"💰 Narxi: {price} star ⭐️\n"
+            f"🎭 Vazifasi: {vazifa}\n"
+            f"🕐 Foydalanish: Kartani tashlashdan oldin aktiv (✅) holatda bo'lishi kerak.\n\n"
             f"Sotib olish uchun pastdagi tugmani bosing. 👇"
         )
     elif ln == "ru":
         purtit = "Покупка"
         desc = (
-            f"🛍 *Продукт*: {toolname}\\n"
-            f"💰 *Цена*: {price} star ⭐️\\n"
-            f"🎭 *Задача*: {vazifa}\\n"
-            f"🕐 *Использование*: Перед отправкой карты должны быть активны (✅).\\n\\n"
+            f"🛍 Продукт: {toolname}\n"
+            f"💰 Цена: {price} star ⭐️\n"
+            f"🎭 Задача: {vazifa}\n"
+            f"🕐 Использование: Перед отправкой карты должны быть активны (✅).\n\n"
             f"Для покупки нажмите на кнопку ниже. 👇"
         )
     else:
         purtit = "Purchase"
         desc = (
-            f"🛍 *Item*: {toolname}\\n"
-            f"💰 *Price*: {price} star ⭐️\\n"
-            f"🎭 *Task*: {vazifa}\\n"
-            f"🕐 *Usage*: It has to be activated before sending cards.\\n\\n"
+            f"🛍 Item: {toolname}\n"
+            f"💰 Price: {price} star ⭐️\n"
+            f"🎭 Task: {vazifa}\n"
+            f"🕐 Usage: It has to be activated before sending cards.\n\n"
             f"Press the button below to purchase. 👇"
         )
     await bot.send_invoice(
@@ -1006,7 +1006,6 @@ async def process_purchase(callback: types.CallbackQuery):
         currency="XTR",
         prices=[LabeledPrice(label=f"{tool_key.title()}", amount=price)],
         start_parameter=f"buy_tool_{tool_key}",
-        parse_mode="MarkdownV2"
     )
 
 
