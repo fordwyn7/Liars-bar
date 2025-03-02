@@ -920,13 +920,9 @@ async def buying_(message: types.Message):
 
     else:
         ms12 = (
-            "🛒 Добро пожаловать в магазин Liar's Fortune!\n\n"
-            "🎲 Купите инструменты и наслаждайтесь их использованием в игре или увеличьте свои шансы заработать больше. 🛍😊\nТекущие доступные продукты 👇"
+            "🛒 Welcome to the Liar's Fortune Shop!\n\n"
+            "🎲 Buy tools and enjoy using them in a game or increase your chance to earn more. 🛍😊\nCurrently available products 👇"
         )
-        # ms12 = (
-        #     "🛒 Welcome to the Liar's Fortune Shop!\n\n"
-        #     "🎲 Buy tools and enjoy using them in a game or increase your chance to earn more. 🛍😊\nCurrently available products 👇"
-        # )
 
     keyboard = InlineKeyboardMarkup(
         inline_keyboard=[
@@ -974,33 +970,34 @@ async def process_purchase(callback: types.CallbackQuery):
             vazifa = "Делает все отправленные карты такими же, как и основная карта ✔️"
         else:
             vazifa = "Changes all sent cards to a table card ✔️"
-    # if ln == "uz":
-    purtit = "Xarid"
-    desc = (
-        f"🛍 Mahsulot: {toolname}\n"
-        f"💰 Narxi: {price} star ⭐️\n"
-        f"🎭 Vazifasi: {vazifa}\n"
-        f"🕐 Foydalanish: Kartani tashlashdan oldin aktiv (✅) holatda bo'lishi kerak.\n\n"
-        f"Sotib olish uchun pastdagi tugmani bosing. 👇"
-    )
-    # elif ln == "en":
-    #     purtit = "Purchase"
-    #     desc = (
-    #         f"🛍 Item: {toolname}\n"  # Added \n here
-    #         f"💰 Price: {price} star ⭐️\n"
-    #         f"🎭 Task: {vazifa}\n"
-    #         f"🕐 Usage: It has to be activated before sending cards.\n\n"
-    #         f"➤ Press the button below to purchase. 👇"
-    #     )
-    # else:
-    #     purtit = "Покупка"
-    #     desc = (
-    #         f"🛍 Продукт: {toolname}\n"
-    #         f"💰 Цена: {price} star ⭐️\n"
-    #         f"🎭 Задача: {vazifa}\n"
-    #         f"🕐 Использование: Перед отправкой карты должны быть активны (✅).\n\n"
-    #         f"Для покупки нажмите на кнопку ниже. 👇"
-    #     )
+    if ln == "uz":
+        purtit = "Xarid"
+        desc = (
+            f"🛍 Mahsulot: {toolname}\n"
+            f"💰 Narxi: {price} star ⭐️\n"
+            f"🎭 Vazifasi: {vazifa}\n"
+            f"🕐 Foydalanish: Kartani tashlashdan oldin aktiv (✅) holatda bo'lishi kerak.\n\n"
+            f"Sotib olish uchun pastdagi tugmani bosing. 👇"
+        )
+    elif ln == "en":
+        purtit = "Purchase"
+        desc = f"""
+            🛍 Item: {toolname}
+            💰 Price: {price} star ⭐️
+            🎭 Task: {vazifa}
+            🕐 Usage: It has to be activated before sending cards.
+
+            ➤ Press the button below to purchase. 👇
+        """
+    else:
+        purtit = "Покупка"
+        desc = (
+            f"🛍 Продукт: {toolname}\n"
+            f"💰 Цена: {price} star ⭐️\n"
+            f"🎭 Задача: {vazifa}\n"
+            f"🕐 Использование: Перед отправкой карты должны быть активны (✅).\n\n"
+            f"Для покупки нажмите на кнопку ниже. 👇"
+        )
     await bot.send_invoice(
         chat_id=user_id,
         title=purtit,
