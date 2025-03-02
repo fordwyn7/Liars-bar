@@ -983,11 +983,11 @@ async def process_purchase(callback: types.CallbackQuery):
         purtit = "Purchase"
         desc = f"""
             🛍 Item: {toolname}
-        💰 Price: {price} star ⭐️
-        🎭 Task: {vazifa}
-        🕐 Usage: It has to be activated before sending cards.
+💰 Price: {price} star ⭐️
+🎭 Task: {vazifa}
+🕐 Usage: It has to be activated before sending cards.
 
-        ➤ Press the button below to purchase. 👇
+➤ Press the button below to purchase. 👇
         """
     else:
         purtit = "Покупка"
