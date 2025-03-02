@@ -252,7 +252,6 @@ CREATE TABLE IF NOT EXISTS supper_tool (
 );
 """
 )
-cursor.execute("DELETE FROM shop_prices WHERE rowid NOT IN (SELECT MIN(rowid) FROM shop_prices);")
 
 
 # cursor.execute("DELETE FROM users_database WHERE user_id = 6735261466;")

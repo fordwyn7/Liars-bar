@@ -95,6 +95,7 @@ def get_main_menu(user_id: int):
         st = "o'yinni boshlash 🎮"
         lb = "🏅 Liderbord"
         bb = "pul ishlash 💸"
+        shp = "🛍 do'kon"
         kb = "📱 kabinet"
         pz = "Sovg'alar 🎁"
         # rf = "❄️ referal"
@@ -108,6 +109,7 @@ def get_main_menu(user_id: int):
         bb = "зарабатывать 💸"
         kb = "📱 кабинет"
         pz = "Призы 🎁"
+        shp = "🛍 магазин"
         # rf = "❄️ реферал"
         # tu = "🤩 турниры"
         gr = "правила игры 📜"
@@ -117,6 +119,7 @@ def get_main_menu(user_id: int):
         st = "start game 🎮"
         lb = "🏅 Leaderboard"
         bb = "earn 💸"
+        shp = "🛍 shop"
         kb = "📱 cabinet"
         pz = "Prizes 🎁"
         # rf = "❄️ referral"
@@ -131,6 +134,7 @@ def get_main_menu(user_id: int):
         ],
         [
             KeyboardButton(text=bb),
+            KeyboardButton(text=shp),
             KeyboardButton(text=pz),
         ],
         [

@@ -1040,7 +1040,7 @@ async def payment_success(message: types.Message):
         f"🛍 Purchase Alert\n"
         f"👤 User: {message.from_user.id}\n"
         f"💳 Bought: {tool_key.replace('_', ' ')}\n"
-        f"💰 Price: 1 Stars\n\n"
+        f"💰 Price: {get_tool_prices()[tool_key]} Stars\n\n"
         f"♻️ Refund key: {payment.telegram_payment_charge_id}",
     )
 
