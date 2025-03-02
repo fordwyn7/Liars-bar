@@ -980,7 +980,7 @@ async def process_purchase(callback: types.CallbackQuery):
             f"Sotib olish uchun pastdagi tugmani bosing. 👇"
         )
     elif ln == "en":
-        purtit = "Purchase"
+        purtit = "Xarid"
         desc = (
             f"🛍 Mahsulot: {toolname}\n"
             f"💰 Narxi: {price} star ⭐️\n"
