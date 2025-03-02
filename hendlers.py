@@ -901,7 +901,6 @@ from aiogram.types import (
 )
 
 
-
 @dp.message(F.text.in_(["🛍 shop", "🛍 do'kon", "🛍 магазин"]))
 async def buying_(message: types.Message):
     user_id = message.from_user.id
@@ -921,7 +920,7 @@ async def buying_(message: types.Message):
 
     else:
         ms12 = (
-            "🛒 Welcome to the *Liar's Fortune Shop*!\n\n"
+            "🛒 Welcome to the Liar's Fortune Shop!\n\n"
             "🎲 Buy tools and enjoy using them in a game or increase your chance to earn more. 🛍😊\nCurrently available products 👇"
         )
 
@@ -973,13 +972,31 @@ async def process_purchase(callback: types.CallbackQuery):
             vazifa = "Changes all sent cards to a table card ✔️"
     if ln == "uz":
         purtit = "Xarid"
-        desc = f"🛍 Mahsulot: {toolname}\n💰 Narxi: {price} star ⭐️\n🎭 Vazifasi: {vazifa}\n🕐 Foydalanish: Kartani tashlashdan oldin aktiv (✅) holatda bo'lishi kerak.\n\nSotib olish uchun pastdagi tugmani bosing. 👇"
+        desc = (
+            f"🛍 *Mahsulot*: {toolname}\\n"
+            f"💰 *Narxi*: {price} star ⭐️\\n"
+            f"🎭 *Vazifasi*: {vazifa}\\n"
+            f"🕐 *Foydalanish*: Kartani tashlashdan oldin aktiv (✅) holatda bo'lishi kerak.\\n\\n"
+            f"Sotib olish uchun pastdagi tugmani bosing. 👇"
+        )
     elif ln == "ru":
         purtit = "Покупка"
-        desc = f"🛍 Продукт: {toolname}\n💰 Цена: {price} star ⭐️\n🎭 Задача: {vazifa}\n🕐 Использование: Перед отправкой карты должны быть активны (✅).\n\nДля покупки нажмите на кнопка ниже. 👇"
+        desc = (
+            f"🛍 *Продукт*: {toolname}\\n"
+            f"💰 *Цена*: {price} star ⭐️\\n"
+            f"🎭 *Задача*: {vazifa}\\n"
+            f"🕐 *Использование*: Перед отправкой карты должны быть активны (✅).\\n\\n"
+            f"Для покупки нажмите на кнопку ниже. 👇"
+        )
     else:
         purtit = "Purchase"
-        desc = f"🛍 Item: {toolname}\n💰 Price: {price} star ⭐️\n🎭 Task: {vazifa}\n🕐 Usage: It has to be activated before sending cards\n\nPress the button below to purchase. 👇"
+        desc = (
+            f"🛍 *Item*: {toolname}\\n"
+            f"💰 *Price*: {price} star ⭐️\\n"
+            f"🎭 *Task*: {vazifa}\\n"
+            f"🕐 *Usage*: It has to be activated before sending cards.\\n\\n"
+            f"Press the button below to purchase. 👇"
+        )
     await bot.send_invoice(
         chat_id=user_id,
         title=purtit,
@@ -989,6 +1006,7 @@ async def process_purchase(callback: types.CallbackQuery):
         currency="XTR",
         prices=[LabeledPrice(label=f"{tool_key.title()}", amount=price)],
         start_parameter=f"buy_tool_{tool_key}",
+        parse_mode="MarkdownV2"
     )
 
 
