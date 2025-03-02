@@ -952,7 +952,7 @@ async def process_purchase(callback: types.CallbackQuery):
         elif ln == "ru":
             vazifa = "Пропускает ход следующего игрока ✔️"
         else:
-            vazifa = "Skips the next player's turn ✔️"
+            vazifa = "Skips the next player`s turn ✔️"
     elif tool_key == "block_press":
         toolname = "block ⛔️"
         if ln == "uz":
@@ -960,7 +960,7 @@ async def process_purchase(callback: types.CallbackQuery):
         elif ln == "ru":
             vazifa = "Следующий игрок не сможет признать тебя лжецом ✔️"
         else:
-            vazifa = "The next player can't press a liar ✔️"
+            vazifa = "The next player can not press a liar ✔️"
 
     else:
         toolname = "change 🔄"
@@ -981,14 +981,13 @@ async def process_purchase(callback: types.CallbackQuery):
         )
     elif ln == "en":
         purtit = "Purchase"
-        desc = f"""
-        - 🛍 Item: {toolname}
-- 💰 Price: {price} star ⭐️
-- 🎭 Task: {vazifa}
-- 🕐 Usage: It has to be activated before sending cards.
-
-- ➤ Press the button below to purchase. 👇
-                """
+        desc = (
+            f"🛍 Item: {1}\n\n"
+            f"💰 Price: {1} star ⭐️\n\n"
+            f"🎭 Task: {1}\n\n"
+            f"🕐 Usage: It has to be activated before sending cards.\n\n"
+            f"➤ Press the button below to purchase. 👇"
+        )
     else:
         purtit = "Покупка"
         desc = (
