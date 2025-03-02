@@ -920,9 +920,13 @@ async def buying_(message: types.Message):
 
     else:
         ms12 = (
-            "🛒 Welcome to the Liar's Fortune Shop!\n\n"
-            "🎲 Buy tools and enjoy using them in a game or increase your chance to earn more. 🛍😊\nCurrently available products 👇"
+            "🛒 Добро пожаловать в магазин Liar's Fortune!\n\n"
+            "🎲 Купите инструменты и наслаждайтесь их использованием в игре или увеличьте свои шансы заработать больше. 🛍😊\nТекущие доступные продукты 👇"
         )
+        # ms12 = (
+        #     "🛒 Welcome to the Liar's Fortune Shop!\n\n"
+        #     "🎲 Buy tools and enjoy using them in a game or increase your chance to earn more. 🛍😊\nCurrently available products 👇"
+        # )
 
     keyboard = InlineKeyboardMarkup(
         inline_keyboard=[
