@@ -982,11 +982,11 @@ async def process_purchase(callback: types.CallbackQuery):
     elif ln == "en":
         purtit = "Purchase"
         desc = (
-            f"🛍 Item: {toolname}\n"
-            f"\n💰 Price: {price} star ⭐️\n"
-            f"\n🎭 Task: {vazifa}\n"
-            f"\n🕐 Usage: It has to be activated before sending cards.\n\n"
-            f"\n➤ Press the button below to purchase. 👇"
+            f"🛍 Mahsulot: {toolname}\n"
+            f"💰 Narxi: {price} star ⭐️\n"
+            f"🎭 Vazifasi: {vazifa}\n"
+            f"🕐 Foydalanish: Kartani tashlashdan oldin aktiv (✅) holatda bo'lishi kerak.\n\n"
+            f"Sotib olish uchun pastdagi tugmani bosing. 👇"
         )
     else:
         purtit = "Покупка"
