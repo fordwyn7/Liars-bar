@@ -948,44 +948,44 @@ async def process_purchase(callback: types.CallbackQuery):
     if tool_key == "skip_pass":
         toolname = "skip 🪓"
         if ln == "uz":
-            vazifa = "Keyingi o'yinchining navbatini o'tkazib yuboradi ✔️"
+            task = "Keyingi o'yinchining navbatini o'tkazib yuboradi ✔️"
         elif ln == "ru":
-            vazifa = "Пропускает ход следующего игрока ✔️"
+            task = "Пропускает ход следующего игрока ✔️"
         else:
-            vazifa = "Skips the next player`s turn ✔️"
+            task = "Skips the next player`s turn ✔️"
     elif tool_key == "block_press":
         toolname = "block ⛔️"
         if ln == "uz":
-            vazifa = "Keyingi o'yinchi sizni yolg'onchi deb topa olmaydi ✔️"
+            task = "Keyingi o'yinchi sizni yolg'onchi deb topa olmaydi ✔️"
         elif ln == "ru":
-            vazifa = "Следующий игрок не сможет признать тебя лжецом ✔️"
+            task = "Следующий игрок не сможет признать тебя лжецом ✔️"
         else:
-            vazifa = "The next player can not press a liar ✔️"
+            task = "The next player can not press a liar ✔️"
 
     else:
         toolname = "change 🔄"
         if ln == "uz":
-            vazifa = "Tashlangan barcha kartalarni bosh karta bilan bir xil ko'rinishga keltirib beradi ✔️"
+            task = "Tashlangan barcha kartalarni bosh karta bilan bir xil ko'rinishga keltirib beradi ✔️"
         elif ln == "ru":
-            vazifa = "Делает все отправленные карты такими же, как и основная карта ✔️"
+            task = "Делает все отправленные карты такими же, как и основная карта ✔️"
         else:
-            vazifa = "Changes all sent cards to a table card ✔️"
+            task = "Changes all sent cards to a table card ✔️"
     if ln == "uz":
         purtit = "Xarid"
         desc = (
             f"🛍 Mahsulot: {toolname}\n"
             f"💰 Narxi: {price} star ⭐️\n"
-            f"🎭 Vazifasi: {vazifa}\n"
+            f"🎭 Vazifasi: {task}\n"
             f"🕐 Foydalanish: Kartani tashlashdan oldin aktiv (✅) holatda bo'lishi kerak.\n\n"
             f"Sotib olish uchun pastdagi tugmani bosing. 👇"
         )
     elif ln == "en":
         purtit = "Purchase"
         desc = (
-            f"🛍 Item: {1}\n\n"
-            f"💰 Price: {1} star ⭐️\n\n"
-            f"🎭 Task: {1}\n\n"
-            f"🕐 Usage: It has to be activated before sending cards.\n\n"
+            f"🛍 Item: {toolname}\n"
+            f"💰 Price: {price} star ⭐️\n"
+            f"🎭 Task: {task}\n"
+            f"🕐 Usage: It has to be activated before sending cards.\n"
             f"➤ Press the button below to purchase. 👇"
         )
     else:
@@ -993,7 +993,7 @@ async def process_purchase(callback: types.CallbackQuery):
         desc = (
             f"🛍 Продукт: {toolname}\n"
             f"💰 Цена: {price} star ⭐️\n"
-            f"🎭 Задача: {vazifa}\n"
+            f"🎭 Задача: {task}\n"
             f"🕐 Использование: Перед отправкой карты должны быть активны (✅).\n\n"
             f"Для покупки нажмите на кнопку ниже. 👇"
         )
