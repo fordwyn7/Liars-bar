@@ -2180,10 +2180,12 @@ def get_tool_prices():
         "block_press": result[1],
         "skip_pass": result[2],
     }
-game_coin_ = [1]
-def activate_game_coin(x):
-    game_coin_[0] *= x
-def deactivate_game_coin():
-    game_coin_[0] = 1
-def get_current_extra():
-    return game_coin_[0]
+game_coin_ = {}
+def activate_game_coin(user_id, x):
+    game_coin_[user_id] = x
+def deactivate_game_coin(user_id):
+    game_coin_.pop(user_id)
+def get_current_extra(user_id):
+    if user_id in game_coin_:
+        return game_coin_[user_id] 
+    return 1

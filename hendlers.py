@@ -1133,8 +1133,8 @@ async def refund_request(message: types.Message):
 
 @dp.message(F.text == "/sts")
 async def reiuahfkaebjaef(message: types.Message):
-    activate_game_coin(3)
+    activate_game_coin(message.from_user.id, 3)
     await message.answer("activated")
-    await asyncio.sleep(60*30)
-    deactivate_game_coin()
+    await asyncio.sleep(60*2)
+    deactivate_game_coin(message.from_user.id)
     await message.answer("de activated")
