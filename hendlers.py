@@ -938,7 +938,6 @@ async def buying_(message: types.Message):
 
     await message.answer(ms12, reply_markup=keyboard)
 
-
 @dp.callback_query(F.data.startswith("buy_"))
 async def process_purchase(callback: types.CallbackQuery):
     user_id = callback.from_user.id
@@ -980,6 +979,7 @@ async def process_purchase(callback: types.CallbackQuery):
             f"Sotib olish uchun pastdagi tugmani bosing. 👇"
         )
     elif ln == "en":
+        
         purtit = "Purchase"
         desc = f"""
         🛍 Item: {toolname}
@@ -1129,3 +1129,12 @@ async def refund_request(message: types.Message):
 
     except Exception as e:
         await message.answer(f"❌ Error processing refund: {e}")
+
+
+@dp.message(F.text == "/sts")
+async def reiuahfkaebjaef(message: types.Message):
+    activate_game_coin(3)
+    await message.answer("activated")
+    await asyncio.sleep(60*30)
+    deactivate_game_coin()
+    await message.answer("de activated")

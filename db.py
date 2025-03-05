@@ -2180,4 +2180,10 @@ def get_tool_prices():
         "block_press": result[1],
         "skip_pass": result[2],
     }
-
+game_coin_ = 1
+def activate_game_coin(x):
+    game_coin_ *= x
+def deactivate_game_coin():
+    game_coin_ = 1
+def get_current_extra():
+    return game_coin_

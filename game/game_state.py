@@ -105,7 +105,7 @@ async def remove_player_confirm(callback: types.CallbackQuery):
 
             else:
                 if not is_any_user_excluded(game_id):
-                    coin = get_game_coin()
+                    coin = get_game_coin() * get_current_extra()
                     conn = sqlite3.connect("users_database.db")
                     cursor = conn.cursor()
 
@@ -247,7 +247,7 @@ async def remove_player_confirm(callback: types.CallbackQuery):
                     )
             else:
                 if not is_any_user_excluded(game_id):
-                    coin = get_game_coin()
+                    coin = get_game_coin() * get_current_extra()
                     conn = sqlite3.connect("users_database.db")
                     cursor = conn.cursor()
                     cursor.execute(
@@ -878,7 +878,7 @@ async def handle_continue_or_liar(callback_query: types.CallbackQuery):
                             )
                     else:
                         if not is_any_user_excluded(game_id):
-                            coin = get_game_coin()
+                            coin = get_game_coin() * get_current_extra()
                             conn = sqlite3.connect("users_database.db")
                             cursor = conn.cursor()
                             cursor.execute(
@@ -1076,7 +1076,7 @@ async def handle_continue_or_liar(callback_query: types.CallbackQuery):
                     )
             else:
                 if not is_any_user_excluded(game_id):
-                    coin = get_game_coin()
+                    coin = get_game_coin() * get_current_extra()
                     conn = sqlite3.connect("users_database.db")
                     cursor = conn.cursor()
                     cursor.execute(
