@@ -927,16 +927,105 @@ async def buying_(message: types.Message):
     keyboard = InlineKeyboardMarkup(
         inline_keyboard=[
             [
-                InlineKeyboardButton(text="skip 🪓", callback_data="buy_skip_pass"),
-                InlineKeyboardButton(text="block ⛔️", callback_data="buy_block_press"),
+                InlineKeyboardButton(text="5X 🚀", callback_data="pur_fifthboost"),
                 InlineKeyboardButton(
                     text="change 🔄", callback_data="buy_card_changer"
                 ),
+            ],
+            [
+                InlineKeyboardButton(text="skip 🪓", callback_data="buy_skip_pass"),
+                InlineKeyboardButton(text="block ⛔️", callback_data="buy_block_press"),
             ],
         ]
     )
 
     await message.answer(ms12, reply_markup=keyboard)
+
+
+@dp.callback_query(F.data.startswith("confirm5x"))
+async def confirm_5x(callback: types.CallbackQuery):
+    user_id = callback.from_user.id
+    ln = get_user_language(user_id)
+    conn = sqlite3.connect("users_database.db")
+    cursor = conn.cursor()
+    cursor.execute(
+        "SELECT unity_coin FROM users_database WHERE user_id = ?", (user_id,)
+    )
+    user_info = cursor.fetchone()
+    if not user_info:
+        await callback.answer("❌ You are not registered in the system.")
+        conn.close()
+        return
+    user_unity_coins = user_info[0]
+    if ln == "uz":
+        ms = f"❌ Sizga yana {50 - user_unity_coins} Unity Coin kerak."
+        ms1 = f"🎉 Siz 5X 🚀 ni muvaffaqiyatli faollashtirdingiz. \nKeyingi 15 daqiqada sovringingiz miqdorini 5 barovar olishga shoshiling 😌"
+    elif ln == "ru":
+        ms = f"❌ Вам нужно еще {50 - user_unity_coins} Unity Coin."
+        ms1 = f"🎉 Вы успешно активировали 5X 🚀. \nПоторопитесь, чтобы получить в 5 раз больше вашего приза в течение следующих 15 минут 😌"
+    else:
+        ms = f"❌ You need {50 - user_unity_coins} more Unity Coins."
+        ms1 = f"🎉 You have successfully activated 5X 🚀. \nHurry up to get 5 times your prize amount in the next 15 minutes 😌"
+    if user_unity_coins < 50:
+        await callback.answer(
+            ms,
+            show_alert=True,
+        )
+        return
+    conn = sqlite3.connect("users_database.db")
+    cursor = conn.cursor()
+    cursor.execute(
+        "UPDATE users_database SET unity_coin = unity_coin - 50 WHERE user_id = ?",
+        (user_id),
+    )
+    conn.commit()
+    conn.close()
+    activate_game_coin(user_id, 5)
+    await callback.message.edit_text(ms1)
+    await asyncio.sleep(60 * 15)
+    deactivate_game_coin(user_id)
+
+@dp.callback_query(F.data.startswith("pur_"))
+async def pro_purchase_pur(callback: types.CallbackQuery):
+    user_id = callback.from_user.id
+    item = callback.data.replace("pur_", "")
+    ln = get_user_language(user_id)
+    desc = (
+        f"🛍 Mahsulot: 5X 🚀 \n"
+        f"💰 Narxi: 50 Unity Coin\n"
+        f"🕐 Davomiyligi: 15 daqiqa\n"
+        f"🎭 Vazifasi: Har bir yutgan o'yiningiz uchun mukofotni 5 karra ko'paytirib beradi.\n\n"
+        f"➤ Sotib olish uchun pastdagi tugmani bosing. 👇"
+    )
+    buytxt = "sotib olish 💰"
+    if ln == "ru":
+        desc = (
+            f"🛍 Продукт: 5X 🚀\n"
+            f"💰 Цена: 50 Unity coin\n"
+            f"🕐 Продолжительность: 15 минут \n"
+            f"🎭 Задача: За каждую выигранную игру приз умножается в 5 раз.\n\n"
+            f"➤ Для покупки нажмите на кнопку ниже. 👇"
+        )
+        buytxt = "купить 💰"
+
+    elif ln == "en":
+        desc = (
+            f"🛍 Item: 5X 🚀\n"
+            f"💰 Price: 50 Unity coins\n"
+            f"🕐 Duration: 15 minutes \n"
+            f"🎭 Task: For each game won, the prize is multiplied by 5 times.\n\n"
+            f"➤ Press the button below to purchase. 👇"
+        )
+        buytxt = "buy 💰"
+    keyboard = InlineKeyboardMarkup(
+        inline_keyboard=[
+            [
+                InlineKeyboardButton(text=f"{buytxt}", callback_data="confirm5x"),
+            ]
+        ]
+    )
+    await callback.message.answer(desc, reply_markup=keyboard)
+
 
 @dp.callback_query(F.data.startswith("buy_"))
 async def process_purchase(callback: types.CallbackQuery):
@@ -979,7 +1068,7 @@ async def process_purchase(callback: types.CallbackQuery):
             f"Sotib olish uchun pastdagi tugmani bosing. 👇"
         )
     elif ln == "en":
-        
+
         purtit = "Purchase"
         desc = f"""
         🛍 Item: {toolname}
@@ -1063,57 +1152,6 @@ async def payment_success(message: types.Message):
     )
 
 
-# CARD_PRICES = {
-#     "card_1": 1,  # 🃏 Card 1 costs 100 Stars
-#     "card_2": 250,  # 🎭 Card 2 costs 250 Stars
-#     "card_3": 500,  # 💎 Card 3 costs 500 Stars
-# }
-
-
-# @dp.message(F.text == "checkkk")
-# async def buy_card(callback: types.Message):
-#     user_id = callback.from_user.id
-#     card_key = "card_1"
-
-#     if card_key not in CARD_PRICES:
-#         return await callback.answer("❌ Invalid selection.", show_alert=True)
-
-#     price = CARD_PRICES[card_key]
-
-#     await bot.send_invoice(
-#         chat_id=user_id,
-#         title="Purchase Card",
-#         description=f"Buy this card for {price} Stars!",
-#         payload=f"card_{card_key}",
-#         provider_token="TELEGRAM_STARS",
-#         currency="XTR",
-#         prices=[LabeledPrice(label=f"Card {card_key}", amount=price)],
-#         start_parameter=f"buy_card_{card_key}",
-#     )
-
-
-# @dp.pre_checkout_query()
-# async def pre_checkout(pre_checkout_query: PreCheckoutQuery):
-#     await bot.answer_pre_checkout_query(pre_checkout_query.id, ok=True)
-
-
-# @dp.message(F.successful_payment)
-# async def payment_success(message: types.Message):
-#     user_id = message.from_user.id
-#     card_key = message.successful_payment.invoice_payload.split("_")[-1]
-
-#     await message.answer(
-#         f"✅ You have successfully purchased *Card {card_key}*! 🎉",
-#         parse_mode="MarkdownV2",
-#     )
-
-#     await bot.send_message(
-#         ADMIN_ID,
-#         f"🛍 *Purchase Alert*\n👤 User: [{message.from_user.full_name}](tg://user?id={user_id})\n💳 Bought: *Card {card_key}*\n💰 Price: {CARD_PRICES[card_key]} Stars",
-#         parse_mode="MarkdownV2",
-#     )
-
-
 @dp.message(F.text.startswith("refund"))
 async def refund_request(message: types.Message):
     try:
@@ -1130,11 +1168,3 @@ async def refund_request(message: types.Message):
     except Exception as e:
         await message.answer(f"❌ Error processing refund: {e}")
 
-
-@dp.message(F.text == "/sts")
-async def reiuahfkaebjaef(message: types.Message):
-    activate_game_coin(message.from_user.id, 3)
-    await message.answer("activated")
-    await asyncio.sleep(60*2)
-    deactivate_game_coin(message.from_user.id)
-    await message.answer("de activated")
