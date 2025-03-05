@@ -972,8 +972,6 @@ async def confirm_5x(callback: types.CallbackQuery):
             show_alert=True,
         )
         return
-    conn = sqlite3.connect("users_database.db")
-    cursor = conn.cursor()
     cursor.execute(
         "UPDATE users_database SET unity_coin = unity_coin - 50 WHERE user_id = ?",
         (user_id),
