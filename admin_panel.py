@@ -1720,7 +1720,7 @@ async def add_tool_states(message: types.Message, state: FSMContext):
     username = message.text
 
     if not (
-        username.isdigit() and get_user_nfgame(username) or get_id_by_nfgame(username)
+        (username.isdigit() and get_user_nfgame(username)) or get_id_by_nfgame(username)
     ):
         await message.answer(
             "❌ Please send a valid user ID or username",
