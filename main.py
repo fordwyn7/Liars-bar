@@ -272,7 +272,6 @@ conn.close()
 
 @dp.message(Command("start"))
 async def cmd_start(message: types.Message, state: FSMContext, lang=0):
-    
     user_id = message.from_user.id
     payload = message.text.split(" ", 1)[-1] if " " in message.text else ""
     if not "/start" in message.text:
@@ -445,6 +444,7 @@ async def cmd_start(message: types.Message, state: FSMContext, lang=0):
         await state.clear()
     else:
         user = message.from_user
+        ln = get_user_language(user.id)
         if is_user_registered(user.id):
             if ln == "ru":
                 ms = "Вы находитесь в главном меню 👇"

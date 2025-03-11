@@ -1857,57 +1857,57 @@ async def update_price(message: types.Message, state: FSMContext):
         )
 
 
-@dp.message(F.text == "/send_right_now")
-async def update_price(message: types.Message, state: FSMContext):
-    message_text = (
-        "🧐 *WE NEED YOUR OPINION\\!* 🧐\n\n"
-        "🎭 Hey, Liar’s Fortune players\\! We noticed some of you have been quiet lately\\. 🤔\n\n"
-        "💡 What’s stopping you from playing\\? Rewards\\? Intense battles\\? Or is something missing\\?\n\n"
-        "📋 Take just *1 minute* to fill out our quick survey\\!\n\n"
-        "🔗 [Click here to fill out](https://forms.gle/e4a1Tz8TRLoRATwY7)\n\n"
-        "🎁 Complete it and receive *50 Unity Coins 💰 \\+ a Super Card\\!* 🍬\n\n"
-        "👂 We’re listening – help us make the game even better\\!"
-    )
-    message_text_uz = (
-        "🧐 *SIZNING FIKRINGIZ MUHIM\\!* 🧐\n\n"
-        "🎭 Hey, Liar’s Fortune o‘yinchilari\\! Ayrimlar jim bo‘lib qolgandek\\! 🤔\n\n"
-        "💡 O‘yin o‘ynashga nima to‘sqinlik qilmoqda\\? Mukofotlar\\? Qizg‘in janglar\\? Yoki nimadir yetishmayaptimi\\?\n\n"
-        "📋 Bor\\-yo‘g‘i *1 daqiqa* vaqt ajratib, tezkor so‘rovnomani to‘ldiring\\!\n\n"
-        "🔗 [So‘rovnomani to‘ldirish uchun shu yerni bosing](https://forms.gle/e4a1Tz8TRLoRATwY7)\n\n"
-        "🎁 To‘ldiring va *50 Unity Coins 💰 \\+ Super Karta* 🍬 qo‘lga kiriting\\!\n\n"
-        "👂 Sizni tinglaymiz – o‘yinni yanada yaxshilashga yordam bering\\!"
-    )
-    message_text_ru = (
-        "🧐 *ВАЖНО ВАШЕ МНЕНИЕ\\!* 🧐\n\n"
-        "🎭 Привет, игроки Liar’s Fortune\\! Мы заметили, что некоторые из вас стали тише\\. 🤔\n\n"
-        "💡 Что мешает вам играть\\? Награды\\? Напряжённые сражения\\? Или чего\\-то не хватает\\?\n\n"
-        "📋 Всего *1 минута* – заполните наш короткий опрос\\!\n\n"
-        "🔗 [Нажмите здесь, чтобы заполнить опрос](https://forms.gle/e4a1Tz8TRLoRATwY7)\n\n"
-        "🎁 Заполните и получите *50 Unity Coins 💰 \\+ Супер карту\\!* 🍬\n\n"
-        "👂 Мы вас слушаем – помогите сделать игру ещё лучше\\!"
-    )
-    users = get_all_user_ids()
-    cnt = 0
-    for user_id in users:
-        try:
-            user_lang = get_user_language(user_id)
-            if user_lang == "ru":
-                msg_text = message_text_ru
-            elif user_lang == "uz":
-                msg_text = message_text_uz
-            else:
-                msg_text = message_text
+# @dp.message(F.text == "/send_right_now")
+# async def update_price(message: types.Message, state: FSMContext):
+#     message_text = (
+#         "🧐 *WE NEED YOUR OPINION\\!* 🧐\n\n"
+#         "🎭 Hey, Liar’s Fortune players\\! We noticed some of you have been quiet lately\\. 🤔\n\n"
+#         "💡 What’s stopping you from playing\\? Rewards\\? Intense battles\\? Or is something missing\\?\n\n"
+#         "📋 Take just *1 minute* to fill out our quick survey\\!\n\n"
+#         "🔗 [Click here to fill out](https://forms.gle/e4a1Tz8TRLoRATwY7)\n\n"
+#         "🎁 Complete it and receive *50 Unity Coins 💰 \\+ a Super Card\\!* 🍬\n\n"
+#         "👂 We’re listening – help us make the game even better\\!"
+#     )
+#     message_text_uz = (
+#         "🧐 *SIZNING FIKRINGIZ MUHIM\\!* 🧐\n\n"
+#         "🎭 Hey, Liar’s Fortune o‘yinchilari\\! Ayrimlar jim bo‘lib qolgandek\\! 🤔\n\n"
+#         "💡 O‘yin o‘ynashga nima to‘sqinlik qilmoqda\\? Mukofotlar\\? Qizg‘in janglar\\? Yoki nimadir yetishmayaptimi\\?\n\n"
+#         "📋 Bor\\-yo‘g‘i *1 daqiqa* vaqt ajratib, tezkor so‘rovnomani to‘ldiring\\!\n\n"
+#         "🔗 [So‘rovnomani to‘ldirish uchun shu yerni bosing](https://forms.gle/e4a1Tz8TRLoRATwY7)\n\n"
+#         "🎁 To‘ldiring va *50 Unity Coins 💰 \\+ Super Karta* 🍬 qo‘lga kiriting\\!\n\n"
+#         "👂 Sizni tinglaymiz – o‘yinni yanada yaxshilashga yordam bering\\!"
+#     )
+#     message_text_ru = (
+#         "🧐 *ВАЖНО ВАШЕ МНЕНИЕ\\!* 🧐\n\n"
+#         "🎭 Привет, игроки Liar’s Fortune\\! Мы заметили, что некоторые из вас стали тише\\. 🤔\n\n"
+#         "💡 Что мешает вам играть\\? Награды\\? Напряжённые сражения\\? Или чего\\-то не хватает\\?\n\n"
+#         "📋 Всего *1 минута* – заполните наш короткий опрос\\!\n\n"
+#         "🔗 [Нажмите здесь, чтобы заполнить опрос](https://forms.gle/e4a1Tz8TRLoRATwY7)\n\n"
+#         "🎁 Заполните и получите *50 Unity Coins 💰 \\+ Супер карту\\!* 🍬\n\n"
+#         "👂 Мы вас слушаем – помогите сделать игру ещё лучше\\!"
+#     )
+#     users = get_all_user_ids()
+#     cnt = 0
+#     for user_id in users:
+#         try:
+#             user_lang = get_user_language(user_id)
+#             if user_lang == "ru":
+#                 msg_text = message_text_ru
+#             elif user_lang == "uz":
+#                 msg_text = message_text_uz
+#             else:
+#                 msg_text = message_text
 
-            await bot.send_message(
-                user_id,
-                msg_text,
-                reply_markup=get_main_menu(user_id),
-                parse_mode="MarkdownV2",
-            )
+#             await bot.send_message(
+#                 user_id,
+#                 msg_text,
+#                 reply_markup=get_main_menu(user_id),
+#                 parse_mode="MarkdownV2",
+#             )
 
-        except Exception:
-            cnt += 1
-            continue
-    await message.answer(
-        f"Message was forwarded anonymously to {len(users) - cnt} users from {len(users)} successfully ✅"
-    )
+#         except Exception:
+#             cnt += 1
+#             continue
+#     await message.answer(
+#         f"Message was forwarded anonymously to {len(users) - cnt} users from {len(users)} successfully ✅"
+#     )
