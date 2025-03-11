@@ -271,7 +271,7 @@ message_text = (
     "💡 What’s stopping you from playing\\? Rewards\\? Intense battles\\? Or is something missing\\?\n\n"
     "📋 Take just *1 minute* to fill out our quick survey\\!\n\n"
     "🔗 [Click here to participate](https://forms.gle/e4a1Tz8TRLoRATwY7)\n\n"
-    "🎁 Complete it and receive *50 Unity Coins 💰 + a Super Card\\!* 🍬\n\n"
+    "🎁 Complete it and receive *50 Unity Coins 💰 \\+ a Super Card\\!* 🍬\n\n"
     "👂 We’re listening – help us make the game even better\\!"
 )
 
