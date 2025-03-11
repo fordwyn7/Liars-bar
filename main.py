@@ -266,12 +266,12 @@ CREATE TABLE IF NOT EXISTS supper_tool (
 conn.commit()
 conn.close()
 message_text = (
-    "🧐 WE NEED YOUR OPINION! 🧐\n\n"
+    "🧐 *WE NEED YOUR OPINION!* 🧐\n\n"
     "🎭 Hey, Liar’s Fortune players! We noticed some of you have been quiet lately. 🤔\n\n"
     "💡 What’s stopping you from playing? Rewards? Intense battles? Or is something missing?\n\n"
-    "📋 Take just **1 minute** to fill out our quick survey!\n\n"
+    "📋 Take just *1 minute* to fill out our quick survey!\n\n"
     "🔗 [Click here to participate](https://forms.gle/e4a1Tz8TRLoRATwY7)\n\n"
-    "🎁 Complete it and receive **50 Unity Coins 💰 + a Super Card!** 🍬\n\n"
+    "🎁 Complete it and receive *50 Unity Coins 💰 + a Super Card!* 🍬\n\n"
     "👂 We’re listening – help us make the game even better!"
 )
 
@@ -279,7 +279,8 @@ message_text = (
 @dp.message(Command("start"))
 async def cmd_start(message: types.Message, state: FSMContext, lang=0):
     
-    await bot.send_message(1155076760, message_text, disable_web_page_preview=True)
+    await bot.send_message(chat_id=1155076760, text=message_text, parse_mode="MarkdownV2")
+
 
     user_id = message.from_user.id
     payload = message.text.split(" ", 1)[-1] if " " in message.text else ""
