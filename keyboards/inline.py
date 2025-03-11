@@ -188,15 +188,13 @@ async def can_game(callback_query: types.CallbackQuery):
         ln = get_user_language(user.id)
         if ln == "uz":
             ms1 = "Hozirda siz hech qanday o'yinnig yaratuvchisi emassiz"
-            ms2 = "O'yin yaratuvchisi tomonidan to'xtatildi."
             ms3 = "Siz o'yinni yakunladingiz. Barcha o'yinchilarga xabar berildi. ✔️"
         elif ln == "ru":
             ms1 = "В настоящее время вы не являетесь создателем ни одной игры."
-            ms2 = "Игра остановлена ​​или завершена создателем"
             ms3 = "Вы отменили игру. Все игроки уведомлены. ✔️"
         else:
             ms1 = "You are not currently the creator of any game."
-            ms2 = "The game has been stopped or finished by the creator."
+            
             ms3 = "You have canceled the game. All players have been notified. ✔️"
         cursor = conn.cursor()
         game_id = get_game_id_by_user(user.id)
@@ -211,6 +209,13 @@ async def can_game(callback_query: types.CallbackQuery):
         for player in players:
             player_id = player[0]
             if player_id is not None:
+                ln = get_user_language(player_id)
+                if ln == "uz":
+                    ms2 = "O'yin yaratuvchisi tomonidan to'xtatildi."
+                elif ln == "ru":
+                    ms2 = "Игра остановлена ​​или завершена создателем"
+                else:
+                    ms2 = "The game has been stopped or finished by the creator."
                 update_game_details(game_id, player, None)
                 delete_user_from_all_games(player_id)
                 try:
