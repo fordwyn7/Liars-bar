@@ -275,7 +275,6 @@ message_text = (
     "👂 We’re listening – help us make the game even better\\!"
 )
 
-await bot.send_message(chat_id=user_id, text=message_text, parse_mode="MarkdownV2")
 
 
 
