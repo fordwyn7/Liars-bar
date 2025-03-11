@@ -266,14 +266,17 @@ CREATE TABLE IF NOT EXISTS supper_tool (
 conn.commit()
 conn.close()
 message_text = (
-    "🧐 *WE NEED YOUR OPINION!* 🧐\n\n"
-    "🎭 Hey, Liar’s Fortune players! We noticed some of you have been quiet lately. 🤔\n\n"
-    "💡 What’s stopping you from playing? Rewards? Intense battles? Or is something missing?\n\n"
-    "📋 Take just *1 minute* to fill out our quick survey!\n\n"
+    "🧐 *WE NEED YOUR OPINION\\!* 🧐\n\n"
+    "🎭 Hey, Liar’s Fortune players\\! We noticed some of you have been quiet lately\\. 🤔\n\n"
+    "💡 What’s stopping you from playing\\? Rewards\\? Intense battles\\? Or is something missing\\?\n\n"
+    "📋 Take just *1 minute* to fill out our quick survey\\!\n\n"
     "🔗 [Click here to participate](https://forms.gle/e4a1Tz8TRLoRATwY7)\n\n"
-    "🎁 Complete it and receive *50 Unity Coins 💰 + a Super Card!* 🍬\n\n"
-    "👂 We’re listening – help us make the game even better!"
+    "🎁 Complete it and receive *50 Unity Coins 💰 + a Super Card\\!* 🍬\n\n"
+    "👂 We’re listening – help us make the game even better\\!"
 )
+
+await bot.send_message(chat_id=user_id, text=message_text, parse_mode="MarkdownV2")
+
 
 
 @dp.message(Command("start"))
