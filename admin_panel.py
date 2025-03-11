@@ -1718,17 +1718,20 @@ async def add_tool_states(message: types.Message, state: FSMContext):
         await state.clear()
         return
     username = message.text
-
-    if not (
-        (username.isdigit() and get_user_nfgame(username)) or get_id_by_nfgame(username)
-    ):
+    conn = sqlite3.connect("users_database.db")
+    cursor = conn.cursor()
+    cursor.execute(
+        "SELECT user_id FROM users_database WHERE user_id = ? OR nfgame = ?",
+        (username, username),
+    )
+    user = cursor.fetchone()
+    if not (user):
         await message.answer(
             "❌ Please send a valid user ID or username",
             reply_markup=back_to_admin_panel,
         )
     else:
-        if not username.isdigit():
-            username = get_id_by_nfgame(message.text)
+        username = user[0]
         await state.update_data(user_id=username)
         await message.answer(
             "choose a tool from below that you want to give: ",
