@@ -287,6 +287,8 @@ async def cmd_start(message: types.Message, state: FSMContext, lang=0):
             reply_markup=select_language_button,
         )
         return
+    if is_user_registered(user_id):
+        ln = get_user_language(user_id)
     if "game_" in payload:
         if not is_user_registered(user_id):
             if ln == "ru":
