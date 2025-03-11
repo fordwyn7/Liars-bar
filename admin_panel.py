@@ -35,12 +35,8 @@ def get_admins2():
 def get_statistics():
     conn = sqlite3.connect("users_database.db")
     cursor = conn.cursor()
-
-    # Total users
     cursor.execute("SELECT COUNT(*) FROM users_database")
     total_users = cursor.fetchone()[0]
-
-    # Total games played
     cursor.execute("SELECT COUNT(DISTINCT game_id) FROM game_archive")
     total_games = cursor.fetchone()[0]
 
