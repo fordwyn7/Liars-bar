@@ -174,7 +174,7 @@ async def admin_panel(message: types.Message):
 async def cancel_butt(message: types.Message, state: FSMContext):
     await state.clear()
     await message.answer(
-        f"Action is canceled. ✔️\You are in admin panel ⬇️",
+        f"Action is canceled. ✔️You are in admin panel ⬇️",
         reply_markup=admin_panel_button,
     )
 
