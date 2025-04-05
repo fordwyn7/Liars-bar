@@ -1160,12 +1160,15 @@ async def process_withdraw_user(callback_query: types.CallbackQuery, state: FSMC
         reward_name = "⭐️ 1,000 Stars"
     if ln == "uz":
         ms = f"❌ Bu mahsulotni olish uchun sizga yana {cost - user_unity_coins} Unity Coin kerak."
+        vaqtincha = "Bu bo'limda texnik ishlar olib borilmoqda ... 😕"
         ms1 = f"💬 Siz tanlovingiz - {reward_name}! \nIltimos, mahsulotni jo'natmoqchi bo'lgan Telegram foydalanuvchisini usernameni kiriting:\n\n❗️ Agar username noto'g'ri kiritilgan bo'lsa, mahsulot yetkazilmasligini unitmang."
     elif ln == "ru":
         ms = f"❌ Вам нужно еще {cost - user_unity_coins} Unity Coin, чтобы получить этот предмет."
+        vaqtincha = "В этом разделе ведутся технические работы... 😕"
         ms1 = f"💬 Вы выбрали - {reward_name}! \nПожалуйста, укажите имя пользователя Telegram, которому вы хотите отправить предмет:\n\n❗️Обратите внимание, что если имя пользователя введено неверно, ваша награда не будет выдана."
     else:
         ms = f"❌ You need {cost - user_unity_coins} more Unity Coins to get this item."
+        vaqtincha = "This section is undergoing technical work... 😕"
         ms1 = f"💬 You selected - {reward_name}! \nPlease provide any Telegram username that you want to get item to:\n\n❗️Note that if the username you entered is incorrect, your reward won't be given."
     if user_unity_coins < cost:
         await callback_query.answer(
@@ -1173,7 +1176,11 @@ async def process_withdraw_user(callback_query: types.CallbackQuery, state: FSMC
             show_alert=True,
         )
         return
-
+    await callback_query.answer(
+        vaqtincha,
+        show_alert=True,
+    )
+    return
     await callback_query.message.answer(ms1)
     await state.set_data({"reward_name": reward_name, "cost": cost})
     await state.set_state(waiting_for_username_withdraw.username_withdraw)

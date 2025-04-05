@@ -28,15 +28,11 @@ main_earn_button = ReplyKeyboardMarkup(
     keyboard=[
         [
             KeyboardButton(text="bonus 🚀"),
-            KeyboardButton(text="mystery box 🎁"),
+            KeyboardButton(text="Join channels 💎"),
         ],
         [
             KeyboardButton(text="❄️ referral"),
             KeyboardButton(text="🤩 tournaments"),
-        ],
-        [
-            KeyboardButton(text="Join channels 💎"),
-            KeyboardButton(text="Dual Boost ⚡️"),
         ],
         [
             KeyboardButton(text="back to main menu 🔙"),
@@ -49,15 +45,11 @@ main_earn_button_ru = ReplyKeyboardMarkup(
     keyboard=[
         [
             KeyboardButton(text="бонус 🚀"),
-            KeyboardButton(text="Тайнбокс 🎁"),
+            KeyboardButton(text="Подписаться 💎"),
         ],
         [
             KeyboardButton(text="❄️ реферал"),
             KeyboardButton(text="🤩 турниры"),
-        ],
-        [
-            KeyboardButton(text="Подписаться 💎"),
-            KeyboardButton(text="Буст x2 ⚡️"),
         ],
         [
             KeyboardButton(text="вернуться в главное меню 🔙"),
@@ -70,15 +62,11 @@ main_earn_button_uz = ReplyKeyboardMarkup(
     keyboard=[
         [
             KeyboardButton(text="bonus 🚀"),
-            KeyboardButton(text="sirli quti 🎁"),
+            KeyboardButton(text="obuna bo'lish 💎"),
         ],
         [
             KeyboardButton(text="❄️ referal"),
             KeyboardButton(text="🤩 turnirlar"),
-        ],
-        [
-            KeyboardButton(text="obuna bo'lish 💎"),
-            KeyboardButton(text="bust x2 ⚡️"),
         ],
         [
             KeyboardButton(text="bosh menuga qaytish 🔙"),
