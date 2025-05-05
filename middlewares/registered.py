@@ -50,6 +50,5 @@ def admin_required():
                 await message.answer("Siz noto'g'ri buyruq yubordingiz!")
                 return
             return await handler(message, *args, **kwargs)
-
         return wrapper
     return decorator

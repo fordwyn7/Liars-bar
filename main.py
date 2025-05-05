@@ -281,14 +281,17 @@ async def cmd_start(message: types.Message, state: FSMContext, lang=0):
         await state.clear()
     await state.update_data(payload=payload)
     ln = lang
-    if not lang and not is_user_registered(user_id):
+    if not (lang in ["uz", "en", "ru"]) and not is_user_registered(user_id):
         await message.answer(
             "🟣 Please select your language: \n\n🔴 Пожалуйста, выберите язык: \n\n🔵 Iltimos, tilni tanlang:",
             reply_markup=select_language_button,
         )
         return
     if is_user_registered(user_id):
-        ln = get_user_language(user_id)
+        if lang == 0:
+            ln = get_user_language(user_id)
+        else:
+            ln = lang
     if "game_" in payload:
         if not is_user_registered(user_id):
             if ln == "ru":
@@ -446,7 +449,6 @@ async def cmd_start(message: types.Message, state: FSMContext, lang=0):
         await state.clear()
     else:
         user = message.from_user
-        ln = get_user_language(user.id)
         if is_user_registered(user.id):
             if ln == "ru":
                 ms = "Вы находитесь в главном меню 👇"
